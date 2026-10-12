@@ -1,0 +1,10 @@
+ShopChief adaptation, 2026-10-02.
+
+Derived works and original licenses:
+marketingskills/seo — MIT; original notice/license preserved in references/licenses/marketingskills--seo.txt
+kostja94/marketing-skills — MIT; original notice/license preserved in references/licenses/kostja94--marketing-skills.txt
+OpenClaudia/openclaudia-skills — MIT; original notice/license preserved in references/licenses/OpenClaudia--openclaudia-skills.txt
+aaron-he-zhu/aaron-marketing-skills — Apache-2.0; original notice/license preserved in references/licenses/aaron-he-zhu--aaron-marketing-skills.txt
+seoskillsai/seo-skills-ai — MIT; original notice/license preserved in references/licenses/seoskillsai--seo-skills-ai.txt
+
+Modified by ShopChief: portable merchant workflow, explicit evidence limits, DTC examples, provider-neutral inputs, and execution boundaries. No upstream executable code is distributed. Upstream trademarks are not endorsements.

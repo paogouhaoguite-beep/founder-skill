@@ -1,0 +1,9 @@
+{
+  "host": "www.example.com",
+  "key": "0123456789abcdef0123456789abcdef",
+  "keyLocation": "https://www.example.com/0123456789abcdef0123456789abcdef.txt",
+  "urlList": [
+    "https://www.example.com/p/mug",
+    "https://www.example.com/p/bottle"
+  ]
+}

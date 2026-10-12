@@ -1,0 +1,6 @@
+ShopChief adaptation, 2026-10-02.
+
+Derived works and original licenses:
+coreyhaines31/marketingskills — MIT; original notice/license preserved in references/licenses/coreyhaines31--marketingskills.txt
+
+Modified by ShopChief: portable merchant workflow, explicit evidence limits, DTC examples, provider-neutral inputs, and execution boundaries. No upstream executable code is distributed. Upstream trademarks are not endorsements.

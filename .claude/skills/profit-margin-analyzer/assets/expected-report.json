@@ -1,0 +1,29 @@
+{
+  "rows": [
+    {
+      "sku": "DEMO-POUCH",
+      "currency": "USD",
+      "period": "synthetic-month",
+      "orders": 10,
+      "net_revenue_including_retained_shipping": "1000.00",
+      "non_ad_variable_costs": "600.00",
+      "pre_ad_contribution": "400.00",
+      "post_ad_contribution": "150.00",
+      "pre_ad_contribution_per_order": "40.00",
+      "ad_spend_per_order": "25.00"
+    },
+    {
+      "sku": "DEMO-BOTTLE",
+      "currency": "USD",
+      "period": "synthetic-month",
+      "orders": 20,
+      "net_revenue_including_retained_shipping": "840.00",
+      "non_ad_variable_costs": "600.00",
+      "pre_ad_contribution": "240.00",
+      "post_ad_contribution": "80.00",
+      "pre_ad_contribution_per_order": "12.00",
+      "ad_spend_per_order": "8.00"
+    }
+  ],
+  "interpretation": "Pre-ad contribution per order is a first-order break-even CPA ceiling only when the order population matches acquired orders. This is contribution, not net profit or observed lifetime value. Fixed overhead is excluded."
+}
