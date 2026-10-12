@@ -1,0 +1,6 @@
+ShopChief adaptation, 2026-10-02.
+
+Derived works and original licenses:
+alirezarezvani/claude-skills — MIT; original notice/license preserved in references/licenses/alirezarezvani--claude-skills.txt
+
+Modified by ShopChief: portable merchant workflow, explicit evidence limits, DTC examples, provider-neutral inputs, and execution boundaries. No upstream executable code is distributed. Upstream trademarks are not endorsements.

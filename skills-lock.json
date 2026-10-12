@@ -1,0 +1,2165 @@
+{
+  "version": 1,
+  "skills": {
+    "ad-budget-pacing": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ad-budget-pacing/SKILL.md",
+      "computedHash": "fadd44b5207ce41c9985a08a8078bb4200ff2b5c3b3ab59fe8908c600df9653d"
+    },
+    "ad-html-creative-draft": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ad-html-creative-draft/SKILL.md",
+      "computedHash": "4724fdafc6ae10d78d06eb7e5436dfe251a65a71f2f22e7a11ee04cc8082f3a3"
+    },
+    "ad-landing-page-message-match": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ad-landing-page-message-match/SKILL.md",
+      "computedHash": "f4194b43477b0ec24c88c44d55226b3a879385ce4d8133a0a7c0e70cbd4ddc4a"
+    },
+    "ad-placement-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ad-placement-review/SKILL.md",
+      "computedHash": "ddeffe2924c3e6ccf8930435a9c6712117ce52ba9ec68bea61acdc1d70ce0dbe"
+    },
+    "affiliate-program-design": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/affiliate-program-design/SKILL.md",
+      "computedHash": "49cbf9aca9b76787425fd67a5feb286d59afd6989e4c31f821deefee4750c426"
+    },
+    "agent-shopping-readiness": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/agent-shopping-readiness/SKILL.md",
+      "computedHash": "f807dd9ef07f97975ee202b55ba45ed47de7677db98e38f13f4e9b4eb0a1ade5"
+    },
+    "ai-referral-measurement": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ai-referral-measurement/SKILL.md",
+      "computedHash": "caacb319a9bb008637831e61c85e7adaccd15a094ba9718e9df066a75a1fac63"
+    },
+    "ai-search-visibility-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ai-search-visibility-audit/SKILL.md",
+      "computedHash": "d93f4b5f5a88fd8301cc48735901e13aa790e72fea8ee7f5d3048539dc2a4196"
+    },
+    "arabic-rtl-artifact-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/arabic-rtl-artifact-review/SKILL.md",
+      "computedHash": "cec49c0f8f90ad21056e21c5f0ed7b894f7fe6a31f3357ea00e15796bf274ac7"
+    },
+    "assortment-demand-gap-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/assortment-demand-gap-review/SKILL.md",
+      "computedHash": "66e2cb66743db1c7e77fa4f4ba37b6c33e6a249be1bd92b5603804eb09de95b3"
+    },
+    "back-in-stock-campaign": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/back-in-stock-campaign/SKILL.md",
+      "computedHash": "35e590d1a484d32339e4df132010784567f7fe871707f7518a319759e280e6b3"
+    },
+    "backlink-evidence-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/backlink-evidence-review/SKILL.md",
+      "computedHash": "7c8bd6a6b27bff3e97f069259bee0ce37a55ef05cfdcc4c2186babf2f504d3ca"
+    },
+    "bid-strategy-change-plan": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/bid-strategy-change-plan/SKILL.md",
+      "computedHash": "40eddc4b14fc6dc02dc791b4b32e8b2c18c7f5561f62c04b6c818f7fadd48134"
+    },
+    "blog-article-writer": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/blog-article-writer/SKILL.md",
+      "computedHash": "63333064e6fadfe4d66631b93631dcca47956d0092f90de6947f281bc6e2ba9e"
+    },
+    "blog-keyword-research": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/blog-keyword-research/SKILL.md",
+      "computedHash": "84f603752325b8faf778b45c6b96ac76273f7cb0c8e7f1f900ee0e38cfd649c7"
+    },
+    "brand-entity-consistency": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/brand-entity-consistency/SKILL.md",
+      "computedHash": "9a075012b36977e90b0763b92829f274ee246e140dc3deaa2976e048af2b6249"
+    },
+    "brand-extension-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/brand-extension-review/SKILL.md",
+      "computedHash": "cfeb78737e59f873a2eda63bdabcc227205fa3ec9ba5f673f28618f3ecbabda0"
+    },
+    "brand-impersonation-evidence": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/brand-impersonation-evidence/SKILL.md",
+      "computedHash": "d057b89f8b091f4cef1842ebaa5510671574bd6b79b926cc53761a7ec8d7ce29"
+    },
+    "brand-message-house": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/brand-message-house/SKILL.md",
+      "computedHash": "d419f54c396df16bfa7512182f56da6e7d1b8e1f0fc7d7cae6ae8aa259d3b9c2"
+    },
+    "brand-name-market-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/brand-name-market-review/SKILL.md",
+      "computedHash": "7625c87799199c19ab79a4137f29212b8f7b9a7310f6f1fe5871e03d0d5320a4"
+    },
+    "brand-narrative-change-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/brand-narrative-change-audit/SKILL.md",
+      "computedHash": "e257f31b1e11f68eeebdd83b86d582477ac6c7d4ff98e1ae723d2e145aecbd8b"
+    },
+    "brand-podcast-recording-plan": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/brand-podcast-recording-plan/SKILL.md",
+      "computedHash": "2d84e17a7d3659359aad7f6c0b4bc16f02db291d5b5980b6e40d1940fb7c7786"
+    },
+    "brand-proof-library": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/brand-proof-library/SKILL.md",
+      "computedHash": "e7978e6305f71dfdd40f04e6a3661794817064d344720c04bddc54a13fb73f87"
+    },
+    "brand-voice-system": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/brand-voice-system/SKILL.md",
+      "computedHash": "4e70478e8a67db8341c41648cb6031667538e1838124d5b23c7bef7bab9e8153"
+    },
+    "bundle-component-availability": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/bundle-component-availability/SKILL.md",
+      "computedHash": "c8b0c7956f0aebc4cfcef4d54805ad1d80b3e0ced05d58ce7491b2e290483027"
+    },
+    "bundle-pricing": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/bundle-pricing/SKILL.md",
+      "computedHash": "e44db770f73e9701f29684a09314872f90ce25ecc0ee297dedfac8fc660364d9"
+    },
+    "campaign-landing-page-concept-brief": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/campaign-landing-page-concept-brief/SKILL.md",
+      "computedHash": "32dd0beecaa9042829f9f68b063802b05a13b5823f6edcbca30240cf143c46e8"
+    },
+    "campaign-utm-governance": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/campaign-utm-governance/SKILL.md",
+      "computedHash": "ce60ce9f60ea13e76d654294c8fdba976779ad3dc3ce74c8cf931322b754b983"
+    },
+    "carrier-rate-and-service-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/carrier-rate-and-service-review/SKILL.md",
+      "computedHash": "39833dd005aa610810fc3356a2fa103016885fb5ab812c70af5691d1534008bd"
+    },
+    "cart-abandonment-recovery": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/cart-abandonment-recovery/SKILL.md",
+      "computedHash": "673e8d1241e2f9c3886608b28e1ad25c424fae19e73b11802bbc777f18da9c03"
+    },
+    "cash-flow-inventory-planning": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/cash-flow-inventory-planning/SKILL.md",
+      "computedHash": "a4f1842a6865cbc84e7c58173a327f757b86682022d0fdad840255cde4f8ffba"
+    },
+    "catalog-collection-and-vendor-hygiene": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/catalog-collection-and-vendor-hygiene/SKILL.md",
+      "computedHash": "353acd11ebf8197873726d5f3954784f2ceb90f4fec331631107c4421833ecc3"
+    },
+    "catalog-defect-triage": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/catalog-defect-triage/SKILL.md",
+      "computedHash": "63d5804c740723510799b96dc00dabbbc936d68a84252e38fb8dfb15255e3ce6"
+    },
+    "catalog-image-alt-text-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/catalog-image-alt-text-review/SKILL.md",
+      "computedHash": "2c4ba160475bf0dee6f0ed132e59a883869c4132abe859d150f33ef58e7dcf25"
+    },
+    "catalog-import-change-preflight": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/catalog-import-change-preflight/SKILL.md",
+      "computedHash": "3936d042ba059579e10d075fbb6c458a2ec69a9571f8da1235a7af869beaf4ea"
+    },
+    "catalog-publication-retirement-control": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/catalog-publication-retirement-control/SKILL.md",
+      "computedHash": "c6ab61cfbbf33f6dfed05c36e30eb3ecae4b6fa76e34b03b1321a67f65fdec68"
+    },
+    "category-revenue-driver-bridge": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/category-revenue-driver-bridge/SKILL.md",
+      "computedHash": "cf41d5bca7c2809612b731e171cc50a5e75b2836e464dc54e35816de38cf1bbc"
+    },
+    "chargeback-evidence-preparation": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/chargeback-evidence-preparation/SKILL.md",
+      "computedHash": "f6c31cb2bd52f937077ca3e8e2cadf9cb74b0faaef7e745454a5cac3f747e863"
+    },
+    "checkout-friction-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/checkout-friction-audit/SKILL.md",
+      "computedHash": "598ea041e48e5fd2eb79f9c9ce346180ff2d74ee3d646fa870d6b7cb45608be3"
+    },
+    "co-marketing-campaign-plan": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/co-marketing-campaign-plan/SKILL.md",
+      "computedHash": "f9212026cfaf41786f14a4a6eec044aca849e16c109ca9f3946fb058c0b6883c"
+    },
+    "cohort-retention-analysis": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/cohort-retention-analysis/SKILL.md",
+      "computedHash": "7a4822a2a1298a0ec77152bc6144fc8032044ca43813c153621001650af9cc10"
+    },
+    "collection-merchandising": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/collection-merchandising/SKILL.md",
+      "computedHash": "5ed6ddc1a0d800217ea3da08f91d33b2f34d6eb3c85b97270294617288757763"
+    },
+    "collection-page-seo": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/collection-page-seo/SKILL.md",
+      "computedHash": "c3112f3206e41f19a84d47b413ae404573342cf832ef0e17c7a4c519bf0fa204"
+    },
+    "commerce-integration-sync-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/commerce-integration-sync-review/SKILL.md",
+      "computedHash": "849a84a06acda54254ba8c441cf9f03361a2d62840e0090a7b511b499b7ef54d"
+    },
+    "commerce-report-reconciliation": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/commerce-report-reconciliation/SKILL.md",
+      "computedHash": "83124b166d9b53e558365518c8c7f7928fc393771dbcddbd38c79101d1bcf435"
+    },
+    "community-message-payload": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/community-message-payload/SKILL.md",
+      "computedHash": "ab735d827df3626e690545201d9bf72b0b46c8634c9884f3b1f6095f22e5fc36"
+    },
+    "community-program-design": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/community-program-design/SKILL.md",
+      "computedHash": "8d6164eabe364f3985ecefff38ea2712ce9177ad5da8470ce7c8dd9cb55a16ba"
+    },
+    "competitor-ad-evidence": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/competitor-ad-evidence/SKILL.md",
+      "computedHash": "441383cdea5a442885a9cf8be113228591e4c59458ab2e2926edc8ebf2567d9a"
+    },
+    "competitor-deep-analysis": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/competitor-deep-analysis/SKILL.md",
+      "computedHash": "65257179c25a89916a94d844fee7e2c79f61835df4f630a96b5f72d8adf00b40"
+    },
+    "complaint-theme-and-csat-analysis": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/complaint-theme-and-csat-analysis/SKILL.md",
+      "computedHash": "e785bb515fd6830fc035506335e015a2fc4377753065e94a7c81e1318aa1d9a1"
+    },
+    "computed-product-knowledge": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/computed-product-knowledge/SKILL.md",
+      "computedHash": "c2d1ff241f6396ce827bf2477fe28366637eabdccf57611adfbb171d96022589"
+    },
+    "consumer-interview-planning": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/consumer-interview-planning/SKILL.md",
+      "computedHash": "11375f4e64c4041f6f32270b79668046363628494e6e08ee512f8fa510a365c0"
+    },
+    "consumer-lead-magnet": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/consumer-lead-magnet/SKILL.md",
+      "computedHash": "834f268f1925039b01d7b08ba6e9d8312369708a101286b31e65e36938cfeb87"
+    },
+    "consumer-market-sizing": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/consumer-market-sizing/SKILL.md",
+      "computedHash": "d626e07e9e5099ae721d6bb44393196f43a917fd68b45648d64ce1bed7e5f55c"
+    },
+    "consumer-workshop-plan": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/consumer-workshop-plan/SKILL.md",
+      "computedHash": "378701cd4ab8bdc098e126fbaef087b64b6ca2962b150efb4406354d28230ca7"
+    },
+    "content-decay-diagnosis": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/content-decay-diagnosis/SKILL.md",
+      "computedHash": "d54b594f335f22e20c3630e85772db2a11946d3dff00d9f5537a2d77f2b4ffcc"
+    },
+    "conversion-value-design": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/conversion-value-design/SKILL.md",
+      "computedHash": "4d2bb69c9f4e3e26572df4fee50e66ad0ea239f9885ac205840d01f0ca8f86fe"
+    },
+    "copywriting": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/copywriting/SKILL.md",
+      "computedHash": "1682db5322df091545de0f107e270d5ceb365c3486ed801e8ccad86dbb681929"
+    },
+    "coupon-rule-and-code-control": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/coupon-rule-and-code-control/SKILL.md",
+      "computedHash": "63ba2358961ad6d27de4fbc3b86a7a9e16342c68d93ce0a684b2d6a7e739bf29"
+    },
+    "crawl-index-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/crawl-index-audit/SKILL.md",
+      "computedHash": "0c53b31612f34cea7a15c034eab47744191412d21297dffe80f97511f815ca0e"
+    },
+    "creative-fatigue-diagnosis": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/creative-fatigue-diagnosis/SKILL.md",
+      "computedHash": "45a76eab79b0dac58cc6f33a0e11443c609e4415de14d3ad295c133987c474da"
+    },
+    "creator-campaign-budget": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/creator-campaign-budget/SKILL.md",
+      "computedHash": "a0a2be8501c68a30e23dcd629e3ec944b28fdd82e9cae747e85d5f8c6fc763bc"
+    },
+    "creator-content-acceptance": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/creator-content-acceptance/SKILL.md",
+      "computedHash": "35328351cf06cd28ce71b7fe44c69d565b5df726451f24665cac8c9293bd01c5"
+    },
+    "creator-outreach-workflow": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/creator-outreach-workflow/SKILL.md",
+      "computedHash": "8a90a3ca9fd197c6afff0d00c7b4757999d3e9b586a2a73fc8f4a6e467993de9"
+    },
+    "creator-paid-amplification": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/creator-paid-amplification/SKILL.md",
+      "computedHash": "cd29ac77256f64c2929016969776fd7645ef1350d2e17d2cb844065a7acf049e"
+    },
+    "creator-rights-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/creator-rights-review/SKILL.md",
+      "computedHash": "3e6147d5688c460c1520b77f008c726ebe23b8f0a59a5f5ec5c1f60382f1e25d"
+    },
+    "cross-dock-and-copacker-handoff": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/cross-dock-and-copacker-handoff/SKILL.md",
+      "computedHash": "7c66642a58f80ae0cfd02749db8944c6d58e69751908209e56b664590586d97c"
+    },
+    "customer-and-order-note-change-control": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/customer-and-order-note-change-control/SKILL.md",
+      "computedHash": "5dd890c0b710bc9431910ab7c8378186ab18a62bf788a19d66e4470e209a3b89"
+    },
+    "customer-identity-and-consent-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/customer-identity-and-consent-audit/SKILL.md",
+      "computedHash": "d574be96d0f9de8de5884f11c51ee51070531102affe6056978fceb4eaeaf33a"
+    },
+    "customer-lifetime-value": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/customer-lifetime-value/SKILL.md",
+      "computedHash": "fa36bd668efe074711cc702872f23ab061d9669d8e86758259c9b01d2ab338d1"
+    },
+    "customer-segmentation-rfm": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/customer-segmentation-rfm/SKILL.md",
+      "computedHash": "6cc4db2dace5eb7f33f3ea986892de0d5cb9d81af7455ee8b5eaf4b774d817b4"
+    },
+    "customer-support-response-drafting": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/customer-support-response-drafting/SKILL.md",
+      "computedHash": "17c312772c948b739444295c2ab6cf231629a6992bf4c0fde95604e09265fedf"
+    },
+    "customer-support-triage": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/customer-support-triage/SKILL.md",
+      "computedHash": "14edbf616498a53f0f4299de94faea8dbcc5515f448b94453b909ff73f6d756c"
+    },
+    "customer-testimonial-production": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/customer-testimonial-production/SKILL.md",
+      "computedHash": "a6d621a46758887fc060dd5ccc3b91f006d0ff3c99d0400f4bcc89c03273ad5b"
+    },
+    "customer-use-story-production": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/customer-use-story-production/SKILL.md",
+      "computedHash": "5a9bd02c77df7ce08ec8b677982054b71c3fc18563278bad1809bb83d49a9baa"
+    },
+    "customs-document-consistency-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/customs-document-consistency-review/SKILL.md",
+      "computedHash": "7556a5c575cebfb6eef3ca06e9e4bc267f653a1c7521e31266ac0a15b648700f"
+    },
+    "cwv-performance-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/cwv-performance-audit/SKILL.md",
+      "computedHash": "8741efffae6ac9226fe5e416c8dd00c5e4f0e1652f6219fc4174cd58ee12f801"
+    },
+    "dark-social-measurement": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dark-social-measurement/SKILL.md",
+      "computedHash": "2434210f3e15d13481df0667fcf02dcc63a9db6c0e7996b92062da5a5a561c0e"
+    },
+    "deferred-revenue-evidence-schedule": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/deferred-revenue-evidence-schedule/SKILL.md",
+      "computedHash": "f93486eb3ecae85650782afb43dd35e13a9f0695c6d6162890656e737d5f5556"
+    },
+    "delivery-trigger-contact-eligibility": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/delivery-trigger-contact-eligibility/SKILL.md",
+      "computedHash": "4b261261dbc5068d94f44e6a8b67a99b8ebd9d7e74211fa1a93f89e510ce23c7"
+    },
+    "demand-forecasting": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/demand-forecasting/SKILL.md",
+      "computedHash": "dc671fc8779ba1764773a58b916a89e64f409e5c36d5224433f5b5691b44f444"
+    },
+    "discount-profitability": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/discount-profitability/SKILL.md",
+      "computedHash": "82d0cf405ec35780843a0d1a3767bfa3c4826a01a93b02911840a7714be25421"
+    },
+    "dispute-pattern-and-prevention-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dispute-pattern-and-prevention-review/SKILL.md",
+      "computedHash": "953f6bdba1860fa1e70c6dad27f505f773a913b767ce0dfc9bd663c309c17cb9"
+    },
+    "domain-expert-interview-planning": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/domain-expert-interview-planning/SKILL.md",
+      "computedHash": "60784ee1a27a856bef9434324a03b378853eec22e0aa16db1dcfcf579fb181a2"
+    },
+    "dropship-supplier-order-control": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dropship-supplier-order-control/SKILL.md",
+      "computedHash": "faa6440ee5bb5c12848f65dcbfefd451c807977d72ea60ff6d711413bc4ff45b"
+    },
+    "dtc-ab-testing": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dtc-ab-testing/SKILL.md",
+      "computedHash": "cb02a22f61584c2c9727f36d54ef6edfb6fe42ab28a260b28ebf38894eb5d3c0"
+    },
+    "dtc-buyer-psychology": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dtc-buyer-psychology/SKILL.md",
+      "computedHash": "b975484eb535297127b6f46ebeaff8e67985133fdd4057a796a6602fd0207cdb"
+    },
+    "dtc-content-strategy": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dtc-content-strategy/SKILL.md",
+      "computedHash": "d5c93e530f669b842d2a96f032481e0b166eaca78bf5a9da059e0ba9b7e7ecf3"
+    },
+    "dtc-growth-experiments": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dtc-growth-experiments/SKILL.md",
+      "computedHash": "1afe8fec6825a707475683b84837635b837549e1d3b4c48cdf330b6a755b1e87"
+    },
+    "dtc-launch-marketing": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dtc-launch-marketing/SKILL.md",
+      "computedHash": "5b9a56f468c7baf6b472c9720b350022c35af3583d9d048b084e42bc25e72a6b"
+    },
+    "dtc-marketing-resource-plan": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dtc-marketing-resource-plan/SKILL.md",
+      "computedHash": "61c3d463ac9180befe8a4db1afd3a4dec53bd162c19885aabb4f67a85236490e"
+    },
+    "dtc-social-content": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dtc-social-content/SKILL.md",
+      "computedHash": "d6e9870ad241e01a8f36c86ec711c66c556eb65594b67b52a8fbdd8941e7b14a"
+    },
+    "email-deliverability-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/email-deliverability-audit/SKILL.md",
+      "computedHash": "72d082363b6ce619208854559148a78182014aba9c7e628645135b739d497d2a"
+    },
+    "email-dynamic-content-rules": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/email-dynamic-content-rules/SKILL.md",
+      "computedHash": "dad376b5d1a5048a4fe17ffcfe7f91c3db2b69d51874488d72606c3c94165288"
+    },
+    "email-frequency-preferences": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/email-frequency-preferences/SKILL.md",
+      "computedHash": "fecba85ee11432d1d6e746ac56be9b0afa9e7cbbaeed7772f787df0c7303444a"
+    },
+    "email-html-rendering": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/email-html-rendering/SKILL.md",
+      "computedHash": "cda9931eaa75737272c3eac7fe75f09cecb1b2a2a10cc780fe54de472e6acb38"
+    },
+    "email-list-hygiene": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/email-list-hygiene/SKILL.md",
+      "computedHash": "b6c77ea5e721760ccfd169d81af82e49d882ad5d25c5751bcbb081aa9b937f08"
+    },
+    "email-placement-investigation": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/email-placement-investigation/SKILL.md",
+      "computedHash": "1afea1ff1ebd63babb183261225d7d0d68ba5a68ec69f45805e08ddf12b8a0b9"
+    },
+    "email-send-quality-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/email-send-quality-review/SKILL.md",
+      "computedHash": "c340e58d005b870c0462633aec405d12ebe57932baa3239d7771465fa28f7541"
+    },
+    "email-subject-line-experiment": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/email-subject-line-experiment/SKILL.md",
+      "computedHash": "3c7b9e9683c79b6bb69786c9ebb71f2431bf989a964c24f08c7a1866546b33a1"
+    },
+    "email-welcome-series": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/email-welcome-series/SKILL.md",
+      "computedHash": "543c25e88f14c77cdbab20629ce49f833ec898c8bfece7180f1f26ec557f7b7f"
+    },
+    "employee-advocacy-program": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/employee-advocacy-program/SKILL.md",
+      "computedHash": "718d5353fb66a9616493793c12c89f0826474ba08e42e53238cfd41a5857b6fe"
+    },
+    "evidence-based-shopper-archetypes": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/evidence-based-shopper-archetypes/SKILL.md",
+      "computedHash": "0f7d0b8068d547d542c2fe1a057463ee3a720c54e320fe34c1e835f0fb534a93"
+    },
+    "evidence-verified-research-brief": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/evidence-verified-research-brief/SKILL.md",
+      "computedHash": "284013469af40568700ca2a13960da78986af93c6104ffbcaa92c22bee74e519"
+    },
+    "financial-statement-linkage-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/financial-statement-linkage-review/SKILL.md",
+      "computedHash": "59c4c460c77071df31b2a7fa7f390d20348346c22c065efc155538bd5f7350ac"
+    },
+    "fulfillment-backlog-and-tracking-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/fulfillment-backlog-and-tracking-review/SKILL.md",
+      "computedHash": "e577f90fb1d50f3ae2989ae1dfab3895ec0d66946eda9127777cc9792ef930dd"
+    },
+    "fulfillment-carrier-comparison": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/fulfillment-carrier-comparison/SKILL.md",
+      "computedHash": "15ff341b9f016669de63fa8855c177063537233b4f4eee11974c28fe0fb2f65f"
+    },
+    "fulfillment-network-scenario-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/fulfillment-network-scenario-review/SKILL.md",
+      "computedHash": "ac8aedcd4526bef1f6718d811059a06af631ecfb2b6cd227b97d74fb65014818"
+    },
+    "ga4-ecommerce-measurement": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ga4-ecommerce-measurement/SKILL.md",
+      "computedHash": "579c853ec348eefd12f231c6cb5f6e10052152827785b848478b8589550e60b3"
+    },
+    "gift-card-balance-control": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/gift-card-balance-control/SKILL.md",
+      "computedHash": "9a40d56409a2873a49df6a97a41572302f5a369eaaecd79f724fe9ea7d15a92b"
+    },
+    "gift-packing-instruction-extraction": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/gift-packing-instruction-extraction/SKILL.md",
+      "computedHash": "9f281610e4c36f908f2ed404d283a6c0e06782d311dd071c81ac76f96d1b553c"
+    },
+    "gmc-misrepresentation-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/gmc-misrepresentation-audit/SKILL.md",
+      "computedHash": "1b5aaa78814cb08605a33189d451684bd15a4b3cebfb741aeedd5215961fb77d"
+    },
+    "google-shopping-campaign-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/google-shopping-campaign-audit/SKILL.md",
+      "computedHash": "ff3874ef5da89fbeeaa5313b43bea84b22fbae86d46c34a1799d11cfd4f8f45c"
+    },
+    "gtm-event-tracking-plan": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/gtm-event-tracking-plan/SKILL.md",
+      "computedHash": "cde22bce912b33f02dfd8d75f4140977dc3f3907b8184b600bccc8e3eafee4ee"
+    },
+    "image-prompt-guide": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/image-prompt-guide/SKILL.md",
+      "computedHash": "3c4b715320414bc8b2f03d2a213b29424923426d87dbf3ff2275a4a2bc7195f2"
+    },
+    "indexnow-change-notification": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/indexnow-change-notification/SKILL.md",
+      "computedHash": "29a480c46de183c4ce63bc8e0a7c9e835b4f74331cc9a2262caba2e1dda7e34f"
+    },
+    "influencer-campaign-measurement": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/influencer-campaign-measurement/SKILL.md",
+      "computedHash": "951c9280e75730415f17c588325f9551db6e3b1fd21b01a0b5df22cc512061e4"
+    },
+    "influencer-partner-selection": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/influencer-partner-selection/SKILL.md",
+      "computedHash": "744190789b342682728ba7387352469d4b832f95920c662f9ae77221f599c010"
+    },
+    "internal-link-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/internal-link-audit/SKILL.md",
+      "computedHash": "32aed08bf197557f9f2a4d78f89430016410c18c85850d15663d48eb258aa4cf"
+    },
+    "international-seo-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/international-seo-audit/SKILL.md",
+      "computedHash": "0d39488df5317f61d908ea4657eac27afb68ff31bd5f31eb611f15bdb4244d68"
+    },
+    "inventory-aging-clearance": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/inventory-aging-clearance/SKILL.md",
+      "computedHash": "41fefa3c28d2accbdf12602bf99f3b338a8a844376d24abd16b0c9bb2048c5dd"
+    },
+    "inventory-cost-and-valuation-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/inventory-cost-and-valuation-audit/SKILL.md",
+      "computedHash": "c5bc8eb1c85e87042857163dbf185d158a0330032d5586c595a81cf6dca7e725"
+    },
+    "inventory-cycle-count-control": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/inventory-cycle-count-control/SKILL.md",
+      "computedHash": "b55c26c3796321111fc2a7be50894d08a7ef83181ccb3e0cb918beb976e58b8b"
+    },
+    "inventory-demand-exception-planning": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/inventory-demand-exception-planning/SKILL.md",
+      "computedHash": "16da532e3fe6323ab3e6ba12ea126754c63615433960f518e3b44c2e7c0dc2af"
+    },
+    "inventory-movement-change-control": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/inventory-movement-change-control/SKILL.md",
+      "computedHash": "82c3b8b83535f6d103690d5a9d3e4c19b0b59267aad8843011bba922400ac86a"
+    },
+    "inventory-replenishment-planning": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/inventory-replenishment-planning/SKILL.md",
+      "computedHash": "7108ff3859f63b4063d32439f7f24dc0cd01bd778a490567bce5538834a43ca8"
+    },
+    "keyword-analysis": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/keyword-analysis/SKILL.md",
+      "computedHash": "d7eff858e81916c259f866e3e5e9f18cb4c51fd758e5ffbec58f36e7765bab63"
+    },
+    "keyword-cannibalization": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/keyword-cannibalization/SKILL.md",
+      "computedHash": "0103901cf4df16751817d6bcc6afd79f1501f2bda9fe7cdf719b57947035739a"
+    },
+    "landed-cost-model": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/landed-cost-model/SKILL.md",
+      "computedHash": "6a73aeb57ae9abd6a07fc81127899f6ba8c5cb394474168aaf22daf77b55be42"
+    },
+    "landing-page-cro": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/landing-page-cro/SKILL.md",
+      "computedHash": "5cde0da77c8ec953179e0d4abf3b47a273bcb75d182002c546f9733aed2d2a1c"
+    },
+    "launch-release-control": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/launch-release-control/SKILL.md",
+      "computedHash": "c95f90f1fb9fef730dcba3f45ee786788805cb8114a3ced09ca1787da26f087f"
+    },
+    "launch-results-retrospective": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/launch-results-retrospective/SKILL.md",
+      "computedHash": "65325a5631c23dc1d1cb099e06e5758459219d131d5a97bd1882880f3097e10c"
+    },
+    "local-delivery-route-and-slot-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/local-delivery-route-and-slot-review/SKILL.md",
+      "computedHash": "c0a252809d8661adeee835de42534e218bee9f22768455d539769cdd6c6cf982"
+    },
+    "lot-expiry-and-cold-chain-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/lot-expiry-and-cold-chain-review/SKILL.md",
+      "computedHash": "80b545dce448bacc1fd0e57ff83111244ea5d70c73f9ea500d1dffbef2504c21"
+    },
+    "loyalty-program-economics": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/loyalty-program-economics/SKILL.md",
+      "computedHash": "4ee0edb51ab9df3e5f7dd94bb151be2de514245c2d83558e3763f22b85c5a031"
+    },
+    "market-basket-affinity-analysis": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/market-basket-affinity-analysis/SKILL.md",
+      "computedHash": "ac672d6f9843b28127ea06e936a6ba6e87621809c8b0477cf4a3a6bc7c54ddbd"
+    },
+    "market-expansion-operating-readiness": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/market-expansion-operating-readiness/SKILL.md",
+      "computedHash": "6b2181db891656adf3e38584daf0305a18827fe7df9c7913c0847051b9e1fbb1"
+    },
+    "marketing-attribution-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/marketing-attribution-audit/SKILL.md",
+      "computedHash": "9c2e7f0b8b960659311961e869aa5eb0741997e437532ad2390b8cdebf140b31"
+    },
+    "marketing-localization-brief": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/marketing-localization-brief/SKILL.md",
+      "computedHash": "f7a1306aeea8a4671b93e9cb43784a8d303c0c57f4d75b9eada3ff1fedfbfd08"
+    },
+    "marketing-roas-analyzer": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/marketing-roas-analyzer/SKILL.md",
+      "computedHash": "c7b0845d7f993771b256949b1db566255126d5390a8f726697f09c1256eb1f86"
+    },
+    "marketing-sop-governance": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/marketing-sop-governance/SKILL.md",
+      "computedHash": "1d25ed4ed50366d43a6ba76e52c0a897c7eb8db5caca5f518afa45686de4ea94"
+    },
+    "media-flight-planning": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/media-flight-planning/SKILL.md",
+      "computedHash": "196623a8668974a7a619b550944ab20995c4646ce8c90abb50469c81a0587429"
+    },
+    "merchant-accounts-payable-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-accounts-payable-review/SKILL.md",
+      "computedHash": "ff99ff9ee971f1ea63f43c875204f24c0ce018adc655a6ae454db26ebfaa32d1"
+    },
+    "merchant-asset-folder-organization": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-asset-folder-organization/SKILL.md",
+      "computedHash": "7f983a74951335d15d1c698c5878ab5ad20cd3435daadf92517c1b8a528514e2"
+    },
+    "merchant-audio-finishing": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-audio-finishing/SKILL.md",
+      "computedHash": "1d514e8a3de8572664f93a28e43835faf3426ec9cfaa850a95b17ca4b75cc171"
+    },
+    "merchant-automation-decision-brief": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-automation-decision-brief/SKILL.md",
+      "computedHash": "6c872dae1c369a1307413687a4baadce046fa11ca621a56958e1cfa727d76b19"
+    },
+    "merchant-automation-workflow-specification": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-automation-workflow-specification/SKILL.md",
+      "computedHash": "33ec6a6168a97282ee440f73c1028ae2ef190d0605f333e5faec13a4f6ad5360"
+    },
+    "merchant-bank-ledger-reconciliation": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-bank-ledger-reconciliation/SKILL.md",
+      "computedHash": "b09d2b758fac49fc2b6e93b6e73631eebdb204fd37514b5c427ff544d6d7a05e"
+    },
+    "merchant-brand-palette-specification": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-brand-palette-specification/SKILL.md",
+      "computedHash": "5c9121223279f7894f843f38134fb2face128cdc5b22924496b9ba6ea81c759b"
+    },
+    "merchant-brand-visual-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-brand-visual-review/SKILL.md",
+      "computedHash": "b232cb836403f3db5cfb30e64f1126556d6f62fdf25ee9ce0d40398b25705435"
+    },
+    "merchant-budget-variance-bridge": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-budget-variance-bridge/SKILL.md",
+      "computedHash": "932b82d7c8c2909a0bb0f0f8fbfd4d90747a9bbee889271fd49ee077502fed88"
+    },
+    "merchant-bulk-creative-production": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-bulk-creative-production/SKILL.md",
+      "computedHash": "721379638435d31c3c6880a93b468d4540473eb8250b8d5e1386b65656822bf7"
+    },
+    "merchant-business-decision-brief": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-business-decision-brief/SKILL.md",
+      "computedHash": "2a0b53b0fa00f7c426eca5dc3c3efb5fee53ac53f6d71a62e3648cdb337c3b44"
+    },
+    "merchant-caption-timing": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-caption-timing/SKILL.md",
+      "computedHash": "fc4648321b4d8ede78cc6ddf9fa60933d5e71c5ed95b4731423da955b20a05aa"
+    },
+    "merchant-chart-and-data-story": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-chart-and-data-story/SKILL.md",
+      "computedHash": "a86a83b642a092df3895b9215db932d89c3fffdad61f0e926fed915fe57849dc"
+    },
+    "merchant-customer-record-merge-plan": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-customer-record-merge-plan/SKILL.md",
+      "computedHash": "eb4eb4d6d43280609b48a732a4a6a47c693eaad261b6396ee7486c37b748f72c"
+    },
+    "merchant-dashboard-data-validation": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-dashboard-data-validation/SKILL.md",
+      "computedHash": "6082cc3001f3a58b2f158a27b1c7d7254d55a58146722c4ad552d9206a7af9ed"
+    },
+    "merchant-data-quality-controls": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-data-quality-controls/SKILL.md",
+      "computedHash": "fa60e7194f52afd0970b97cc00f5a0b167c55371f67f236f7d4ba44db7c6beed"
+    },
+    "merchant-design-change-execution": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-design-change-execution/SKILL.md",
+      "computedHash": "3cc515fa90270933728e7e0d5be005ddc71d4a99e100ada0e4d29f4f17ac4358"
+    },
+    "merchant-design-export-repair": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-design-export-repair/SKILL.md",
+      "computedHash": "3df1123d827e9634207ead3d51efc9257cc8052ca95d822221d0e0767dc4a43d"
+    },
+    "merchant-document-extraction": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-document-extraction/SKILL.md",
+      "computedHash": "f4f0c5f85836c915836655989a7cf2b6fcbf4e2e97070f8250744a429e5dc6e7"
+    },
+    "merchant-document-template-system": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-document-template-system/SKILL.md",
+      "computedHash": "62486bc430f9f069dc78abaddf544fa513df6d06561ba7e6bc937c2ec0deea88"
+    },
+    "merchant-editable-document-production": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-editable-document-production/SKILL.md",
+      "computedHash": "88fe589acf24a5a2ee272369617182a47aacfe51efc7814d6dea6d753534ff6b"
+    },
+    "merchant-editorial-format-conversion": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-editorial-format-conversion/SKILL.md",
+      "computedHash": "8cb7fdb536bc602dee99a4522f89ef4ed3b42ba2b211853c5e9cf3b9f602a7e9"
+    },
+    "merchant-editorial-image-brief": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-editorial-image-brief/SKILL.md",
+      "computedHash": "5c952f0e8469d8bed8ec420167e2a082bb0559ea28e0f2d01a301b05e53bc83d"
+    },
+    "merchant-expense-evidence-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-expense-evidence-review/SKILL.md",
+      "computedHash": "922aa428e9925cd8bf0bf593af10352efcbfbb753fdb604e6fd3aa1590021fb2"
+    },
+    "merchant-export-merge-and-reconcile": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-export-merge-and-reconcile/SKILL.md",
+      "computedHash": "ea22e130436980c9d0b9a8ebe00095e58a0f59b6976debf053eac292f7fe31a7"
+    },
+    "merchant-financial-scenario-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-financial-scenario-review/SKILL.md",
+      "computedHash": "9c0f08876d1fc189c8a5a20c65fdf987de653b10976a44a083a928d47751c9b0"
+    },
+    "merchant-html-brief-production": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-html-brief-production/SKILL.md",
+      "computedHash": "3128b023d7ca2fce5bb39df9f8f7a8ee17540403886b58292081c97a000a855d"
+    },
+    "merchant-image-rights-register": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-image-rights-register/SKILL.md",
+      "computedHash": "162f1db17f7efa958ae454bad82e7a3d20e36e42b3319804c3069b9a7fd4fccd"
+    },
+    "merchant-inbox-triage-drafts": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-inbox-triage-drafts/SKILL.md",
+      "computedHash": "c10e5ed2682bf020d912f335bfb5d7cffd2a3466818ba93466c01659f4687606"
+    },
+    "merchant-infographic-production": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-infographic-production/SKILL.md",
+      "computedHash": "ea4c7c3c1e88bc0f4b528bd89375fd09699c7951218778158e2cdecfaffbf6a3"
+    },
+    "merchant-logo-commission-brief": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-logo-commission-brief/SKILL.md",
+      "computedHash": "00540bc1f1e92bfc5fb13dc65a5f6c8a71e8eebcf54e04365a1042c1130dd074"
+    },
+    "merchant-meeting-decision-record": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-meeting-decision-record/SKILL.md",
+      "computedHash": "484cae037f1545491298adc95abb6914ca176606ff52ab57a9233e07803ed69c"
+    },
+    "merchant-month-end-close-pack": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-month-end-close-pack/SKILL.md",
+      "computedHash": "95d3924d443ecd6f0df8c5c708168e44d251089ec2121edceb7d1fde4a740ed2"
+    },
+    "merchant-operating-procedure": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-operating-procedure/SKILL.md",
+      "computedHash": "805dcb57f4358dbdbe4f8521dc2810f5c6510c8d44700dccf3ba12c1bba6205c"
+    },
+    "merchant-ordered-funnel-analysis": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-ordered-funnel-analysis/SKILL.md",
+      "computedHash": "7ed3ac8f2a3bdb5bd63aa6c0b8a050bc4bddc0531934322cc0ee59cef49eb963"
+    },
+    "merchant-pdf-delivery": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-pdf-delivery/SKILL.md",
+      "computedHash": "6b9ff8e60ce1066df9c61c1ac7d3a7850f98c6965a551dcdd3fca5ae9cbda03f"
+    },
+    "merchant-pdf-form-completion": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-pdf-form-completion/SKILL.md",
+      "computedHash": "35b44c0626481bc5818a4868d8feffa23e2ef210708e702afe3e490cdff03088"
+    },
+    "merchant-plain-language-edit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-plain-language-edit/SKILL.md",
+      "computedHash": "7017e41f6cbd13ac936fe0902a6003db6930545bf5d07d16c66d04657f57f355"
+    },
+    "merchant-press-release-draft": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-press-release-draft/SKILL.md",
+      "computedHash": "7890ff168710e81d4009e51fdc4e7ac9633452c7888fe9c484efb510f6b18841"
+    },
+    "merchant-print-artwork-preflight": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-print-artwork-preflight/SKILL.md",
+      "computedHash": "cda68b641162b19ede68721f7f9249dcf7378350664db7284687c9a60441459c"
+    },
+    "merchant-push-notification-draft": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-push-notification-draft/SKILL.md",
+      "computedHash": "0281a98745fb8f6bb6c99c111bdc13180e9fe671e6831182e8490ba4625d429f"
+    },
+    "merchant-receivables-and-invoice-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-receivables-and-invoice-review/SKILL.md",
+      "computedHash": "290c5b6ff4100c6ca6c69022985125cfdf08ee31f2762366dff0a8a6e36f5bfa"
+    },
+    "merchant-recurring-report-production": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-recurring-report-production/SKILL.md",
+      "computedHash": "56442a011a9e006bcacbee3153d43ff54b45554a5613e382ffed54568b475592"
+    },
+    "merchant-review-mining": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-review-mining/SKILL.md",
+      "computedHash": "4b5ef02013b5354c45d2307444164e9671ef7b0291271cf925c3670d558308cf"
+    },
+    "merchant-slide-production": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-slide-production/SKILL.md",
+      "computedHash": "956bb2ca7cbb5cb619e861918183615239df476d997495d86a73d01299d97284"
+    },
+    "merchant-social-carousel-production": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-social-carousel-production/SKILL.md",
+      "computedHash": "5dcb31ee8ce19ae15c14b6360affed0f18e4e4ea8a14466963957898499c8e17"
+    },
+    "merchant-sonic-identity-brief": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-sonic-identity-brief/SKILL.md",
+      "computedHash": "e45d4bede1c2d5dd2110ae0ca7a3d0122c8eb6ffa70af5a8e090863a2158bb4a"
+    },
+    "merchant-spreadsheet-formula-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-spreadsheet-formula-audit/SKILL.md",
+      "computedHash": "c69542f14dfbcfee34c14badb6d89f617da0c8b1af14e8e38d3307e6baf4fb40"
+    },
+    "merchant-spreadsheet-model-design": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-spreadsheet-model-design/SKILL.md",
+      "computedHash": "80f3186f61837a71a53a3e77f4e6f935ea13e10660d0036f96b4c4478996f452"
+    },
+    "merchant-spreadsheet-question-answering": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-spreadsheet-question-answering/SKILL.md",
+      "computedHash": "76806b53d8551c3354cb619b698762c3d98e8594ecd5f41cb71ae745111a39b9"
+    },
+    "merchant-static-creative-resizing": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-static-creative-resizing/SKILL.md",
+      "computedHash": "9fac33d3d99da885f373962141ff7e219a5ba917893454af64f092d8b122b6c4"
+    },
+    "merchant-statistical-analysis-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-statistical-analysis-review/SKILL.md",
+      "computedHash": "4bd7448a0e57e92ef21c779c0ca6f0d1c6e1ec599680f4ee3139a7379fcacf10"
+    },
+    "merchant-team-capacity-plan": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-team-capacity-plan/SKILL.md",
+      "computedHash": "cfcf89726c4a42f201e4512b78c6ff208c0f5f9b8e4dc7b42ee703792c487e45"
+    },
+    "merchant-translation-and-locale-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-translation-and-locale-review/SKILL.md",
+      "computedHash": "304f34a17451377b3c5237817b7512abae3969a7752a2e80d47ac9f85896df55"
+    },
+    "merchant-video-edit-plan": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-video-edit-plan/SKILL.md",
+      "computedHash": "9b6c2347664e2e57ebd7390c9ecd3f2aa2c05d4341b66616f4d755129c1d0e37"
+    },
+    "merchant-video-output-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-video-output-review/SKILL.md",
+      "computedHash": "1ad8c12e1debcb27834c793a39fa5f7f8ec92b8504e050252aa1ea69bf7d5340"
+    },
+    "merchant-visual-direction-brief": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-visual-direction-brief/SKILL.md",
+      "computedHash": "9ad7e79e8e833ec62beb4007e97b11e532fa2db8e4e1021d7f83d531c125576b"
+    },
+    "merchant-voiceover-production": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/merchant-voiceover-production/SKILL.md",
+      "computedHash": "18dc56eb2aa4423928e531b0495e2eb59734c5e8b402798856bb0feb61b531d7"
+    },
+    "meta-ad-account-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/meta-ad-account-audit/SKILL.md",
+      "computedHash": "109374b269dce1ae29e973e7f834c978e87080e4876a4ea2c3ddf319e593df1d"
+    },
+    "mobile-store-ux-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/mobile-store-ux-audit/SKILL.md",
+      "computedHash": "aed38d0deeaea1f8e9fa019b0edd1e6909016891a76f279864abe33490bb3fee"
+    },
+    "multi-location-stock-allocation": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/multi-location-stock-allocation/SKILL.md",
+      "computedHash": "58e91e6f348284c8e60a3be5f59e7f320f222b8807795a43719ba28df9794814"
+    },
+    "negative-keyword-planning": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/negative-keyword-planning/SKILL.md",
+      "computedHash": "fce71712516548aab20fb93341bb31a5097dfc25d5a9bcc6e0ca89a52e70548e"
+    },
+    "newsletter-editorial-plan": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/newsletter-editorial-plan/SKILL.md",
+      "computedHash": "7f819e1e337eb344eb414540fecf5e94d663473f8c1d477e06d107d3da563566"
+    },
+    "nps-followup-priority-planning": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/nps-followup-priority-planning/SKILL.md",
+      "computedHash": "8a7c6892e02eac30405e97a75501d8c4d79bcac71d5dbb41351ba630267407aa"
+    },
+    "offline-activation-plan": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/offline-activation-plan/SKILL.md",
+      "computedHash": "3507d9c3e779124ab8b49fa37cc8249d263ea6b5e1d44f2f155e0d6f654384f6"
+    },
+    "onsite-search-optimization": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/onsite-search-optimization/SKILL.md",
+      "computedHash": "e11f5a3aee48f9a3eecd9865856d9b10d7cb225a196e6145ca8c5710bddf4a3e"
+    },
+    "operating-audit-evidence-index": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/operating-audit-evidence-index/SKILL.md",
+      "computedHash": "3ce87a0d3439627ae634abdf66f181f02072311321cb914ea0a7f5809b3847f1"
+    },
+    "operations-process-handoff-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/operations-process-handoff-review/SKILL.md",
+      "computedHash": "1b638db22c1139e6e3058da8ebc8de841f2fa3bb3519f955e228443604abe1b8"
+    },
+    "order-address-and-lookup-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/order-address-and-lookup-review/SKILL.md",
+      "computedHash": "2760b4f4a8ead40b8f15579d39a954eedc4bf506840287597a256d79badf56b5"
+    },
+    "order-cost-allocation": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/order-cost-allocation/SKILL.md",
+      "computedHash": "3357e4670b7693b9d8321ad1e718b07f6bd301466456d40fc59890e50047ef2f"
+    },
+    "order-risk-review-queue": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/order-risk-review-queue/SKILL.md",
+      "computedHash": "770c0f133e05f6fbd10578f97550d9e88ea2fd19af2e2d7b2837cec109c4faa8"
+    },
+    "order-state-change-control": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/order-state-change-control/SKILL.md",
+      "computedHash": "c9ec2e3cd5902b25f9784f1a42ea4c6254d1eb58b28f96ef6d804847754fb016"
+    },
+    "packaging-label-proof-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/packaging-label-proof-review/SKILL.md",
+      "computedHash": "19d323ccb1dfb30f7d214516132a09c67a1bcd4a2da3477ecad50d6168953248"
+    },
+    "packaging-marketing-brief": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/packaging-marketing-brief/SKILL.md",
+      "computedHash": "83d7c5451576bae1a97edcd98720b2554aae5ec2c241f605f1999a9369b9c7fe"
+    },
+    "paid-audience-seed-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/paid-audience-seed-review/SKILL.md",
+      "computedHash": "c8434627a9735514c44d78cbc841ec01e54469ca884e1ab4bb181f5f40455df2"
+    },
+    "paid-campaign-architecture": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/paid-campaign-architecture/SKILL.md",
+      "computedHash": "3c43825029f02cc07a3fa866638b3a3c721f67c1ed2fdcb95586c1e7d7f3c0db"
+    },
+    "paid-change-readout": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/paid-change-readout/SKILL.md",
+      "computedHash": "7d3eeeca524e9a46dabc8ef17c91d7a84d0f49f242d7d04414aed3c6fb037c3f"
+    },
+    "paid-search-query-mining": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/paid-search-query-mining/SKILL.md",
+      "computedHash": "07d0ca583e22459433e7dec7d6b3eadd4eabb126a1cc057b7a18322e84ff4be7"
+    },
+    "paid-social-creative-brief": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/paid-social-creative-brief/SKILL.md",
+      "computedHash": "66b8759ab868747ea1439dc6f80fbf4a9e98d0fa13ff38de7e19aeb71fc858a4"
+    },
+    "payment-payout-reconciliation": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/payment-payout-reconciliation/SKILL.md",
+      "computedHash": "ecb30d39a5950d140a8e13324cdc8fdf0e62328a3a1d144d52f5081bd1b9176b"
+    },
+    "popup-signup-design": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/popup-signup-design/SKILL.md",
+      "computedHash": "1b9926a32549316a836cc7839733114b6917e1658e666dd711feb64a8798ef99"
+    },
+    "post-purchase-email-flow": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/post-purchase-email-flow/SKILL.md",
+      "computedHash": "b03d15e44c18e1a228ff0ac02fffd7bfa4ca2829a91a41a07d4e7c24564fd2a3"
+    },
+    "press-outreach-kit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/press-outreach-kit/SKILL.md",
+      "computedHash": "09e1555942af8bf6a2d44eb7702afeae7e9878fbf9b375155ad7019bb451185f"
+    },
+    "price-position-and-change-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/price-position-and-change-review/SKILL.md",
+      "computedHash": "230c4fa8a2d838907fbf922ed7bac90cfbe1d7c66b7235c0cec9ed23f9c9823f"
+    },
+    "price-test-planning": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/price-test-planning/SKILL.md",
+      "computedHash": "610a54380cdfbe5780b2b0092d810965e690aae2ff1c161a0cb900be053a94b7"
+    },
+    "privacy-data-handling-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/privacy-data-handling-review/SKILL.md",
+      "computedHash": "266e7a5514c30db13fd1c746e2eaf5feb9b8dd00639de7f911726dad2d9cada7"
+    },
+    "procurement-intake-specification": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/procurement-intake-specification/SKILL.md",
+      "computedHash": "314d5aa67cfe80b93f11556b31f8644237f7959eb7a80845c513833c20fca728"
+    },
+    "product-ad-key-visual-generation": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-ad-key-visual-generation/SKILL.md",
+      "computedHash": "5de2bf4a277eff294444dcfa3107220bb41f77a8b5fa63150916cd3cf747dfbd"
+    },
+    "product-attribute-schema-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-attribute-schema-audit/SKILL.md",
+      "computedHash": "79ac64418b368dfca94778b85774cb417acca45410d243a3b8d0dd79894b6de3"
+    },
+    "product-bundle-image-composition": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-bundle-image-composition/SKILL.md",
+      "computedHash": "d856eb2d0a9453d033ca379dfc108f3fabfcd44ba291952a6c7c273d8e21d913"
+    },
+    "product-campaign-visual-set": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-campaign-visual-set/SKILL.md",
+      "computedHash": "b5787fe21c7afe94f32c6c20f2f9ebadff38ef7ddf44cc600d0ea7d1aaca4cc1"
+    },
+    "product-claim-evidence-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-claim-evidence-review/SKILL.md",
+      "computedHash": "4255f13d84c940b5daa0b2c90dc54c96abcd19c28430b32283f2de8818600de2"
+    },
+    "product-claim-literature-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-claim-literature-review/SKILL.md",
+      "computedHash": "49c92d9f77de111c3b35b7ec69ebd783f68d7b49ae1c2be2f1997871778d72ca"
+    },
+    "product-comparison-page": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-comparison-page/SKILL.md",
+      "computedHash": "0a811d61630e3743bfe33ed6b7d9ef98d35b8318e6af24f66db8e1e4b9c40ef2"
+    },
+    "product-demo-video-production": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-demo-video-production/SKILL.md",
+      "computedHash": "887d384e0985ce122ef25889e57aa4f54a5cc6d60b7644218e30ed925a6ce0b9"
+    },
+    "product-detail-page-image-production": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-detail-page-image-production/SKILL.md",
+      "computedHash": "0f2f9e36b46595d800a3b506544c3902654325f3d3338882500bbea020709ce9"
+    },
+    "product-feed-optimization": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-feed-optimization/SKILL.md",
+      "computedHash": "9602ae68f9310d5515c955b2bd007f505d26460af77e0d06db31515b07f6be1b"
+    },
+    "product-image-editing-workflow": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-image-editing-workflow/SKILL.md",
+      "computedHash": "7d5d5248d21ca78e8575d779bd62676f0c84b20ff0c0e520eaee7213d728fa79"
+    },
+    "product-image-localization": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-image-localization/SKILL.md",
+      "computedHash": "4cfeb0c56ff48b8dc740ba62a6cf78ebf69b92fa4f3cb5c35ec559714a705cfc"
+    },
+    "product-image-shot-list": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-image-shot-list/SKILL.md",
+      "computedHash": "84eec0c758d8685c6465ba5fa2e2ee481acad8bac87d78d2dc7de124bc651c5c"
+    },
+    "product-image-to-video": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-image-to-video/SKILL.md",
+      "computedHash": "db64e43fac43e20e70b9ae1b0f4d6a48e6b7a42450f9f6e70ccabed9c567b008"
+    },
+    "product-instruction-illustration": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-instruction-illustration/SKILL.md",
+      "computedHash": "8e57badba5deca77be100cd3bf55e530e301fde0d5a49ded8b4c8abc0bb38b1c"
+    },
+    "product-keyword-research": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-keyword-research/SKILL.md",
+      "computedHash": "8683bc248062320405632b4ae682c89469e9395911de81cce6aaecb417cc5025"
+    },
+    "product-lifestyle-scene-generation": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-lifestyle-scene-generation/SKILL.md",
+      "computedHash": "9e74148f3399144b55045e6bc62046c90e3e2584398c7b5ecf39998a14010c34"
+    },
+    "product-loop-video-generation": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-loop-video-generation/SKILL.md",
+      "computedHash": "785f43fbbf8edc2c8b025b6cb716619ffd54cc893a46e439f7dd9878b2c6133c"
+    },
+    "product-marketing-context": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-marketing-context/SKILL.md",
+      "computedHash": "1c43b76053e05c124646381c78407f4d54e3076d78c2a9ac55ab97588285df9d"
+    },
+    "product-message-comprehension-test": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-message-comprehension-test/SKILL.md",
+      "computedHash": "9ffef8af25f08bc81d6c961c30c12d3db66dbffa6da9e701b264883b853bbd91"
+    },
+    "product-motion-generation-brief": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-motion-generation-brief/SKILL.md",
+      "computedHash": "613beeb9d0002918cc289a66843be31495ad2499b1cb8f7055b732f9fded9d08"
+    },
+    "product-offer-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-offer-review/SKILL.md",
+      "computedHash": "cef16f1ec6e22ae0bfaca5997efdaa2b10dadc74fc66b8100b16beeee47e08a2"
+    },
+    "product-opportunity-research": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-opportunity-research/SKILL.md",
+      "computedHash": "d0b8052e2f5f6fb587b8db656ceb7bc7621bed533b5bc5c7e761194c17030246"
+    },
+    "product-page-seo": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-page-seo/SKILL.md",
+      "computedHash": "cf574e349733fb53d3cf63a43f3fa2cb8f0b199e0b7fff99e6af009c5a6bc678"
+    },
+    "product-prior-art-evidence-map": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-prior-art-evidence-map/SKILL.md",
+      "computedHash": "830500ffdda395cacf17a999fb26b6c00d4b0df38d2f4ef072b9a852e063a124"
+    },
+    "product-selector-tool-brief": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-selector-tool-brief/SKILL.md",
+      "computedHash": "a55990e8f260cb31a90ef1a93a044966840307279dc46eaed2bb064c1bf37fad"
+    },
+    "product-ugc-video-production": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-ugc-video-production/SKILL.md",
+      "computedHash": "62bb21e41233d6473852cc5832baf9ce48fd7dc512b622a06d236b9b11071997"
+    },
+    "product-video-ad-variants": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-video-ad-variants/SKILL.md",
+      "computedHash": "00664d28a28104117ebce5bd12fc59fc4bca8ba0d1070736680684d7e2eca9f2"
+    },
+    "product-video-localization": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-video-localization/SKILL.md",
+      "computedHash": "c3445e97af123f20272163b5e193ec3181614b85ae63e79c04398f149a3c577b"
+    },
+    "product-video-storyboard": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-video-storyboard/SKILL.md",
+      "computedHash": "cb93ba2832e1ca4934921173b1a5d63b2d889c3b5b6522f70ad03badac14b823"
+    },
+    "production-capacity-and-sequencing": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/production-capacity-and-sequencing/SKILL.md",
+      "computedHash": "a96d4b86eab22e6416c4bcd53e8004397aaca7471e1b73f4607308bf319b602f"
+    },
+    "profit-margin-analyzer": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/profit-margin-analyzer/SKILL.md",
+      "computedHash": "f83fc2d0142363be1742991ffb9c8ff8ab48b314226687f7d3597eb6c23acf21"
+    },
+    "programmatic-seo-planner": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/programmatic-seo-planner/SKILL.md",
+      "computedHash": "760d274245485a1bb16ba1968509dd339fa31ca9d5154980cda9847ea26f28e6"
+    },
+    "promotion-incremental-economics-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/promotion-incremental-economics-review/SKILL.md",
+      "computedHash": "6d3b1b149edafd0c7424d9c768d11e5b205610686271180f5bbab18708a035c5"
+    },
+    "public-creative-trend-scout": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/public-creative-trend-scout/SKILL.md",
+      "computedHash": "af37f31e78cee0b3bf21092b422b1ff9946f6af8239ebb6c220fd4ab61f0b54a"
+    },
+    "public-review-response-drafting": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/public-review-response-drafting/SKILL.md",
+      "computedHash": "3132955a2765d05953cf17e64c6210386a3e8475efe4e51ab9797a54fe119fe3"
+    },
+    "purchase-order-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/purchase-order-review/SKILL.md",
+      "computedHash": "8a7e7dd9455cd4a1dc44a6c7107b211ce724494208b8b0683dafa2e6bede9703"
+    },
+    "qualitative-research-synthesis": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/qualitative-research-synthesis/SKILL.md",
+      "computedHash": "e5b05f797d34ad358969578f070de6f672fe1978cfb5d050a1ca558cdb3a2339"
+    },
+    "quality-nonconformance-action-control": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/quality-nonconformance-action-control/SKILL.md",
+      "computedHash": "b41f31a166d568f5729787f7ad8b950c391e56e28cf81533bd488a5e37e35afa"
+    },
+    "referral-program-design": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/referral-program-design/SKILL.md",
+      "computedHash": "c607a306359a73581f6e92d06f3b45a53d7331365077184b99d7a7ccddf9d891"
+    },
+    "refund-and-replacement-control": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/refund-and-replacement-control/SKILL.md",
+      "computedHash": "ecafca30278677192f1b050542b3cde075ad55e9a960b2e20b1798d9e6bb93e8"
+    },
+    "regulatory-change-action-register": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/regulatory-change-action-register/SKILL.md",
+      "computedHash": "a5918ba9d554f56a0243c7bc917b74101c0658c8695cf4c14d69145c5472803b"
+    },
+    "retail-location-discovery": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/retail-location-discovery/SKILL.md",
+      "computedHash": "9205df310f3b372f6755e514ed8a087cc400975ae39eb4f389dca19ac2d4a9f3"
+    },
+    "retail-market-structure-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/retail-market-structure-review/SKILL.md",
+      "computedHash": "2af70b2f413d3abab3f57ad97d07ed79a543b58ced4d1f91289d62dd1f86a7b3"
+    },
+    "retail-media-economics": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/retail-media-economics/SKILL.md",
+      "computedHash": "a63cdad7c49472755bf60deb019d708a39d0e244939b357e8fbf725bfeeb8d5c"
+    },
+    "return-policy-economic-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/return-policy-economic-review/SKILL.md",
+      "computedHash": "f54cc8834a8b2f3d7294f711f658aeb577f3f90f2b19b71de1115cd85a3aaeee"
+    },
+    "return-receipt-and-resolution-control": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/return-receipt-and-resolution-control/SKILL.md",
+      "computedHash": "f217639ad7f8e96a8b218303ef2033fecc12339b3565c18da08b4506a331de7d"
+    },
+    "returned-goods-recovery-planning": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/returned-goods-recovery-planning/SKILL.md",
+      "computedHash": "233d7cd989a64148b751509ae61336d4ec50054310e8784c9e257b0faa613e03"
+    },
+    "returns-exchange-workflow": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/returns-exchange-workflow/SKILL.md",
+      "computedHash": "926c5b56bb474fd8af4950a5fce5753b77687c4040a9f2eec322f9829449ae55"
+    },
+    "returns-reason-analysis": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/returns-reason-analysis/SKILL.md",
+      "computedHash": "8b7e350cf103371f67c72da0c064a2b118034995fc3b412f56bba184ab898e84"
+    },
+    "review-informed-product-faq": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/review-informed-product-faq/SKILL.md",
+      "computedHash": "aa26e95bf006e1b2b681ce76e9ba6d7c27aeff4b033b07f2afb73b7cc674002b"
+    },
+    "review-request-workflow": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/review-request-workflow/SKILL.md",
+      "computedHash": "1c1bf41c2fbd4dbc692bb1e844987e4084445ae1317d7befef7ae031b2faa4f5"
+    },
+    "schema-markup-designer": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/schema-markup-designer/SKILL.md",
+      "computedHash": "8c6695bff28b5223bab4668a09374447a0fa9147564e08aec1a2d728d5e382c0"
+    },
+    "search-content-evidence-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/search-content-evidence-audit/SKILL.md",
+      "computedHash": "ce5259be20b51493acebb851ac210968ad7de9d30716b2dabcdb4a14e8841325"
+    },
+    "search-metadata-release-check": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/search-metadata-release-check/SKILL.md",
+      "computedHash": "e8eebda8f4f53103703c362644b05d72786c6b675a9361daae2a9930d6f75225"
+    },
+    "search-portfolio-performance": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/search-portfolio-performance/SKILL.md",
+      "computedHash": "75415d12dbbc8ee5b250ee9ad903ead9365c66dcb1405dc98832a0491d9dc9b5"
+    },
+    "seasonal-promotion-calendar": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/seasonal-promotion-calendar/SKILL.md",
+      "computedHash": "0db84f9a8a0990e97cd02b98c93e8e13a15fcf71b8562b3ded1bc4cb4b1630eb"
+    },
+    "seo-content-research": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/seo-content-research/SKILL.md",
+      "computedHash": "45665c8a0b2a19e9a1167390de31f960357a331e896bb2cb65c6d6b092225346"
+    },
+    "share-of-voice-measurement": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/share-of-voice-measurement/SKILL.md",
+      "computedHash": "f362dd7a1e6f0e20b95dafbf04243f50cd78e306c9637f67683ff411cdc37aac"
+    },
+    "shipment-exception-claim-preparation": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shipment-exception-claim-preparation/SKILL.md",
+      "computedHash": "ae73c4c91de4bb2d837ee2bc34bb1bfa6d546b8e781a6ac68aba5e62350bb9d3"
+    },
+    "shipment-load-feasibility-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shipment-load-feasibility-review/SKILL.md",
+      "computedHash": "d0d947c670846f971103028ed041f1bbfba5fa64963699318b1e2be5d1045404"
+    },
+    "shipment-split-routing-and-tracking-control": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shipment-split-routing-and-tracking-control/SKILL.md",
+      "computedHash": "6b6354df18f016526e515e5926e42e316335bd30494a38707cc04a6462623f83"
+    },
+    "shipping-rate-and-zone-coverage-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shipping-rate-and-zone-coverage-review/SKILL.md",
+      "computedHash": "7866eb13511f695cd33b7f15d270846dd104fa04721c9edb39289b8d44014e7d"
+    },
+    "shipping-threshold-analysis": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shipping-threshold-analysis/SKILL.md",
+      "computedHash": "04125fb99b3a3f1e622a0c46057c1c9b44b96a16edbf20baf8a5888ce8eb6a20"
+    },
+    "shopify-admin-api": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shopify-admin-api/SKILL.md",
+      "computedHash": "8d2a669efe937a64247de9b812c26a8b1d27952b60f0eb09182817ee7da65819"
+    },
+    "shopify-builder": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shopify-builder/SKILL.md",
+      "computedHash": "782dd1bd3ed5e2c1ac578cf59e4d3d8d585342f76ac2bc29a357214282b8e9a7"
+    },
+    "shopify-product-launch": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shopify-product-launch/SKILL.md",
+      "computedHash": "349f01a1606eeb3b799e66cc0082b66c93c71736e7ff531e8c239ee01e9e772d"
+    },
+    "shopify-product-page-cro": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shopify-product-page-cro/SKILL.md",
+      "computedHash": "e61df789470840f2dec6ed795bd029271eb8949fb4a4a9982e4f5ed2a6eb16af"
+    },
+    "shopify-upsell-cross-sell": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shopify-upsell-cross-sell/SKILL.md",
+      "computedHash": "30df1661f8a9fc01497b5c732720fb391231193be859c4b213174a32ec36da17"
+    },
+    "shopper-concept-validation-sprint": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shopper-concept-validation-sprint/SKILL.md",
+      "computedHash": "9c81bb3f3340ac5bcc850aa9b3bed87ab091561430cadeb341d6154eba591f13"
+    },
+    "shopper-opportunity-mapping": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shopper-opportunity-mapping/SKILL.md",
+      "computedHash": "c87189a4d38106354ccadd8b33e623a424dc3deecdaeacce886a323d92ce4e66"
+    },
+    "shopper-survey-design": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shopper-survey-design/SKILL.md",
+      "computedHash": "27bafff6ea552ba104cbf9d7c213009c6b087c3890605b9d28636c225fa0730b"
+    },
+    "shopper-switching-jobs-analysis": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shopper-switching-jobs-analysis/SKILL.md",
+      "computedHash": "49bd256b023565ad5645e9c7dfe7a3ae41ddca163425f8087a507ec255ba573a"
+    },
+    "shopper-usability-testing": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shopper-usability-testing/SKILL.md",
+      "computedHash": "749442d46a2dd99406d0901e7ed28f6ed62cf3d1f11b957d9a7e0a26970b3fab"
+    },
+    "shopping-feed-disapproval-triage": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/shopping-feed-disapproval-triage/SKILL.md",
+      "computedHash": "3dd784be7e9dc07dc0ac77bb97b32414da0ad4abe18cfcc5c67e44f76224f492"
+    },
+    "site-migration-seo": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/site-migration-seo/SKILL.md",
+      "computedHash": "4982241988a3bbe3a0722f0531f82bde01cdfe5af502b869aecce6de3e8491ec"
+    },
+    "site-seo-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/site-seo-audit/SKILL.md",
+      "computedHash": "fdf7766f8f5cc4b96a3d02fc74bc5ed997a49782c5dd1b758bef0ad6bed8f293"
+    },
+    "sku-and-option-identity-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/sku-and-option-identity-audit/SKILL.md",
+      "computedHash": "05a4629ff00388c65bde817cb05b18a28ab3d87ae84a82e16de39c66da76bb3d"
+    },
+    "sku-portfolio-rationalization": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/sku-portfolio-rationalization/SKILL.md",
+      "computedHash": "6e9ba11e358c129210a8afb57a64510cb29fd047adbe07e69792d515c6d51f07"
+    },
+    "sms-campaign-planning": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/sms-campaign-planning/SKILL.md",
+      "computedHash": "deccf381bcd24284fb03b085db59c55fd99ae59a3d2d02d1e3f0217cecbcf862"
+    },
+    "social-channel-capacity-plan": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/social-channel-capacity-plan/SKILL.md",
+      "computedHash": "e9fe2c4e6e7b74593e23f4b16fcaf0561bf5f03ed8589fdd6b581e61345f3ee9"
+    },
+    "social-crisis-runbook": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/social-crisis-runbook/SKILL.md",
+      "computedHash": "d92cfe10c2e455379a8a4fb6b70cdbaa22b394fea24cf63737c3fab11fd7d8e2"
+    },
+    "social-inbox-moderation": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/social-inbox-moderation/SKILL.md",
+      "computedHash": "b1bd518fbb4bbad8b8b10277ca368c509c6f0469347c2f871a9f7378fab0e498"
+    },
+    "social-listening-query-plan": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/social-listening-query-plan/SKILL.md",
+      "computedHash": "61591cc72ad5daa55fd905aeb1178259e1d9ce6880a24677da3e076884e63c08"
+    },
+    "social-performance-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/social-performance-review/SKILL.md",
+      "computedHash": "67cbb95f5ebb6b2cd56493f4678f782a4d813e28330a72861c1387f447ff4d02"
+    },
+    "social-preview-metadata": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/social-preview-metadata/SKILL.md",
+      "computedHash": "7a15e4f17a89901a3e0fda180d82f345a0d2dadc5de534b18137a1feaf1d7068"
+    },
+    "social-publication-qa": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/social-publication-qa/SKILL.md",
+      "computedHash": "72aa823fbbd4bc7c0f8ee0fdc158dc4d6016f4d0155c5c47e2751a82f12dbedf"
+    },
+    "source-content-repurposing": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/source-content-repurposing/SKILL.md",
+      "computedHash": "3102a0fcdb3b0e5345de19d6a900fafb7032bc76bf1668c627535f634059eae5"
+    },
+    "sourcing-impact-evidence-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/sourcing-impact-evidence-review/SKILL.md",
+      "computedHash": "d7a0c5254fd318e4da7691144aca799c5bf848bce5500f70d0ade05f9adf1b6b"
+    },
+    "statement-extraction-reconciliation": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/statement-extraction-reconciliation/SKILL.md",
+      "computedHash": "3bf65007454efd676da5773e219956abb87cdc1371580cb496292dc116ecc680"
+    },
+    "store-configuration-and-access-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/store-configuration-and-access-review/SKILL.md",
+      "computedHash": "cff5e2738d98e38f519fab7c62dd4a6b0f1f00e3cf7efacd5b739f4410214174"
+    },
+    "store-incident-signal-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/store-incident-signal-review/SKILL.md",
+      "computedHash": "c0e9f7e63bcbf1440b17a950d9c583fbfd76c43193b303cb2e3483b3aadcbd41"
+    },
+    "store-policy-content-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/store-policy-content-review/SKILL.md",
+      "computedHash": "28b2a1e93347de6562f3122e14f1a9f5fa65ac3961071a45706acd471ffa9d8e"
+    },
+    "store-resource-retirement-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/store-resource-retirement-review/SKILL.md",
+      "computedHash": "10665094572bfb6253e702d017ef97ddd7e675f72f5835101686d4a9d2c3b22d"
+    },
+    "storefront-access-gating-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/storefront-access-gating-review/SKILL.md",
+      "computedHash": "aa362fc62f9c5dc96aa3c16abb6ea69068528639a6a23ae386cc6899aee7e348"
+    },
+    "storefront-accessibility-audit": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/storefront-accessibility-audit/SKILL.md",
+      "computedHash": "95ae4f987cafdc32725d64006564c65f5b0b711bce76712195bf536f8c0af55e"
+    },
+    "storefront-design-handoff": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/storefront-design-handoff/SKILL.md",
+      "computedHash": "6e5b1e9dd3e6ed9a6cb41cbf5eaf3336ed5f2584600be85841fbc226f94bdcf3"
+    },
+    "storefront-microcopy-state-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/storefront-microcopy-state-review/SKILL.md",
+      "computedHash": "afd88dc10abb6fd21baf36233681cb5b01c0c197147f033be7cd5c3da1fa424d"
+    },
+    "storefront-navigation-research": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/storefront-navigation-research/SKILL.md",
+      "computedHash": "1c277ef692dc8b8bc69cde36bc30d54ce817b638c65fb99be170453a2a5c1bb6"
+    },
+    "storefront-path-and-eligibility-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/storefront-path-and-eligibility-review/SKILL.md",
+      "computedHash": "5b17ae418456d2c29323799f362dc007506d9c1dda622bff03f20d0da1889ff2"
+    },
+    "storefront-typography-specification": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/storefront-typography-specification/SKILL.md",
+      "computedHash": "0ea82f18bab0bc525e5d1481f4eec2c7fb0333d980ce199189a573c3febf5777"
+    },
+    "storefront-visual-design-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/storefront-visual-design-review/SKILL.md",
+      "computedHash": "07ffe36c02ba6b0743523bbe8b6a4493c84238c355e68551c4bdf4ba10c8697b"
+    },
+    "subscription-renewal-exception-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/subscription-renewal-exception-review/SKILL.md",
+      "computedHash": "66542f53be229d5238ac46d8f5ef0142385037132356cc58521c195df3a7ab82"
+    },
+    "subscription-retention": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/subscription-retention/SKILL.md",
+      "computedHash": "1289473d5af39dd7ae679bf6c34ba1ade46dbba85db98ba430f6d422383f5cb3"
+    },
+    "subscription-unit-economics": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/subscription-unit-economics/SKILL.md",
+      "computedHash": "bedc1376176c10fa4f2186055a788d867832cca14691081084e1f54c6e28a160"
+    },
+    "supplier-collaboration-exceptions": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/supplier-collaboration-exceptions/SKILL.md",
+      "computedHash": "c6f35805df6a74e8499353da44576e6e4bbad9e5a09dddc5b261cda52b294bdb"
+    },
+    "supplier-contract-obligations": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/supplier-contract-obligations/SKILL.md",
+      "computedHash": "7e92a50708a8f7231890e09bd871368fec608662ecc1dfbce3304028923b08cc"
+    },
+    "supplier-finder": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/supplier-finder/SKILL.md",
+      "computedHash": "982ff4c5b104e2f3c8c3a8b085d4f510a486c01f9e73af3a01606a60395e97c5"
+    },
+    "supplier-performance-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/supplier-performance-review/SKILL.md",
+      "computedHash": "26c9a477712c9bf11cfbff030c377a2deefa92a44cd4c2d448076407bf364814"
+    },
+    "supplier-quality-inspection-plan": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/supplier-quality-inspection-plan/SKILL.md",
+      "computedHash": "1720050b5d1f880d1a6905009ad355e23fbd04a4914fefdaec7918cc2fc8b2d1"
+    },
+    "supplier-quote-comparison": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/supplier-quote-comparison/SKILL.md",
+      "computedHash": "f4a9da44ad93e1194138a77d94c99a2a7a0a17952009b8c3e0fb216835e1ee02"
+    },
+    "supplier-rfp-and-negotiation": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/supplier-rfp-and-negotiation/SKILL.md",
+      "computedHash": "325de8961608c6396a5103dd1044c62ac278d07fc75120d64e91390feecbbc4d"
+    },
+    "supplier-spend-analysis": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/supplier-spend-analysis/SKILL.md",
+      "computedHash": "d287edddb0c13322d9d269b482c7707d2c6d0b1f5b5e771011a1613723645bf3"
+    },
+    "support-escalation-evidence-pack": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/support-escalation-evidence-pack/SKILL.md",
+      "computedHash": "e0b707dbad06c5c4bdf79ff57d370bb64ecef84ede82e0d38633b18e3bea5d0f"
+    },
+    "support-knowledge-base": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/support-knowledge-base/SKILL.md",
+      "computedHash": "108f01fe2501b3799f7e8cd8ff6fb7f313652fe1b3009d21c20a456cc559b459"
+    },
+    "support-macro-library-design": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/support-macro-library-design/SKILL.md",
+      "computedHash": "005fcabf3fc674cedb38be6b78c3d017ad0cf85976c3ca5ba0fb6f6010a9da29"
+    },
+    "support-workload-capacity-planning": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/support-workload-capacity-planning/SKILL.md",
+      "computedHash": "b822607b5832f918a1f738fa5d312b6054247e7bcdc4aaeebffe52ab5e42bc53"
+    },
+    "tax-records-and-configuration-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/tax-records-and-configuration-review/SKILL.md",
+      "computedHash": "1b1f1e53d14f4f1588b2f6ffd3b5d290cd52af96c5eaf1e4c0a5df4e2776b3cc"
+    },
+    "theme-studio": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/theme-studio/SKILL.md",
+      "computedHash": "b93e4ce2651471e1b619963c523edf2b9a3af174983efe05d565e19718810473"
+    },
+    "transcript-derived-content-package": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/transcript-derived-content-package/SKILL.md",
+      "computedHash": "c86ecd545fa1a0b4a479c24215a351edc84671640ca33d7f6beead6e868ef671"
+    },
+    "trend-stage-timing-analyzer": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/trend-stage-timing-analyzer/SKILL.md",
+      "computedHash": "d0ba7a6ea590f3381fd530df6ba5928206f74aba2022b270bcadf57b90b32b0c"
+    },
+    "ugc-creator-brief": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ugc-creator-brief/SKILL.md",
+      "computedHash": "84deb8d3d7115011b2a24357c68805e031bd5d85950942262023b3e8c865f435"
+    },
+    "variant-copy-consistency": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/variant-copy-consistency/SKILL.md",
+      "computedHash": "193a0da12262a9c19e41d2eaed087faa55e707e3f57082cf237f366141caed81"
+    },
+    "video-search-readiness": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/video-search-readiness/SKILL.md",
+      "computedHash": "fed096533705fefca6611876fad4719f36b33ec6199bf54cf9c26700b7fb67e5"
+    },
+    "voice-of-customer-messaging": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/voice-of-customer-messaging/SKILL.md",
+      "computedHash": "1f39504ccc27604deb8de76fda168c22a16a6903b2d5bf81946cb846aba27aa2"
+    },
+    "warehouse-pick-and-wave-planning": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/warehouse-pick-and-wave-planning/SKILL.md",
+      "computedHash": "eb9605d2e22a6f51ef53560c4c684f7f8757eab25d6078fcad06b790de1f22cb"
+    },
+    "warehouse-slotting-capacity-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/warehouse-slotting-capacity-review/SKILL.md",
+      "computedHash": "5bd38fdd8cbecfd3402d20aa0e14933b706721224a5425a739981d442e521693"
+    },
+    "weekly-store-performance-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/weekly-store-performance-review/SKILL.md",
+      "computedHash": "66a4b03cb4316e2ae8706e394a672f96deafcaabf0211a7fc7961e36cce0b79a"
+    },
+    "wholesale-account-and-quote-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/wholesale-account-and-quote-review/SKILL.md",
+      "computedHash": "1db1ef9237b9f93afdd37dc788463600d39340b9eb81caed0e21bf786baffe70"
+    },
+    "wholesale-channel-terms-review": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/wholesale-channel-terms-review/SKILL.md",
+      "computedHash": "982d513386e4fde4f7e7c4aa8382d75f42eec7fe3b9e4b3617e4064625217a98"
+    },
+    "winback-email-flow": {
+      "source": "ai-project-official/shopchief-commerce-skills",
+      "sourceType": "github",
+      "skillPath": "skills/winback-email-flow/SKILL.md",
+      "computedHash": "115c4a3b79ede2e01e8d7f8b9f39c2012a9ef689b388995178b4900436605758"
+    }
+  }
+}

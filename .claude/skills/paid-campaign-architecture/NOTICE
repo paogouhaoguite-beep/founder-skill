@@ -1,0 +1,8 @@
+ShopChief adaptation, 2026-10-02.
+
+Derived works and original licenses:
+thatrebeccarae/claude-marketing — MIT; original notice/license preserved in references/licenses/thatrebeccarae--claude-marketing.txt
+aaron-he-zhu/aaron-marketing-skills — Apache-2.0; original notice/license preserved in references/licenses/aaron-he-zhu--aaron-marketing-skills.txt
+kostja94/marketing-skills — MIT; original notice/license preserved in references/licenses/kostja94--marketing-skills.txt
+
+Modified by ShopChief: portable merchant workflow, explicit evidence limits, DTC examples, provider-neutral inputs, and execution boundaries. No upstream executable code is distributed. Upstream trademarks are not endorsements.

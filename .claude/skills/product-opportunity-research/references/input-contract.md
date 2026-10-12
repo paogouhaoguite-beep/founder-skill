@@ -1,0 +1,1 @@
+Use the explicit product/category, Shopify target market, time range, priorities and constraints supplied by the user. Clarify only decision-critical gaps. Missing supplier costs do not block market screening. Public Amazon US evidence never changes the merchant target.

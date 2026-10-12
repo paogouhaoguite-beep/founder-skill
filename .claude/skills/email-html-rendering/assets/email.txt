@@ -1,0 +1,7 @@
+Refills available
+
+Keep your jar in use. Check its size, then choose the matching refill.
+Product details and current availability: https://store.example/refills
+
+Harbor Store, 10 Example Road
+Unsubscribe from marketing email: {{unsubscribe_url}}

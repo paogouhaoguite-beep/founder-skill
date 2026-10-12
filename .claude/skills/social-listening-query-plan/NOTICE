@@ -1,0 +1,10 @@
+ShopChief adaptation, 2026-10-02.
+
+Derived works and original licenses:
+aaron-he-zhu/aaron-marketing-skills — Apache-2.0; original notice/license preserved in references/licenses/aaron-he-zhu--aaron-marketing-skills.txt
+OpenClaudia/openclaudia-skills — MIT; original notice/license preserved in references/licenses/OpenClaudia--openclaudia-skills.txt
+kostja94/marketing-skills — MIT; original notice/license preserved in references/licenses/kostja94--marketing-skills.txt
+
+Modified by ShopChief: portable merchant workflow, explicit evidence limits, DTC examples, provider-neutral inputs, and execution boundaries. No upstream executable code is distributed. Upstream trademarks are not endorsements.
+
+Additional adaptation, 2026-10-02: SkillMedev/skills, skills/media-monitor/SKILL.md (MIT). Original copyright and full license are retained in references/licenses/SkillMedev--skills.txt. ShopChief modified alert calibration, source-chain independence, sentiment arithmetic and merchant execution boundaries.

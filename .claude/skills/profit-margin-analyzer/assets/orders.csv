@@ -1,0 +1,3 @@
+sku,currency,period,orders,net_merchandise_revenue,retained_shipping_revenue,landed_cogs,payment_platform_fees,fulfillment_shipping,attributable_return_costs,ad_spend
+DEMO-POUCH,USD,synthetic-month,10,1000,0,400,40,140,20,250
+DEMO-BOTTLE,USD,synthetic-month,20,800,40,360,32,180,28,160
