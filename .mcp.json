@@ -14,7 +14,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "tanvo-mcp"
+        "tanvo-mcp@0.2.1"
       ],
       "env": {}
     }
