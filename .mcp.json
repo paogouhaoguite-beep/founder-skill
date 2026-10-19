@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "gawain": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@gawain-ai/mcp-server"
+      ],
+      "env": {}
+    }
+  }
+}
