@@ -1,6 +1,6 @@
-"""Weekly buy mode: spend a fixed amount on the same weekday every week.
+"""Weekly buyer: spend a fixed amount on the same weekday every week.
 
-With `dca_take_profit` set (0.20 = 20%), it sells everything it bought once
+With `dca_take_profit` set (0.30 = 30%), it sells everything it bought once
 the holdings, after the selling fee, are worth that much more than the money
 put in since the last sale. Then it starts a fresh round of weekly buys. Set
 it to null to never sell.

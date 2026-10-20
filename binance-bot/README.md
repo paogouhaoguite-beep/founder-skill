@@ -1,62 +1,27 @@
-# Binance spot trading bot
+# Binance weekly buy bot
 
-A small Binance spot bot. It studies recent charts, picks whichever famous
-trading method has actually worked lately, trades it with a stop-loss on every
-position, and reinvests its gains so the next trade gets bigger.
+Buys a fixed amount of crypto on Binance every week, taking turns between
+BTC, ETH and SOL. When everything it bought is worth 30% more than the money
+put in (after fees), it sells it all and starts a new round.
 
-**Read this first: no bot can promise profit.** Markets change, fees eat small
-accounts, and anything that "always makes money" is a scam. This bot is built
-to *refuse to trade* when it cannot find an edge, and to cut losses short when
-it is wrong. Expect losing trades and losing weeks. Only use money you can
-afford to lose completely.
+**No bot can promise profit.** This one only makes money if the coins are
+worth more when it sells than the average price it paid. Crypto can fall by
+half and stay down for a year or more. Only use money you can afford to lose.
 
-## What it does
+## How it works
 
-1. **Reads the charts.** It downloads the last 1500 four-hour candles for each
-   coin in `symbols` (BTC, ETH, SOL, BNB by default).
-2. **Learns from famous traders.** It tests four published rule sets:
+1. Every week, on `dca_day` (Monday by default, UTC), it buys `dca_amount`
+   USDT (6 by default) of the next coin in `dca_symbols`.
+2. If the bot is off on the buy day, it buys later the same week. A week that
+   passes entirely while it is off is skipped, never doubled up.
+3. Every hour it checks the value of everything bought this round. Once that
+   is `dca_take_profit` (30%) above the money put in, after the selling fee,
+   it sells it all. The USDT stays in your Binance Spot wallet.
+4. The next buy day starts a fresh round.
 
-   | Strategy | Inspired by | Idea |
-   |---|---|---|
-   | `turtle` | Richard Dennis, the Turtle Traders | buy breakouts above the 20/55-candle high |
-   | `trend_ema` | trend followers such as Ed Seykota | buy when a fast EMA crosses a slow one, in an uptrend |
-   | `rsi2` | Larry Connors | buy sharp dips inside an uptrend, sell the bounce |
-   | `macd_trend` | Gerald Appel (MACD) | buy MACD crosses above the 200 EMA |
-   | `trend_hold` (off by default) | Meb Faber | hold while price is above its long moving average |
-
-3. **Proves it before using it (walk-forward test).** Each method is tuned on
-   the older 70% of the chart and then run on the newest 30%, which it has
-   never seen. It only becomes the "champion" if it made money in both parts,
-   with at least 10 trades, a profit factor of 1.5 or better, and a drawdown under 20%,
-   all after fees and slippage. If nothing passes, **the bot does not trade.**
-   It re-learns every 24 hours.
-4. **Trades the champion.** On every newly closed candle it checks for a buy
-   signal. Each buy gets an ATR stop-loss that is also placed on Binance itself,
-   so it still works if your computer goes off.
-5. **Compounds.** Each trade risks 1% of *current* equity. After a win the
-   account is bigger, so the next trade is bigger; after a loss it shrinks.
-   Set `reinvest_pct` below `1.0` to lock part of each profit in a "vault" the
-   bot will never trade again.
-6. **Kill switch.** If equity falls 25% from its peak, it sells everything and
-   stops until you run `reset-halt`.
-
-How strict is step 3? On computer-generated random charts (where no real edge
-exists) the filter was still fooled about 3 times in 25, and on charts with real
-trends it found one 21 times in 25. A champion is a good sign, not a guarantee.
-
-## Small accounts (under 5,000 rupees)
-
-5,000 INR is roughly 55 to 60 USDT, which is enough: Binance's minimum order is
-about 5 USDT. Set `start_equity` to your USDT amount for paper mode. With 1%
-risk per trade the bot risks about 0.6 USDT per trade, so growth is slow and
-steady by design. Things that eat into a small account:
-
-- **Fees**: 0.1% per buy and per sell. Paying fees in BNB with the BNB discount
-  turned on lowers this.
-- **Indian tax**: 30% tax on crypto gains plus 1% TDS on sells. Losses cannot be
-  offset against gains. Count this before you count profit.
-- Raising `risk_per_trade` makes it grow faster **and** lose faster. Do not go
-  above 0.02 (2%).
+Buying the same amount every week means you buy more coins when the price is
+low and fewer when it is high. That helps when prices dip and recover; it does
+not help if prices fall and stay down.
 
 ## Setup
 
@@ -64,119 +29,68 @@ Needs only Python 3.9+, no extra packages.
 
 ```
 cd binance-bot
-cp config.example.json config.json      # edit symbols, start_equity, etc.
-python main.py learn                    # see what it learned (no account needed)
-python main.py run                      # paper trading: pretend money, real prices
-python main.py status                   # balance, open position, trade history
+cp config.example.json config.json      # change coins, amount, day, profit target
+python main.py dca                      # practice: pretend money, real prices
+python main.py status                   # buys so far, money put in, what it is worth now
 ```
 
-Run paper mode for **at least 2 to 4 weeks** before thinking about real money.
+Stop it with Ctrl+C (on Android in Termux: Volume Down + C). It remembers
+everything when you start it again.
 
-### Fast test on years of real prices
-
-```
-python main.py simulate             # last 3 years; --years 1 for a quicker run
-```
-
-This replays real Binance candles (from Binance's public data mirror,
-`data-api.binance.vision`) through the bot's own trading code, one candle at a
-time, re-learning every day, with fees, slippage and stop-losses. It takes a
-few minutes and shows what the bot would have done.
-
-Result with the default settings, October 2023 to October 2026, starting with
-60 USDT: **ended at 53.98 USDT (-10%)**, 61 trades, 14 wins, worst drop 13%. Over
-the same period simply holding BTC returned about +194%. The bot sat out most
-of the time because no strategy passed its test, and the trades it did take
-lost slightly more than they won. Treat the defaults as **not yet profitable**.
-
-### Tested variants
-
-Four versions were fixed in advance and judged only on Oct 2020 to Oct 2023,
-then checked on Oct 2023 to Oct 2026, which played no part in the choice. All
-start with 60 USDT.
-
-| Variant | Oct 2020 to Oct 2023 | Oct 2023 to Oct 2026 |
-|---|---|---|
-| A: defaults (4h candles) | +20.5%, 75 trades | -6.7%, 65 trades |
-| B: daily candles | +0.7%, 6 trades | -4.0%, 15 trades |
-| C: A plus `trend_hold` | +13.9%, 90 trades | -6.8%, 78 trades |
-| D: B plus `trend_hold` | +0.7%, 6 trades | +0.7%, 16 trades |
-| Holding BTC | +136% | +200% |
-
-A won the choosing period and then lost money on the later one. No variant
-made money in both periods by more than about 1%. The bot keeps losses small
-(worst drop 3% to 14%), but it has not shown an edge over simply holding.
-
-To try a variant: `"interval": "1d", "learn_candles": 730, "min_trades_test": 6`
-for daily candles, and add `"trend_hold"` to `strategies`.
-
-### Going live
+### Real money
 
 1. On Binance, create an API key with **Enable Spot & Margin Trading** ON and
-   **Enable Withdrawals OFF**. Restrict it to your IP address.
+   **Enable Withdrawals OFF**. Restrict it to your IP address if you can.
 2. Put the keys in environment variables (never in a file you share):
    ```
    export BINANCE_API_KEY=...
    export BINANCE_API_SECRET=...
    ```
-3. Hold USDT in your Spot wallet.
+   (Windows Command Prompt: `set BINANCE_API_KEY=...`)
+3. Keep enough USDT in your Spot wallet for the weekly buys. If there is not
+   enough, the bot waits and retries rather than buying less.
 4. In `config.json` set `"live_trading_acknowledged": true`.
-5. `python main.py run --live`
+5. `python main.py dca --live`
 
-To practise with fake money on Binance's own test exchange first, set
-`"base_url": "https://testnet.binance.vision"` and use testnet API keys.
+The bot only needs to run at least once each week, so a phone with Termux works.
 
-The bot must stay running to trade (a computer that stays on, or a small cloud
-server). If it stops, the stop-loss order already on Binance still protects an
-open position.
-
-## Weekly buy mode
-
-A simpler, slower alternative to the trading bot: buy a fixed amount on the
-same day every week. By default it sells everything once the coins are worth
-30% more than the money put in (after fees), then starts a new round.
-
-```
-python main.py dca              # practice with pretend money
-python main.py dca --live       # real money (same API key and config steps as above)
-python main.py status           # buys so far, money put in, what it is worth now
-```
+## Settings
 
 | Key | Default | Meaning |
 |---|---|---|
 | `dca_amount` | `6` | USDT spent each week (Binance's minimum order is about 5) |
-| `dca_symbols` | `["BTCUSDT", "ETHUSDT", "SOLUSDT"]` | coins to buy; with several it buys one per week, in turn |
-| `dca_day` | `monday` | buy day (UTC). If the bot is off that day, it buys later the same week |
+| `dca_symbols` | `["BTCUSDT", "ETHUSDT", "SOLUSDT"]` | coins to buy, one per week, in turn |
+| `dca_day` | `monday` | buy day (UTC) |
 | `dca_take_profit` | `0.30` | sell everything at this profit (0.30 = 30%) after fees; `null` = never sell |
-| `dca_poll_seconds` | `3600` | how often it checks whether this week's buy is due |
+| `dca_poll_seconds` | `3600` | how often it checks |
 
-A week that passes entirely while the bot is off is skipped, never doubled.
-In live mode, if your Spot wallet has less USDT than `dca_amount`, it waits
-and retries rather than buying less.
+## Safety details
 
-On real Binance prices, buying 6 USDT of BTC every Monday:
+- Every order carries an ID. If the network drops Binance's reply, the bot
+  asks Binance whether the order went through instead of buying twice.
+- If a coin stops trading on Binance (EOS was delisted in 2025), the bot
+  skips it for buying, ignores the frozen price Binance keeps showing for it,
+  and lists anything it could not sell as STRANDED in `status` for you to
+  handle in the Binance app.
 
-| If you kept buying for... | Losing at the end | Median result | Worst start |
-|---|---|---|---|
-| 1 year | 28% of start weeks | +25% | -50% (June 2021) |
-| 2 years | 29% of start weeks | +80% | -50% (Nov 2020) |
-| 3 years | 7% of start weeks | +85% | -9% (Dec 2019) |
+## How it did on past prices
 
-Same test with a take-profit (sold USDT kept as cash, not reinvested).
-Each cell: share of start weeks losing money / median result.
+Real Binance prices, 6 USDT every Monday, starting in every week since 2018.
+Each cell: share of start weeks losing money / median result. Sold USDT is
+kept as cash, not reinvested.
 
-| Period | Never sell | Sell at +20% | Sell at +30% |
+BTC only, by profit target:
+
+| Kept buying for | Never sell | Sell at +20% | Sell at +30% |
 |---|---|---|---|
 | 1 year | 28% / +25% | 23% / +13% | 24% / +18% |
 | 2 years | 29% / +80% | 17% / +16% | 16% / +25% |
 | 3 years | 7% / +85% | 4% / +18% | 3% / +25% |
 
-Selling at a target lost money less often and its worst result was smaller,
-but it also capped the gains: the best 3-year result at +30% was +33%, against
-+609% for never selling. Each sale is also a taxable gain (30% plus 1% TDS in India).
+Selling at a target lost money less often, but capped the gains: the best
+3-year result at +30% was +33%, against +609% for never selling.
 
-Which coins? Same test (weekly buys, sell at +30%), every start week since 2018.
-Each cell: share of start weeks losing money / median result.
+By coins, selling at +30%:
 
 | Coins | 2 years | 3 years (worst start) |
 |---|---|---|
@@ -188,28 +102,22 @@ Each cell: share of start weeks losing money / median result.
 
 "Today's top 5" looks good partly because we already know those coins did
 well. "2018's top 6" is what someone picking coins with potential back then
-would have bought, and it did worse. EOS was delisted from Binance in 2025.
-Adding SOL to BTC + ETH left the median unchanged but made the bad cases
-worse (worst 1-year start -54% against -43%). It is the default because it
-was asked for; remove `"SOLUSDT"` for the lower-risk pair.
-If a coin stops trading, the bot skips it for buying, ignores its frozen price,
-and reports any of it still held as STRANDED in `status` for you to handle in
-the Binance app.
+would have bought, and it did worse. Adding SOL left the median unchanged but
+made the bad cases worse (worst 1-year start -54% against -43% for BTC + ETH);
+remove `"SOLUSDT"` for the lower-risk pair.
 
-It needs new money every week, it can sit at a large loss for a year or more,
-and past results do not promise future ones.
+Bad stretches were real: someone who started in mid-2021 was down about half
+a year or two later. Past results do not promise future ones.
 
-## Settings
+**India:** gains are taxed at 30%, plus 1% TDS when you sell, and each
+profit sale counts. Fees are 0.1% per buy and per sell.
 
-| Key | Default | Meaning |
-|---|---|---|
-| `symbols` | BTC/ETH/SOL/BNB vs USDT | coins it may trade (one position at a time) |
-| `interval` | `4h` | candle size; shorter means more trades and more fees |
-| `risk_per_trade` | `0.01` | fraction of equity lost if the stop is hit |
-| `max_position_pct` | `0.95` | most of the account one trade may use (no leverage) |
-| `reinvest_pct` | `1.0` | share of each profit reinvested; the rest is locked away |
-| `max_drawdown` | `0.25` | kill-switch level |
-| `relearn_hours` | `24` | how often it re-studies the charts |
+## Why there is no trading bot
+
+An earlier version also had a chart-reading trading bot. Tested on three
+years of real Binance prices it lost money (-7% to -10%) while simply holding
+BTC returned about +200%, so it was removed. It is still in this repository's
+git history.
 
 ## Tests
 

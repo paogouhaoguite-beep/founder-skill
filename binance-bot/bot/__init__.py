@@ -1,1 +1,1 @@
-"""A small, dependency-free Binance spot trading bot."""
+"""A small, dependency-free Binance weekly buy bot."""
