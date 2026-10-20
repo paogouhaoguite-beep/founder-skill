@@ -200,5 +200,20 @@ class LiveWeeklyBuy(unittest.TestCase):
         self.assertAlmostEqual(state["invested"], 6.0)
 
 
+    def test_take_profit_sells_real_holdings(self):
+        ex = FakeExchange()
+        state = {}
+        cfg = dict(CFG, dca_take_profit=0.20)
+        b = WeeklyBuyer(cfg, ex, LiveBroker(ex, cfg, state), state, log=lambda *_: None)
+        b.step(1792972800)
+        b.step(1792972800 + 7 * 86400)
+        ex.p = 130.0
+        b.step(1792972800 + 8 * 86400)
+        self.assertEqual(len(state["sales"]), 1)
+        self.assertLess(ex.bal["BTC"], 1e-4)  # only dust left
+        self.assertAlmostEqual(ex.bal["USDT"], 100 - 12 + state["sales"][0]["proceeds"], delta=0.05)
+        self.assertGreater(state["realized"], 12 * 0.20)
+
+
 if __name__ == "__main__":
     unittest.main()

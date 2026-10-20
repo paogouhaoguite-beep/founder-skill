@@ -227,6 +227,30 @@ class WeeklyBuy(unittest.TestCase):
             b.step(MON + w * 7 * DAY)
         self.assertEqual([x["symbol"] for x in state["buys"]], ["BTCUSDT", "ETHUSDT", "BTCUSDT"])
 
+    def test_take_profit_sells_at_target_after_fees_and_restarts(self):
+        b, state = self.buyer(dca_take_profit=0.20)
+        b.step(MON)
+        b.client.p = 100 * 1.20  # +20% price is not enough once fees and slippage are paid
+        b.step(MON + DAY)
+        self.assertEqual(state["sales"], [])
+        b.client.p = 100 * 1.25
+        b.step(MON + DAY)
+        self.assertEqual(len(state["sales"]), 1)
+        self.assertGreaterEqual(state["sales"][0]["profit"], 6 * 0.20)
+        self.assertEqual((state["invested"], state["holdings"]), (0.0, {}))
+        self.assertAlmostEqual(state["paper_cash"], 60 - 6 + state["sales"][0]["proceeds"])
+        b.step(MON + 7 * DAY)  # next week: a fresh round starts
+        self.assertAlmostEqual(state["invested"], 6.0)
+        self.assertAlmostEqual(state["total_invested"], 12.0)
+        self.assertIn("profit sales", b.summary())
+
+    def test_never_sells_when_disabled(self):
+        b, state = self.buyer(dca_take_profit=None)
+        b.step(MON)
+        b.client.p = 1000.0
+        b.step(MON + DAY)
+        self.assertEqual(state["sales"], [])
+
     def test_skips_below_minimum_and_without_funds(self):
         b, state = self.buyer(dca_amount=3)
         self.assertFalse(b.step(MON))

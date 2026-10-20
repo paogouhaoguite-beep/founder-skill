@@ -133,7 +133,8 @@ open position.
 ## Weekly buy mode
 
 A simpler, slower alternative to the trading bot: buy a fixed amount on the
-same day every week and never sell.
+same day every week. By default it sells everything once the coins are worth
+20% more than the money put in (after fees), then starts a new round.
 
 ```
 python main.py dca              # practice with pretend money
@@ -146,6 +147,7 @@ python main.py status           # buys so far, money put in, what it is worth no
 | `dca_amount` | `6` | USDT spent each week (Binance's minimum order is about 5) |
 | `dca_symbols` | `["BTCUSDT"]` | coins to buy; with several it buys one per week, in turn |
 | `dca_day` | `monday` | buy day (UTC). If the bot is off that day, it buys later the same week |
+| `dca_take_profit` | `0.20` | sell everything at this profit (0.20 = 20%) after fees; `null` = never sell |
 | `dca_poll_seconds` | `3600` | how often it checks whether this week's buy is due |
 
 A week that passes entirely while the bot is off is skipped, never doubled.
@@ -159,6 +161,18 @@ On real Binance prices, buying 6 USDT of BTC every Monday:
 | 1 year | 28% of start weeks | +25% | -50% (June 2021) |
 | 2 years | 29% of start weeks | +80% | -50% (Nov 2020) |
 | 3 years | 7% of start weeks | +85% | -9% (Dec 2019) |
+
+Same test with the 20% take-profit (sold USDT kept as cash, not reinvested):
+
+| Period | Never sell: losing / median | Sell at +20%: losing / median |
+|---|---|---|
+| 1 year | 28% / +25% | 23% / +13% |
+| 2 years | 29% / +80% | 17% / +16% |
+| 3 years | 7% / +85% | 4% / +18% |
+
+Selling at +20% lost money less often and its worst result was smaller, but
+it also capped the gains: the best 3-year result was +25% against +609% for
+never selling. Each sale is also a taxable gain (30% plus 1% TDS in India).
 
 It needs new money every week, it can sit at a large loss for a year or more,
 and past results do not promise future ones.

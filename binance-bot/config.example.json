@@ -28,6 +28,7 @@
   "dca_amount": 6,
   "dca_symbols": ["BTCUSDT"],
   "dca_day": "monday",
+  "dca_take_profit": 0.20,
   "dca_poll_seconds": 3600,
 
   "live_trading_acknowledged": false
