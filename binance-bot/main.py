@@ -3,6 +3,8 @@
     python main.py learn          study the charts and show which strategy wins
     python main.py run            trade with pretend money (paper mode, default)
     python main.py run --live     trade real money (needs API keys + config flag)
+    python main.py dca            weekly buy mode with pretend money: buy a fixed amount every week, never sell
+    python main.py dca --live     weekly buy mode with real money
     python main.py simulate       replay the last 3 years of real prices through the bot (minutes, not weeks)
     python main.py status         show balance, open position and trade history
     python main.py reset-halt     clear the kill switch after you have reviewed why it fired
@@ -14,6 +16,7 @@ import os
 import sys
 
 from bot import learner
+from bot.dca import WeeklyBuyer
 from bot.binance import INTERVAL_MS, BinanceClient, LiveBroker, PaperBroker
 from bot.replay import simulate
 from bot.trader import Trader
@@ -65,15 +68,16 @@ def run_simulation(cfg, years):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("command", choices=["learn", "run", "simulate", "status", "reset-halt"])
+    ap.add_argument("command", choices=["learn", "run", "dca", "simulate", "status", "reset-halt"])
     ap.add_argument("--years", type=float, default=3.0, help="how far back `simulate` replays")
     ap.add_argument("--live", action="store_true", help="trade real money")
     ap.add_argument("--config", default=os.path.join(HERE, "config.json"))
     args = ap.parse_args(argv)
 
     cfg = load_config(args.config)
-    live = args.command == "run" and args.live
-    state_path = os.path.join(HERE, "state.live.json" if live else "state.paper.json")
+    live = args.command in ("run", "dca") and args.live
+    prefix = "state.dca." if args.command == "dca" else "state."
+    state_path = os.path.join(HERE, prefix + ("live.json" if live else "paper.json"))
     state = load_state(state_path)
     client = BinanceClient(cfg["base_url"], os.environ.get("BINANCE_API_KEY", ""),
                            os.environ.get("BINANCE_API_SECRET", ""))
@@ -112,6 +116,11 @@ def main(argv=None):
             print("open position: %s" % (s.get("position") or "none"))
             print("trades: %d, wins: %d, total pnl: %+.4f" % (len(trades), wins, sum(t["pnl"] for t in trades)))
             print("halted: %s" % s.get("halted", False))
+        for name in ("state.dca.paper.json", "state.dca.live.json"):
+            p = os.path.join(HERE, name)
+            if os.path.exists(p):
+                print("== %s ==" % name)
+                print(WeeklyBuyer(cfg, client, None, load_state(p), log=None).summary())
         return 0
 
     if live:
@@ -127,7 +136,10 @@ def main(argv=None):
         broker = PaperBroker(client, cfg, state)
 
     try:
-        Trader(cfg, client, broker, state, state_path).run()
+        if args.command == "dca":
+            WeeklyBuyer(cfg, client, broker, state, state_path).run()
+        else:
+            Trader(cfg, client, broker, state, state_path).run()
     except KeyboardInterrupt:
         print("\nStopped. State saved in %s" % state_path)
     return 0

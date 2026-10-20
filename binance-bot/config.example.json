@@ -25,5 +25,10 @@
   "min_profit_factor": 1.5,
   "max_test_drawdown": 0.2,
 
+  "dca_amount": 6,
+  "dca_symbols": ["BTCUSDT"],
+  "dca_day": "monday",
+  "dca_poll_seconds": 3600,
+
   "live_trading_acknowledged": false
 }

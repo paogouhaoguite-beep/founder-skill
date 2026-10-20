@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from bot import backtest, learner  # noqa: E402
 from bot.binance import PaperBroker, floor_to_step, fmt  # noqa: E402
+from bot.dca import WeeklyBuyer, week_and_day  # noqa: E402
 from bot.replay import simulate  # noqa: E402
 from bot.indicators import atr, ema, highest_prior, rsi, sma  # noqa: E402
 from bot.strategies import STRATEGIES  # noqa: E402
@@ -176,6 +177,63 @@ class Replay(unittest.TestCase):
         pnl = sum(t["pnl"] for t in state["trades"])
         if not state["position"]:
             self.assertAlmostEqual(curve[-1][1], cfg["start_equity"] + pnl, places=6)
+
+
+class FixedPriceClient:
+    def __init__(self, price=100.0, minimum=5.0):
+        self.p, self.minimum = price, minimum
+
+    def price(self, symbol):
+        return self.p
+
+    def symbol_info(self, symbol):
+        return {"min_notional": self.minimum}
+
+
+class Broke:
+    live = True
+
+    def quote_balance(self):
+        return 1.0
+
+
+MON = 1792972800  # 2026-10-26 00:00 UTC, a Monday
+DAY = 86400
+
+
+class WeeklyBuy(unittest.TestCase):
+    def buyer(self, **over):
+        client = FixedPriceClient()
+        state = {}
+        cfg = dict(CFG, **over)
+        return WeeklyBuyer(cfg, client, PaperBroker(client, cfg, state), state, log=lambda *_: None), state
+
+    def test_monday_is_monday(self):
+        self.assertEqual(week_and_day(MON)[1], 0)
+
+    def test_buys_once_per_week_and_catches_up_later_in_week(self):
+        b, state = self.buyer(dca_day="wednesday")
+        self.assertFalse(b.step(MON + DAY))         # Tuesday: not yet
+        self.assertTrue(b.step(MON + 4 * DAY))      # bot was off Wednesday, buys Friday
+        self.assertFalse(b.step(MON + 5 * DAY))     # not twice in a week
+        self.assertTrue(b.step(MON + 9 * DAY))      # next Wednesday
+        self.assertEqual(len(state["buys"]), 2)
+        self.assertAlmostEqual(state["invested"], 12.0)
+        self.assertAlmostEqual(state["holdings"]["BTCUSDT"], 2 * 6 / (100 * 1.0005) * 0.999)
+
+    def test_rotates_symbols(self):
+        b, state = self.buyer(dca_symbols=["BTCUSDT", "ETHUSDT"])
+        for w in range(3):
+            b.step(MON + w * 7 * DAY)
+        self.assertEqual([x["symbol"] for x in state["buys"]], ["BTCUSDT", "ETHUSDT", "BTCUSDT"])
+
+    def test_skips_below_minimum_and_without_funds(self):
+        b, state = self.buyer(dca_amount=3)
+        self.assertFalse(b.step(MON))
+        client, st = FixedPriceClient(), {}
+        live = WeeklyBuyer(CFG, client, Broke(), st, log=lambda *_: None)
+        self.assertFalse(live.step(MON))
+        self.assertEqual(st["buys"], [])
 
 
 if __name__ == "__main__":

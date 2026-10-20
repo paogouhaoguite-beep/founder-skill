@@ -130,6 +130,39 @@ The bot must stay running to trade (a computer that stays on, or a small cloud
 server). If it stops, the stop-loss order already on Binance still protects an
 open position.
 
+## Weekly buy mode
+
+A simpler, slower alternative to the trading bot: buy a fixed amount on the
+same day every week and never sell.
+
+```
+python main.py dca              # practice with pretend money
+python main.py dca --live       # real money (same API key and config steps as above)
+python main.py status           # buys so far, money put in, what it is worth now
+```
+
+| Key | Default | Meaning |
+|---|---|---|
+| `dca_amount` | `6` | USDT spent each week (Binance's minimum order is about 5) |
+| `dca_symbols` | `["BTCUSDT"]` | coins to buy; with several it buys one per week, in turn |
+| `dca_day` | `monday` | buy day (UTC). If the bot is off that day, it buys later the same week |
+| `dca_poll_seconds` | `3600` | how often it checks whether this week's buy is due |
+
+A week that passes entirely while the bot is off is skipped, never doubled.
+In live mode, if your Spot wallet has less USDT than `dca_amount`, it waits
+and retries rather than buying less.
+
+On real Binance prices, buying 6 USDT of BTC every Monday:
+
+| If you kept buying for... | Losing at the end | Median result | Worst start |
+|---|---|---|---|
+| 1 year | 28% of start weeks | +25% | -50% (June 2021) |
+| 2 years | 29% of start weeks | +80% | -50% (Nov 2020) |
+| 3 years | 7% of start weeks | +85% | -9% (Dec 2019) |
+
+It needs new money every week, it can sit at a large loss for a year or more,
+and past results do not promise future ones.
+
 ## Settings
 
 | Key | Default | Meaning |
