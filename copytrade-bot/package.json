@@ -1,0 +1,20 @@
+{
+  "name": "copytrade-bot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Mirror the buys and sells of chosen Solana meme coin wallets.",
+  "type": "module",
+  "license": "MIT",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node src/index.js run",
+    "analyze": "node src/index.js analyze",
+    "status": "node src/index.js status",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.98.0",
+    "bs58": "^6.0.0",
+    "dotenv": "^16.4.5"
+  }
+}

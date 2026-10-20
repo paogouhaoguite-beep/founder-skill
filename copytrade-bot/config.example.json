@@ -1,0 +1,28 @@
+{
+  "mode": "paper",
+
+  "sizing": "fixed",
+  "buySol": 0.05,
+  "copyRatio": 0.1,
+  "maxBuySol": 0.25,
+  "minLeaderBuySol": 0.2,
+  "maxOpenPositions": 5,
+  "allowAddToPosition": false,
+
+  "slippageBps": 1500,
+  "priorityFeeMaxLamports": 2000000,
+  "maxSignalAgeSeconds": 45,
+
+  "takeProfitPct": 150,
+  "stopLossPct": 40,
+  "maxHoldMinutes": 240,
+  "priceCheckSeconds": 20,
+
+  "pollIntervalMs": 1500,
+  "stateFile": "state.json",
+
+  "targets": [
+    { "address": "PASTE_WALLET_ADDRESS_HERE", "label": "trader-1" },
+    { "address": "PASTE_ANOTHER_WALLET_HERE", "label": "trader-2", "buySol": 0.1 }
+  ]
+}
