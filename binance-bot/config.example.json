@@ -26,7 +26,7 @@
   "max_test_drawdown": 0.2,
 
   "dca_amount": 6,
-  "dca_symbols": ["BTCUSDT", "ETHUSDT"],
+  "dca_symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT"],
   "dca_day": "monday",
   "dca_take_profit": 0.30,
   "dca_poll_seconds": 3600,
