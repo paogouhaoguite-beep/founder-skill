@@ -66,12 +66,27 @@ The bot only needs to run at least once each week, so a phone with Termux works.
 
 ## Safety details
 
-- Every order carries an ID. If the network drops Binance's reply, the bot
-  asks Binance whether the order went through instead of buying twice.
-- If a coin stops trading on Binance (EOS was delisted in 2025), the bot
-  skips it for buying, ignores the frozen price Binance keeps showing for it,
-  and lists anything it could not sell as STRANDED in `status` for you to
-  handle in the Binance app.
+- **Never buys twice, never sells your own coins.** Every order is saved
+  with its ID in the history file before it is sent. If the reply is lost,
+  Binance is down, or the phone dies mid-order, the next check asks Binance
+  about that exact order instead of sending another. A profit sale that
+  stops halfway resumes coin by coin. The bot only ever sells what it bought,
+  so coins you hold yourself in the same account are safe.
+- **One copy at a time.** Starting the bot while another copy is already
+  running (say, in a second Termux window) is refused, because two copies
+  would buy twice.
+- **Delisted coins.** If a coin stops trading on Binance (EOS was delisted in
+  2025), the bot notices within an hour, skips it for buying, ignores the
+  frozen price Binance keeps showing for it, and lists anything it could not
+  sell as STRANDED in `status` for you to handle in the Binance app.
+- **Small leftovers.** If one coin's share is under Binance's 5 USDT minimum
+  when it is time to sell, it is kept and carried into the next round.
+- **Unfilled buys** (no sellers at that moment) are not recorded and are
+  retried later the same week.
+- **Clock drift.** If the phone's clock drifts and Binance rejects requests,
+  the bot resyncs with Binance's clock by itself.
+- **Mistakes in config.json** are listed in plain words at start-up. A damaged
+  history file is reported and never overwritten.
 
 ## How it did on past prices
 

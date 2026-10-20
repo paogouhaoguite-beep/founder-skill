@@ -37,7 +37,7 @@ class FixedPriceClient:
 class Broke:
     live = True
 
-    def quote_balance(self):
+    def quote_balance(self, symbol):
         return 1.0
 
 

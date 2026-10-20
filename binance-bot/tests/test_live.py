@@ -81,30 +81,30 @@ class LiveOrders(unittest.TestCase):
 
     def test_lost_reply_does_not_double_buy(self):
         self.ex.timeout_next_order = True
-        qty, avg = self.broker.buy("BTCUSDT", 50.0)
+        qty, avg, spent = self.broker.buy("BTCUSDT", 50.0, "id1")
         self.assertGreater(qty, 0)
         self.assertEqual(len(self.ex.orders), 1)
 
     def test_rejected_order_is_not_retried(self):
         self.ex.reject_next_order = True
         with self.assertRaises(BinanceError):
-            self.broker.buy("BTCUSDT", 50.0)
+            self.broker.buy("BTCUSDT", 50.0, "id1")
         self.assertEqual(self.ex.orders, [])
 
     def test_order_that_never_arrived_raises(self):
         self.ex.drop_next_order = True
         with self.assertRaises(OSError):
-            self.broker.buy("BTCUSDT", 50.0)
+            self.broker.buy("BTCUSDT", 50.0, "id1")
         self.assertEqual(self.ex.orders, [])
 
     def test_buy_quantity_is_net_of_fee(self):
-        qty, avg = self.broker.buy("BTCUSDT", 50.0)
+        qty, avg, spent = self.broker.buy("BTCUSDT", 50.0, "id1")
         self.assertAlmostEqual(qty, self.ex.bal["BTC"])
         self.assertAlmostEqual(avg, 100.0)
 
     def test_sell_never_exceeds_what_is_held(self):
-        self.broker.buy("BTCUSDT", 50.0)
-        self.assertGreater(self.broker.sell("BTCUSDT", 10.0), 0)  # asks for far more than held
+        self.broker.buy("BTCUSDT", 50.0, "id1")
+        self.assertGreater(self.broker.sell("BTCUSDT", 10.0, "id2"), 0)  # asks for far more than held
         self.assertLess(self.ex.bal["BTC"], 1e-4)
 
 

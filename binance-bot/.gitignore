@@ -1,3 +1,4 @@
 config.json
 state.*.json
 state.*.json.tmp
+state.*.json.lock

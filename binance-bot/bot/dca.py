@@ -11,11 +11,17 @@ doubled up. With several symbols it rotates: one coin per week, in order.
 A coin Binance stops trading (delisted or halted) is skipped for buying, and
 coins the bot can no longer price or sell are set aside as "stranded" for you
 to deal with in the Binance app, so the rest keeps working.
+
+Every order is written to the history file, with its ID, BEFORE it is sent.
+If anything fails halfway (network, Binance outage, phone dying), the next
+check asks Binance what happened to that exact order instead of sending
+another one. So a hiccup can never buy twice or sell coins the bot did not buy.
 """
 
 import json
 import os
 import time
+import uuid
 from datetime import datetime, timezone
 
 from .binance import BinanceError
@@ -27,6 +33,15 @@ def week_and_day(now):
     """ISO week key ("2026-W43") and weekday (0 = Monday), in UTC."""
     y, w, d = datetime.fromtimestamp(now, timezone.utc).isocalendar()
     return "%d-W%02d" % (y, w), d - 1
+
+
+def new_order_id():
+    return "bot" + uuid.uuid4().hex[:24]
+
+
+def _rejected(e):
+    """True when Binance definitely refused (4xx); False for outages, which may be retried."""
+    return isinstance(e, BinanceError) and (e.status or 500) < 500
 
 
 class WeeklyBuyer:
@@ -67,7 +82,7 @@ class WeeklyBuyer:
                         continue
                     out[s] = self.client.price(s)
                 except BinanceError as e:
-                    if (e.status or 500) >= 500:
+                    if not _rejected(e):
                         raise
                     self.log("Cannot get a price for %s (%s). It may have been delisted." % (s, e))
         return out
@@ -75,40 +90,111 @@ class WeeklyBuyer:
     def value(self):
         return sum(self.state["holdings"][s] * p for s, p in self.prices().items())
 
+    # ---- selling -----------------------------------------------------
     def take_profit(self, now):
-        target = self.cfg.get("dca_take_profit")
-        invested = self.state["invested"]
-        if not target or invested <= 0:
-            return False
-        prices = self.prices()
-        value = sum(self.state["holdings"][s] * p for s, p in prices.items())
-        if value * (1 - self.cfg["fee_rate"]) * (1 - self.cfg["slippage"]) < invested * (1 + target):
-            return False
-        proceeds = 0.0
-        for s, q in self.state["holdings"].items():
-            if not q:
-                continue
-            try:
-                if s not in prices:
-                    raise BinanceError("no price", 400)
-                proceeds += self.broker.sell(s, q)
-            except BinanceError as e:
-                if (e.status or 500) >= 500:
-                    raise
-                self.state["stranded"][s] = self.state["stranded"].get(s, 0.0) + q
-                self.log("Could not sell %s (%s); left in your account for you to handle in the Binance app." % (s, e))
-        profit = proceeds - invested
-        self.state["sales"].append({"time": int(now), "invested": invested, "proceeds": proceeds, "profit": profit})
-        self.state["realized"] += profit
-        self.state["invested"] = 0.0
-        self.state["holdings"] = {}
-        self.save()
-        self.log("Take profit: sold everything for %.2f USDT, profit %+.2f (%+.1f%%). Starting a new round." % (
-            proceeds, profit, 100 * profit / invested))
+        if not self.state.get("selling"):
+            target = self.cfg.get("dca_take_profit")
+            invested = self.state["invested"]
+            if not target or invested <= 0:
+                return False
+            prices = self.prices()
+            value = sum(self.state["holdings"][s] * p for s, p in prices.items())
+            if value * (1 - self.cfg["fee_rate"]) * (1 - self.cfg["slippage"]) < invested * (1 + target):
+                return False
+            self.state["selling"] = {"invested": invested, "proceeds": 0.0, "carried": {},
+                                     "carried_value": 0.0, "pending": {}}
+            self.save()
+        self._finish_sale(now)
         return True
+
+    def _finish_sale(self, now):
+        """Sell coin by coin, saving after each one, so an interrupted sale
+        resumes where it stopped instead of selling anything twice."""
+        sale, holdings = self.state["selling"], self.state["holdings"]
+        prices = self.prices()
+        for s in list(holdings):
+            q = holdings[s]
+            pending = sale["pending"].get(s)
+            if pending:  # a sell was sent but its outcome is unknown: ask Binance
+                got = self.broker.recover_sell(s, pending)
+                del sale["pending"][s]
+                if got is not None:
+                    sale["proceeds"] += got
+                    del holdings[s]
+                    self.save()
+                    continue
+                self.save()
+            if not q:
+                del holdings[s]
+                continue
+            if s not in prices:
+                self._strand(s, q, "cannot be priced")
+                continue
+            if q * prices[s] < self.client.symbol_info(s)["min_notional"]:
+                # Binance will not sell this little; keep it for the next round
+                sale["carried"][s] = q
+                sale["carried_value"] += q * prices[s]
+                del holdings[s]
+                self.save()
+                continue
+            oid = new_order_id()
+            sale["pending"][s] = oid
+            self.save()
+            try:
+                got = self.broker.sell(s, q, oid)
+            except Exception as e:
+                if not _rejected(e):
+                    raise  # outcome unknown; the order id is saved and checked next time
+                del sale["pending"][s]
+                self._strand(s, q, str(e))
+                continue
+            del sale["pending"][s]
+            sale["proceeds"] += got
+            del holdings[s]
+            self.save()
+
+        invested = sale["invested"]
+        profit = sale["proceeds"] + sale["carried_value"] - invested
+        self.state["sales"].append({"time": int(now), "invested": invested, "proceeds": sale["proceeds"],
+                                    "carried_over": sale["carried_value"], "profit": profit})
+        self.state["realized"] += profit
+        self.state["holdings"] = dict(sale["carried"])
+        self.state["invested"] = sale["carried_value"]
+        del self.state["selling"]
+        self.save()
+        self.log("Take profit: sold for %.2f USDT, profit %+.2f (%+.1f%%). Starting a new round." % (
+            sale["proceeds"], profit, 100 * profit / invested))
+
+    def _strand(self, s, q, why):
+        self.state["stranded"][s] = self.state["stranded"].get(s, 0.0) + q
+        del self.state["holdings"][s]
+        self.save()
+        self.log("Could not sell %s (%s); left in your account for you to handle in the Binance app." % (s, why))
+
+    # ---- buying ------------------------------------------------------
+    def _record_buy(self, when, week, symbol, qty, price, spent):
+        self.state["holdings"][symbol] = self.state["holdings"].get(symbol, 0.0) + qty
+        self.state["invested"] += spent
+        self.state["total_invested"] += spent
+        self.state["last_week"] = week
+        self.state["next_index"] += 1
+        self.state["buys"].append({"time": int(when), "symbol": symbol, "spent": spent, "qty": qty, "price": price})
+        self.save()
+        self.log("Weekly buy: %.2f USDT of %s at %.6g" % (spent, symbol, price))
+
+    def _resolve_pending_buy(self):
+        """A buy was sent but its outcome is unknown: ask Binance about that exact order."""
+        pb = self.state["pending_buy"]
+        got = self.broker.recover_buy(pb["symbol"], pb["id"])
+        del self.state["pending_buy"]
+        self.save()
+        if got and got[0] > 0:
+            self._record_buy(pb["time"], pb["week"], pb["symbol"], *got)
 
     def step(self, now=None):
         now = now or time.time()
+        if self.state.get("pending_buy"):
+            self._resolve_pending_buy()
         self.take_profit(now)
         if not self.due(now):
             return False
@@ -119,7 +205,7 @@ class WeeklyBuyer:
             try:
                 info = self.client.symbol_info(symbol)
             except BinanceError as e:
-                if (e.status or 500) >= 500:
+                if not _rejected(e):
                     raise
                 info = {"trading": False}
             if info.get("trading", True):
@@ -133,18 +219,26 @@ class WeeklyBuyer:
         if amount < minimum:
             self.log("dca_amount %.2f is below Binance's minimum order of %.2f for %s." % (amount, minimum, symbol))
             return False
-        if self.broker.live and self.broker.quote_balance() < amount:
+        if self.broker.live and self.broker.quote_balance(symbol) < amount:
             self.log("Not enough USDT for this week's %.2f buy; will retry at the next check." % amount)
             return False
-        qty, price = self.broker.buy(symbol, amount)
-        self.state["holdings"][symbol] = self.state["holdings"].get(symbol, 0.0) + qty
-        self.state["invested"] += amount
-        self.state["total_invested"] += amount
-        self.state["last_week"] = week_and_day(now)[0]
-        self.state["next_index"] += 1
-        self.state["buys"].append({"time": int(now), "symbol": symbol, "spent": amount, "qty": qty, "price": price})
+        week = week_and_day(now)[0]
+        oid = new_order_id()
+        self.state["pending_buy"] = {"id": oid, "symbol": symbol, "week": week, "time": int(now)}
         self.save()
-        self.log("Weekly buy: %.2f USDT of %s at %.6g" % (amount, symbol, price))
+        try:
+            qty, price, spent = self.broker.buy(symbol, amount, oid)
+        except Exception as e:
+            if _rejected(e):
+                del self.state["pending_buy"]
+                self.save()
+            raise  # otherwise the order id stays saved and is checked at the next step
+        del self.state["pending_buy"]
+        if qty <= 0:
+            self.save()
+            self.log("Binance could not fill the %s buy (no sellers at that moment); will retry." % symbol)
+            return False
+        self._record_buy(now, week, symbol, qty, price, spent)
         return True
 
     def summary(self):
@@ -156,6 +250,8 @@ class WeeklyBuyer:
         if target and invested:
             lines.append("sells everything when worth %.2f (+%.0f%% after fees)" % (
                 invested * (1 + target) / ((1 - self.cfg["fee_rate"]) * (1 - self.cfg["slippage"])), 100 * target))
+        if self.state.get("selling") or self.state.get("pending_buy"):
+            lines.append("an order was interrupted; it will be checked with Binance at the next run")
         if self.state["stranded"]:
             lines.append("STRANDED (could not be priced or sold, check the Binance app): %s" % self.state["stranded"])
         lines.append("all time: %d buys, %.2f put in, %d profit sales, %+.2f profit taken" % (
