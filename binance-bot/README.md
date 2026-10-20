@@ -22,6 +22,7 @@ afford to lose completely.
    | `trend_ema` | trend followers such as Ed Seykota | buy when a fast EMA crosses a slow one, in an uptrend |
    | `rsi2` | Larry Connors | buy sharp dips inside an uptrend, sell the bounce |
    | `macd_trend` | Gerald Appel (MACD) | buy MACD crosses above the 200 EMA |
+   | `trend_hold` (off by default) | Meb Faber | hold while price is above its long moving average |
 
 3. **Proves it before using it (walk-forward test).** Each method is tuned on
    the older 70% of the chart and then run on the newest 30%, which it has
@@ -87,6 +88,27 @@ Result with the default settings, October 2023 to October 2026, starting with
 the same period simply holding BTC returned about +194%. The bot sat out most
 of the time because no strategy passed its test, and the trades it did take
 lost slightly more than they won. Treat the defaults as **not yet profitable**.
+
+### Tested variants
+
+Four versions were fixed in advance and judged only on Oct 2020 to Oct 2023,
+then checked on Oct 2023 to Oct 2026, which played no part in the choice. All
+start with 60 USDT.
+
+| Variant | Oct 2020 to Oct 2023 | Oct 2023 to Oct 2026 |
+|---|---|---|
+| A: defaults (4h candles) | +20.5%, 75 trades | -6.7%, 65 trades |
+| B: daily candles | +0.7%, 6 trades | -4.0%, 15 trades |
+| C: A plus `trend_hold` | +13.9%, 90 trades | -6.8%, 78 trades |
+| D: B plus `trend_hold` | +0.7%, 6 trades | +0.7%, 16 trades |
+| Holding BTC | +136% | +200% |
+
+A won the choosing period and then lost money on the later one. No variant
+made money in both periods by more than about 1%. The bot keeps losses small
+(worst drop 3% to 14%), but it has not shown an edge over simply holding.
+
+To try a variant: `"interval": "1d", "learn_candles": 730, "min_trades_test": 6`
+for daily candles, and add `"trend_hold"` to `strategies`.
 
 ### Going live
 

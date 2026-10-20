@@ -21,7 +21,7 @@ def learn(history, cfg):
         if split < 250 or len(candles) - split < 50:
             continue
         train = candles[:split]
-        for strat in STRATEGIES.values():
+        for strat in (STRATEGIES[n] for n in cfg.get("strategies", STRATEGIES)):
             best, best_score = None, None
             for params in strat.grid():
                 res = backtest.run(train, strat, params, cfg)

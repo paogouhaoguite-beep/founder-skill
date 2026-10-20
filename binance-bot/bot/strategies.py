@@ -27,10 +27,11 @@ class Strategy:
     inspired_by = ""
     idea = ""
     base_grid = {}
+    stop_choices = STOP_ATR_CHOICES
 
     def grid(self):
         keys = list(self.base_grid) + ["stop_atr"]
-        values = list(self.base_grid.values()) + [STOP_ATR_CHOICES]
+        values = list(self.base_grid.values()) + [self.stop_choices]
         for combo in product(*values):
             params = dict(zip(keys, combo))
             if self.valid(params):
@@ -115,7 +116,22 @@ class MACDTrend(Strategy):
         return entries, exits
 
 
-STRATEGIES = {s.name: s for s in (Turtle(), TrendEMA(), RSI2(), MACDTrend())}
+class TrendHold(Strategy):
+    name = "trend_hold"
+    inspired_by = "Meb Faber (moving-average timing)"
+    idea = "Hold while price is above its long moving average; step aside when it closes below."
+    base_grid = {"ma": (50, 100, 200)}
+    stop_choices = (3.0, 5.0)
+
+    def signals(self, candles, p):
+        closes = [c["c"] for c in candles]
+        ma = sma(closes, p["ma"])
+        entries = [ma[i] is not None and closes[i] > ma[i] for i in range(len(closes))]
+        exits = [ma[i] is not None and closes[i] < ma[i] for i in range(len(closes))]
+        return entries, exits
+
+
+STRATEGIES = {s.name: s for s in (Turtle(), TrendEMA(), RSI2(), MACDTrend(), TrendHold())}
 
 
 def params_to_json(params):

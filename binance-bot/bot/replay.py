@@ -51,14 +51,20 @@ class ReplayBroker(PaperBroker):
         return proceeds
 
 
-def simulate(history, cfg, warmup_candles, log=lambda *_: None):
-    """Returns (state, equity_curve). equity_curve is a list of (time_ms, equity)."""
+def simulate(history, cfg, warmup_candles, log=lambda *_: None, start_ms=None, end_ms=None):
+    """Returns (state, equity_curve). equity_curve is a list of (time_ms, equity).
+
+    Trading starts after `warmup_candles` steps, or at `start_ms` if given."""
     client = ReplayClient(history)
     state = {}
     trader = Trader(cfg, client, ReplayBroker(client, cfg, state), state, log=log)
     timeline = sorted({c["close_time"] + 1 for cs in history.values() for c in cs})
     curve = []
-    for t in timeline[warmup_candles:]:
+    if start_ms is not None:
+        steps = [t for t in timeline if start_ms <= t < (end_ms or float("inf"))]
+    else:
+        steps = timeline[warmup_candles:]
+    for t in steps:
         client.now_ms = t
         trader.step(now=t / 1000)
         curve.append((t, trader.equity()))

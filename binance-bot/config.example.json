@@ -1,6 +1,7 @@
 {
   "base_url": "https://api.binance.com",
   "symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"],
+  "strategies": ["turtle", "trend_ema", "rsi2", "macd_trend"],
   "interval": "4h",
   "learn_candles": 1500,
   "signal_candles": 400,
