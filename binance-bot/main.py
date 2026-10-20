@@ -3,6 +3,7 @@
     python main.py learn          study the charts and show which strategy wins
     python main.py run            trade with pretend money (paper mode, default)
     python main.py run --live     trade real money (needs API keys + config flag)
+    python main.py simulate       replay the last 3 years of real prices through the bot (minutes, not weeks)
     python main.py status         show balance, open position and trade history
     python main.py reset-halt     clear the kill switch after you have reviewed why it fired
 """
@@ -13,7 +14,8 @@ import os
 import sys
 
 from bot import learner
-from bot.binance import BinanceClient, LiveBroker, PaperBroker
+from bot.binance import INTERVAL_MS, BinanceClient, LiveBroker, PaperBroker
+from bot.replay import simulate
 from bot.trader import Trader
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -35,9 +37,36 @@ def load_state(path):
     return {}
 
 
+def run_simulation(cfg, years):
+    # public market data mirror; works even where api.binance.com is blocked
+    client = BinanceClient("https://data-api.binance.vision")
+    total = int(years * 365 * 86_400_000 / INTERVAL_MS[cfg["interval"]]) + cfg["learn_candles"]
+    print("Downloading %d candles per coin ..." % total)
+    history = {s: client.closed_klines(s, cfg["interval"], total) for s in cfg["symbols"]}
+    print("Replaying (this takes a few minutes) ...")
+    state, curve = simulate(history, cfg, cfg["learn_candles"])
+    start, end = cfg["start_equity"], curve[-1][1]
+    peak, max_dd = start, 0.0
+    for _, eq in curve:
+        peak = max(peak, eq)
+        max_dd = max(max_dd, (peak - eq) / peak)
+    trades = state["trades"]
+    wins = [t for t in trades if t["pnl"] > 0]
+    print("\nStart %.2f -> end %.2f (%+.1f%%), worst drop %.1f%%" % (start, end, 100 * (end / start - 1), 100 * max_dd))
+    print("Trades %d, won %d (%.0f%%)%s" % (len(trades), len(wins), 100 * len(wins) / max(len(trades), 1),
+                                           ", KILL SWITCH FIRED" if state["halted"] else ""))
+    first = curve[0][0]
+    for s in cfg["symbols"]:
+        cs = [c for c in history[s] if c["t"] >= first]
+        if cs:
+            print("Buy and hold %s over the same period: %+.1f%%" % (s, 100 * (cs[-1]["c"] / cs[0]["o"] - 1)))
+    return 0
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("command", choices=["learn", "run", "status", "reset-halt"])
+    ap.add_argument("command", choices=["learn", "run", "simulate", "status", "reset-halt"])
+    ap.add_argument("--years", type=float, default=3.0, help="how far back `simulate` replays")
     ap.add_argument("--live", action="store_true", help="trade real money")
     ap.add_argument("--config", default=os.path.join(HERE, "config.json"))
     args = ap.parse_args(argv)
@@ -53,6 +82,9 @@ def main(argv=None):
         history = {s: client.closed_klines(s, cfg["interval"], cfg["learn_candles"]) for s in cfg["symbols"]}
         print(learner.format_report(learner.learn(history, cfg)))
         return 0
+
+    if args.command == "simulate":
+        return run_simulation(cfg, args.years)
 
     if args.command == "reset-halt":
         for name in ("state.paper.json", "state.live.json"):

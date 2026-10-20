@@ -57,11 +57,12 @@ class Trader:
         report = self.state["report"]
         return report is None or now - report["learned_at"] >= self.cfg["relearn_hours"] * 3600
 
-    def relearn(self):
+    def relearn(self, now):
         self.log("Studying the charts for %s ..." % ", ".join(self.cfg["symbols"]))
         history = {s: self.client.closed_klines(s, self.cfg["interval"], self.cfg["learn_candles"])
                    for s in self.cfg["symbols"]}
         report = learner.learn(history, self.cfg)
+        report["learned_at"] = int(now)
         self.state["report"] = report
         self.log(learner.format_report(report))
 
@@ -143,7 +144,7 @@ class Trader:
             self.log("Bot is halted by the kill switch. Run `python main.py reset-halt` to resume.")
             return
         if self.needs_learning(now):
-            self.relearn()
+            self.relearn(now)
 
         equity = self.equity()
         peak = max(self.state["peak_equity"] or equity, equity)

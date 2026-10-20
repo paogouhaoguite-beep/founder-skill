@@ -71,6 +71,23 @@ python main.py status                   # balance, open position, trade history
 
 Run paper mode for **at least 2 to 4 weeks** before thinking about real money.
 
+### Fast test on years of real prices
+
+```
+python main.py simulate             # last 3 years; --years 1 for a quicker run
+```
+
+This replays real Binance candles (from Binance's public data mirror,
+`data-api.binance.vision`) through the bot's own trading code, one candle at a
+time, re-learning every day, with fees, slippage and stop-losses. It takes a
+few minutes and shows what the bot would have done.
+
+Result with the default settings, October 2023 to October 2026, starting with
+60 USDT: **ended at 53.98 USDT (-10%)**, 61 trades, 14 wins, worst drop 13%. Over
+the same period simply holding BTC returned about +194%. The bot sat out most
+of the time because no strategy passed its test, and the trades it did take
+lost slightly more than they won. Treat the defaults as **not yet profitable**.
+
 ### Going live
 
 1. On Binance, create an API key with **Enable Spot & Margin Trading** ON and

@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from bot import backtest, learner  # noqa: E402
 from bot.binance import PaperBroker, floor_to_step, fmt  # noqa: E402
+from bot.replay import simulate  # noqa: E402
 from bot.indicators import atr, ema, highest_prior, rsi, sma  # noqa: E402
 from bot.strategies import STRATEGIES  # noqa: E402
 from bot.trader import Trader  # noqa: E402
@@ -164,6 +165,17 @@ class TraderLoop(unittest.TestCase):
         state["position"] = {"symbol": "X", "strategy": "turtle", "cost": 10.0, "opened": 0}
         trader.close_position(14.0, "test")
         self.assertAlmostEqual(state["vault"], 2.0)
+
+
+class Replay(unittest.TestCase):
+    def test_replay_uses_only_closed_candles_and_reconciles(self):
+        history = {"AUSDT": make_candles(700, drift=0.002, seed=11), "BUSDT": make_candles(700, seed=12)}
+        cfg = dict(CFG, symbols=list(history), learn_candles=400, relearn_hours=24 * 7, max_drawdown=0.9)
+        state, curve = simulate(history, cfg, warmup_candles=400)
+        self.assertEqual(len(curve), 300)
+        pnl = sum(t["pnl"] for t in state["trades"])
+        if not state["position"]:
+            self.assertAlmostEqual(curve[-1][1], cfg["start_equity"] + pnl, places=6)
 
 
 if __name__ == "__main__":
