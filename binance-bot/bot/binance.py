@@ -108,6 +108,7 @@ class BinanceClient:
                 "tick": float(f["PRICE_FILTER"]["tickSize"]),
                 "min_notional": float(notional.get("minNotional", 5.0)),
                 "quote_precision": int(data.get("quoteAssetPrecision", 8)),
+                "trading": data.get("status", "TRADING") == "TRADING",
             }
         return self._symbol_cache[symbol]
 

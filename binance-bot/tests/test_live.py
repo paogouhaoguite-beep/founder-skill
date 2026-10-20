@@ -193,7 +193,8 @@ class LiveWeeklyBuy(unittest.TestCase):
     def test_lost_reply_is_still_recorded_once(self):
         ex = FakeExchange()
         state = {}
-        b = WeeklyBuyer(CFG, ex, LiveBroker(ex, CFG, state), state, log=lambda *_: None)
+        cfg = dict(CFG, dca_symbols=["BTCUSDT"])
+        b = WeeklyBuyer(cfg, ex, LiveBroker(ex, cfg, state), state, log=lambda *_: None)
         ex.timeout_next_order = True
         self.assertTrue(b.step(1792972800))
         self.assertEqual(len(ex.orders), 1)
@@ -203,7 +204,7 @@ class LiveWeeklyBuy(unittest.TestCase):
     def test_take_profit_sells_real_holdings(self):
         ex = FakeExchange()
         state = {}
-        cfg = dict(CFG, dca_take_profit=0.20)
+        cfg = dict(CFG, dca_take_profit=0.20, dca_symbols=["BTCUSDT"])
         b = WeeklyBuyer(cfg, ex, LiveBroker(ex, cfg, state), state, log=lambda *_: None)
         b.step(1792972800)
         b.step(1792972800 + 7 * 86400)

@@ -145,7 +145,7 @@ python main.py status           # buys so far, money put in, what it is worth no
 | Key | Default | Meaning |
 |---|---|---|
 | `dca_amount` | `6` | USDT spent each week (Binance's minimum order is about 5) |
-| `dca_symbols` | `["BTCUSDT"]` | coins to buy; with several it buys one per week, in turn |
+| `dca_symbols` | `["BTCUSDT", "ETHUSDT"]` | coins to buy; with several it buys one per week, in turn |
 | `dca_day` | `monday` | buy day (UTC). If the bot is off that day, it buys later the same week |
 | `dca_take_profit` | `0.30` | sell everything at this profit (0.30 = 30%) after fees; `null` = never sell |
 | `dca_poll_seconds` | `3600` | how often it checks whether this week's buy is due |
@@ -174,6 +174,23 @@ Each cell: share of start weeks losing money / median result.
 Selling at a target lost money less often and its worst result was smaller,
 but it also capped the gains: the best 3-year result at +30% was +33%, against
 +609% for never selling. Each sale is also a taxable gain (30% plus 1% TDS in India).
+
+Which coins? Same test (weekly buys, sell at +30%), every start week since 2018.
+Each cell: share of start weeks losing money / median result.
+
+| Coins | 2 years | 3 years (worst start) |
+|---|---|---|
+| BTC only | 16% / +25% | 3% / +25% (-2%) |
+| BTC + ETH (default) | 6% / +24% | 0% / +25% (+5%) |
+| Today's top 5: BTC ETH BNB SOL XRP | 8% / +25% | 0% / +26% (+3%) |
+| 2018's top 6: BTC ETH XRP LTC ADA EOS | 33% / +21% | 9% / +19% (-10%) |
+
+"Today's top 5" looks good partly because we already know those coins did
+well. "2018's top 6" is what someone picking coins with potential back then
+would have bought, and it did worse. EOS was delisted from Binance in 2025.
+If a coin stops trading, the bot skips it for buying, ignores its frozen price,
+and reports any of it still held as STRANDED in `status` for you to handle in
+the Binance app.
 
 It needs new money every week, it can sit at a large loss for a year or more,
 and past results do not promise future ones.

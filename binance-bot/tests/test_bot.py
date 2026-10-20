@@ -7,7 +7,7 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from bot import backtest, learner  # noqa: E402
-from bot.binance import PaperBroker, floor_to_step, fmt  # noqa: E402
+from bot.binance import BinanceError, PaperBroker, floor_to_step, fmt  # noqa: E402
 from bot.dca import WeeklyBuyer, week_and_day  # noqa: E402
 from bot.replay import simulate  # noqa: E402
 from bot.indicators import atr, ema, highest_prior, rsi, sma  # noqa: E402
@@ -182,12 +182,18 @@ class Replay(unittest.TestCase):
 class FixedPriceClient:
     def __init__(self, price=100.0, minimum=5.0):
         self.p, self.minimum = price, minimum
+        self.delisted = set()  # removed entirely: Binance answers "Invalid symbol"
+        self.halted = set()    # how Binance really shows a delisted coin: listed, not trading, frozen price
 
     def price(self, symbol):
-        return self.p
+        if symbol in self.delisted:
+            raise BinanceError("400 Invalid symbol.", 400)
+        return 0.78 if symbol in self.halted else self.p
 
     def symbol_info(self, symbol):
-        return {"min_notional": self.minimum}
+        if symbol in self.delisted:
+            raise BinanceError("400 Invalid symbol.", 400)
+        return {"min_notional": self.minimum, "trading": symbol not in self.halted}
 
 
 class Broke:
@@ -212,7 +218,7 @@ class WeeklyBuy(unittest.TestCase):
         self.assertEqual(week_and_day(MON)[1], 0)
 
     def test_buys_once_per_week_and_catches_up_later_in_week(self):
-        b, state = self.buyer(dca_day="wednesday")
+        b, state = self.buyer(dca_day="wednesday", dca_symbols=["BTCUSDT"])
         self.assertFalse(b.step(MON + DAY))         # Tuesday: not yet
         self.assertTrue(b.step(MON + 4 * DAY))      # bot was off Wednesday, buys Friday
         self.assertFalse(b.step(MON + 5 * DAY))     # not twice in a week
@@ -243,6 +249,34 @@ class WeeklyBuy(unittest.TestCase):
         self.assertAlmostEqual(state["invested"], 6.0)
         self.assertAlmostEqual(state["total_invested"], 12.0)
         self.assertIn("profit sales", b.summary())
+
+    def test_delisted_coin_is_skipped_and_stranded(self):
+        b, state = self.buyer(dca_symbols=["BTCUSDT", "EOSUSDT", "ETHUSDT"], dca_take_profit=0.30)
+        for w in range(3):
+            b.step(MON + w * 7 * DAY)
+        self.assertEqual([x["symbol"] for x in state["buys"]], ["BTCUSDT", "EOSUSDT", "ETHUSDT"])
+        b.client.delisted.add("EOSUSDT")
+        b.step(MON + 3 * 7 * DAY)
+        b.step(MON + 4 * 7 * DAY)  # EOS's turn: skipped, ETH bought instead
+        self.assertEqual([x["symbol"] for x in state["buys"]][3:], ["BTCUSDT", "ETHUSDT"])
+        b.client.p = 200.0  # the coins it can still price are up enough to sell
+        b.step(MON + 4 * 7 * DAY + DAY)
+        self.assertEqual(len(state["sales"]), 1)
+        self.assertIn("EOSUSDT", state["stranded"])
+        self.assertEqual(state["holdings"], {})
+        self.assertIn("STRANDED", b.summary())
+
+    def test_halted_coin_with_frozen_price_is_not_counted(self):
+        b, state = self.buyer(dca_symbols=["BTCUSDT", "EOSUSDT"], dca_take_profit=0.30)
+        b.step(MON)
+        b.step(MON + 7 * DAY)
+        b.client.halted.add("EOSUSDT")
+        state["holdings"]["EOSUSDT"] = 1000.0  # a frozen price that would look like a big gain
+        b.step(MON + 7 * DAY + DAY)
+        self.assertEqual(state["sales"], [])
+        b.step(MON + 14 * DAY)  # BTC's turn
+        b.step(MON + 21 * DAY)  # EOS's turn: halted, so BTC is bought instead
+        self.assertEqual([x["symbol"] for x in state["buys"]][2:], ["BTCUSDT", "BTCUSDT"])
 
     def test_never_sells_when_disabled(self):
         b, state = self.buyer(dca_take_profit=None)

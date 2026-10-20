@@ -8,12 +8,17 @@ it to null to never sell.
 If the bot is off on the buy day it buys at the next check later that same
 week. A week that passes entirely while the bot is off is skipped, never
 doubled up. With several symbols it rotates: one coin per week, in order.
+A coin Binance stops trading (delisted or halted) is skipped for buying, and
+coins the bot can no longer price or sell are set aside as "stranded" for you
+to deal with in the Binance app, so the rest keeps working.
 """
 
 import json
 import os
 import time
 from datetime import datetime, timezone
+
+from .binance import BinanceError
 
 DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 
@@ -36,6 +41,7 @@ class WeeklyBuyer:
         state.setdefault("sales", [])
         state.setdefault("realized", 0.0)
         state.setdefault("total_invested", state["invested"])
+        state.setdefault("stranded", {})
 
     def save(self):
         if not self.state_path:
@@ -49,18 +55,48 @@ class WeeklyBuyer:
         week, day = week_and_day(now)
         return day >= DAYS.index(self.cfg["dca_day"].lower()) and self.state["last_week"] != week
 
+    def prices(self):
+        """Current price of every held coin. Coins Binance has stopped trading are
+        left out: it keeps showing a frozen last price for them that nobody can sell at."""
+        out = {}
+        for s, q in self.state["holdings"].items():
+            if q:
+                try:
+                    if not self.client.symbol_info(s).get("trading", True):
+                        self.log("%s is no longer trading on Binance; its price is not counted." % s)
+                        continue
+                    out[s] = self.client.price(s)
+                except BinanceError as e:
+                    if (e.status or 500) >= 500:
+                        raise
+                    self.log("Cannot get a price for %s (%s). It may have been delisted." % (s, e))
+        return out
+
     def value(self):
-        return sum(q * self.client.price(s) for s, q in self.state["holdings"].items() if q)
+        return sum(self.state["holdings"][s] * p for s, p in self.prices().items())
 
     def take_profit(self, now):
         target = self.cfg.get("dca_take_profit")
         invested = self.state["invested"]
         if not target or invested <= 0:
             return False
-        value = self.value() * (1 - self.cfg["fee_rate"]) * (1 - self.cfg["slippage"])
-        if value < invested * (1 + target):
+        prices = self.prices()
+        value = sum(self.state["holdings"][s] * p for s, p in prices.items())
+        if value * (1 - self.cfg["fee_rate"]) * (1 - self.cfg["slippage"]) < invested * (1 + target):
             return False
-        proceeds = sum(self.broker.sell(s, q) for s, q in self.state["holdings"].items() if q > 0)
+        proceeds = 0.0
+        for s, q in self.state["holdings"].items():
+            if not q:
+                continue
+            try:
+                if s not in prices:
+                    raise BinanceError("no price", 400)
+                proceeds += self.broker.sell(s, q)
+            except BinanceError as e:
+                if (e.status or 500) >= 500:
+                    raise
+                self.state["stranded"][s] = self.state["stranded"].get(s, 0.0) + q
+                self.log("Could not sell %s (%s); left in your account for you to handle in the Binance app." % (s, e))
         profit = proceeds - invested
         self.state["sales"].append({"time": int(now), "invested": invested, "proceeds": proceeds, "profit": profit})
         self.state["realized"] += profit
@@ -77,9 +113,23 @@ class WeeklyBuyer:
         if not self.due(now):
             return False
         symbols = self.cfg["dca_symbols"]
-        symbol = symbols[self.state["next_index"] % len(symbols)]
         amount = float(self.cfg["dca_amount"])
-        minimum = self.client.symbol_info(symbol)["min_notional"]
+        for _ in range(len(symbols)):
+            symbol = symbols[self.state["next_index"] % len(symbols)]
+            try:
+                info = self.client.symbol_info(symbol)
+            except BinanceError as e:
+                if (e.status or 500) >= 500:
+                    raise
+                info = {"trading": False}
+            if info.get("trading", True):
+                break
+            self.log("%s is not trading on Binance (delisted or halted); buying the next coin instead." % symbol)
+            self.state["next_index"] += 1
+        else:
+            self.log("None of %s can be bought right now." % ", ".join(symbols))
+            return False
+        minimum = info["min_notional"]
         if amount < minimum:
             self.log("dca_amount %.2f is below Binance's minimum order of %.2f for %s." % (amount, minimum, symbol))
             return False
@@ -106,6 +156,8 @@ class WeeklyBuyer:
         if target and invested:
             lines.append("sells everything when worth %.2f (+%.0f%% after fees)" % (
                 invested * (1 + target) / ((1 - self.cfg["fee_rate"]) * (1 - self.cfg["slippage"])), 100 * target))
+        if self.state["stranded"]:
+            lines.append("STRANDED (could not be priced or sold, check the Binance app): %s" % self.state["stranded"])
         lines.append("all time: %d buys, %.2f put in, %d profit sales, %+.2f profit taken" % (
             len(self.state["buys"]), self.state["total_invested"], len(self.state["sales"]), self.state["realized"]))
         return "\n".join(lines)
