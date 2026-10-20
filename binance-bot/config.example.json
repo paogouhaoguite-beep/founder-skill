@@ -1,0 +1,28 @@
+{
+  "base_url": "https://api.binance.com",
+  "symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"],
+  "interval": "4h",
+  "learn_candles": 1500,
+  "signal_candles": 400,
+  "relearn_hours": 24,
+  "poll_seconds": 60,
+
+  "start_equity": 60,
+  "risk_per_trade": 0.01,
+  "max_position_pct": 0.95,
+  "reinvest_pct": 1.0,
+  "max_drawdown": 0.25,
+
+  "fee_rate": 0.001,
+  "slippage": 0.0005,
+  "min_notional": 5,
+  "stop_limit_buffer": 0.005,
+
+  "train_fraction": 0.7,
+  "min_trades_train": 5,
+  "min_trades_test": 10,
+  "min_profit_factor": 1.5,
+  "max_test_drawdown": 0.2,
+
+  "live_trading_acknowledged": false
+}
