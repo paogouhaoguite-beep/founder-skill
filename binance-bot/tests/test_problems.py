@@ -13,7 +13,7 @@ import main  # noqa: E402
 from bot.binance import BinanceClient, BinanceError, LiveBroker  # noqa: E402
 from bot.dca import WeeklyBuyer  # noqa: E402
 
-CFG = main.load_config("/nonexistent")
+CFG = dict(main.load_config("/nonexistent", exchange="binance"), dca_amount=6, dca_symbols=["BTCUSDT", "ETHUSDT", "SOLUSDT"])
 MON = 1792972800  # 2026-10-26 00:00 UTC, a Monday
 WEEK = 7 * 86400
 BASE = {"BTCUSDT": "BTC", "ETHUSDT": "ETH", "SOLUSDT": "SOL"}

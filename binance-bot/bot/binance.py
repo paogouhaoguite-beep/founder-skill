@@ -9,28 +9,13 @@ import hashlib
 import hmac
 import json
 import time
-from decimal import ROUND_DOWN, Decimal
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
+from .exchange import ExchangeError, floor_to_step, fmt, refused
 
-class BinanceError(Exception):
-    def __init__(self, message, status=None):
-        super().__init__(message)
-        self.status = status
-
-
-def floor_to_step(value, step):
-    step_d = Decimal(str(step))
-    if step_d <= 0:
-        return Decimal(str(value))
-    return (Decimal(str(value)) / step_d).to_integral_value(rounding=ROUND_DOWN) * step_d
-
-
-def fmt(d):
-    s = format(Decimal(d).normalize(), "f")
-    return s if s not in ("-0", "") else "0"
+BinanceError = ExchangeError
 
 
 class BinanceClient:
@@ -119,12 +104,12 @@ class PaperBroker:
 
     def buy(self, symbol, quote_amount, order_id=None):
         """Returns (quantity received after fee, average price, quote spent)."""
-        price = self.client.price(symbol) * (1 + self.cfg["slippage"])
+        price = getattr(self.client, "buy_price", self.client.price)(symbol) * (1 + self.cfg["slippage"])
         return quote_amount / price * (1 - self.cfg["fee_rate"]), price, quote_amount
 
     def sell(self, symbol, qty, order_id=None):
-        price = self.client.price(symbol) * (1 - self.cfg["slippage"])
-        return qty * price * (1 - self.cfg["fee_rate"])
+        price = getattr(self.client, "sell_price", self.client.price)(symbol) * (1 - self.cfg["slippage"])
+        return qty * price * (1 - self.cfg["fee_rate"]) * (1 - self.cfg.get("tds_rate", 0.0))
 
     def recover_buy(self, symbol, order_id):
         return None
@@ -162,7 +147,7 @@ class LiveBroker:
                 try:
                     return self.client.get_order(params["symbol"], order_id)
                 except BinanceError as lookup:
-                    if (lookup.status or 0) < 500:
+                    if refused(lookup):
                         raise e from None  # the order never reached Binance
                 except OSError:
                     pass
@@ -172,7 +157,7 @@ class LiveBroker:
         try:
             return self.client.get_order(symbol, order_id)
         except BinanceError as e:
-            if (e.status or 0) < 500:
+            if refused(e):
                 return None  # Binance has no such order: it was never placed
             raise
 

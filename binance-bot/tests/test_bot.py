@@ -8,7 +8,7 @@ from bot.binance import BinanceError, PaperBroker, floor_to_step, fmt  # noqa: E
 from bot.dca import WeeklyBuyer, week_and_day  # noqa: E402
 from main import load_config  # noqa: E402
 
-CFG = load_config("/nonexistent")
+CFG = dict(load_config("/nonexistent", exchange="binance"), dca_amount=6, dca_symbols=["BTCUSDT", "ETHUSDT", "SOLUSDT"])
 
 
 class Rounding(unittest.TestCase):

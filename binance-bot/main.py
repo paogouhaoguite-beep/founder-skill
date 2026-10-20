@@ -1,4 +1,4 @@
-"""Weekly buy bot for Binance.
+"""Weekly buy bot for CoinDCX (rupees) or Binance (USDT).
 
     python main.py dca            buy with pretend money at real prices (practice)
     python main.py dca --live     buy with real money (needs API keys + config flag)
@@ -11,19 +11,58 @@ import os
 import sys
 
 from bot.binance import BinanceClient, LiveBroker, PaperBroker
+from bot.coindcx import CoinDCXBroker, CoinDCXClient
 from bot.dca import DAYS, WeeklyBuyer
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-STATE_FILES = ("state.dca.paper.json", "state.dca.live.json")
+
+EXCHANGES = {
+    # name: currency, smallest weekly amount, key variables, default fee settings
+    "coindcx": {"currency": "INR", "minimum": 100, "keys": ("COINDCX_API_KEY", "COINDCX_API_SECRET"),
+                "fee_rate": 0.0059, "slippage": 0.001, "tds_rate": 0.01},
+    "binance": {"currency": "USDT", "minimum": 5, "keys": ("BINANCE_API_KEY", "BINANCE_API_SECRET"),
+                "fee_rate": 0.001, "slippage": 0.0005, "tds_rate": 0.0},
+}
 
 
-def load_config(path):
+def state_files(exchange):
+    """History files. Binance keeps its original names so earlier history carries over."""
+    if exchange == "binance":
+        return "state.dca.paper.json", "state.dca.live.json"
+    return "state.dca.%s.paper.json" % exchange, "state.dca.%s.live.json" % exchange
+
+
+def exchange_settings(cfg):
+    """Set the chosen exchange's currency and fees. These always come from the
+    exchange, never from config.json, so an old config copied over from the
+    Binance version cannot leave Binance's fee in place for CoinDCX."""
+    ex = EXCHANGES.get(cfg.get("exchange"))
+    if ex:
+        cfg["currency"] = ex["currency"]
+        for k in ("fee_rate", "slippage", "tds_rate"):
+            cfg[k] = ex[k]
+    return cfg
+
+
+def make_client(cfg):
+    if cfg["exchange"] == "coindcx":
+        key, secret = EXCHANGES["coindcx"]["keys"]
+        return CoinDCXClient(cfg.get("coindcx_url", "https://api.coindcx.com"),
+                             os.environ.get(key, ""), os.environ.get(secret, ""))
+    key, secret = EXCHANGES["binance"]["keys"]
+    return BinanceClient(cfg.get("binance_url") or cfg.get("base_url") or "https://api.binance.com",
+                         os.environ.get(key, ""), os.environ.get(secret, ""))
+
+
+def load_config(path, exchange=None):
     with open(os.path.join(HERE, "config.example.json")) as fh:
         cfg = json.load(fh)
     if os.path.exists(path):
         with open(path) as fh:
             cfg.update(json.load(fh))
-    return cfg
+    if exchange:
+        cfg["exchange"] = exchange
+    return exchange_settings(cfg)
 
 
 def load_state(path):
@@ -35,21 +74,27 @@ def load_state(path):
     except ValueError:
         # never start over on top of a damaged history: it is the bot's only record of what it bought
         sys.exit("The history file %s is damaged. Rename it (e.g. add .bak) and start again; the bot will "
-                 "begin a new history. Your coins are still in your Binance account." % path)
+                 "begin a new history. Your coins are still in your exchange account." % path)
 
 
 def check_config(cfg):
     """Plain-language problems with config.json, or an empty list."""
     problems = []
+    ex = EXCHANGES.get(cfg.get("exchange"))
+    if ex is None:
+        return ["exchange must be \"coindcx\" or \"binance\"."]
+    cur = ex["currency"]
     if str(cfg.get("dca_day", "")).lower() not in DAYS:
         problems.append("dca_day must be a full day name such as \"monday\".")
     amount = cfg.get("dca_amount")
-    if not isinstance(amount, (int, float)) or amount < 5:
-        problems.append("dca_amount must be a number of USDT, at least 5 (Binance's minimum order).")
+    if not isinstance(amount, (int, float)) or amount < ex["minimum"]:
+        problems.append("dca_amount must be a number of %s, at least %d (the smallest order on %s)." % (
+            cur, ex["minimum"], cfg["exchange"]))
     symbols = cfg.get("dca_symbols")
     if not isinstance(symbols, list) or not symbols or not all(
-            isinstance(x, str) and x.isupper() and x.endswith("USDT") for x in symbols):
-        problems.append("dca_symbols must be a list of Binance pairs like [\"BTCUSDT\", \"ETHUSDT\"].")
+            isinstance(x, str) and x.isupper() and x.endswith(cur) for x in symbols):
+        problems.append("dca_symbols must be a list of %s pairs like [\"BTC%s\", \"ETH%s\"]." % (
+            cfg["exchange"], cur, cur))
     tp = cfg.get("dca_take_profit")
     if tp is not None and (not isinstance(tp, (int, float)) or not 0 < tp <= 5):
         problems.append("dca_take_profit must be a fraction like 0.30 for 30%, or null to never sell.")
@@ -85,17 +130,17 @@ def main(argv=None):
     args = ap.parse_args(argv)
 
     cfg = load_config(args.config)
-    client = BinanceClient(cfg["base_url"], os.environ.get("BINANCE_API_KEY", ""),
-                           os.environ.get("BINANCE_API_SECRET", ""))
 
     if args.command == "status":
         found = False
-        for name in STATE_FILES:
-            p = os.path.join(HERE, name)
-            if os.path.exists(p):
-                found = True
-                print("== %s ==" % ("real money" if "live" in name else "practice"))
-                print(WeeklyBuyer(cfg, client, None, load_state(p), log=lambda *_: None).summary())
+        for exchange in EXCHANGES:
+            ecfg = exchange_settings(dict(cfg, exchange=exchange))
+            for name in state_files(exchange):
+                p = os.path.join(HERE, name)
+                if os.path.exists(p):
+                    found = True
+                    print("== %s, %s ==" % (exchange, "real money" if ".live." in name else "practice"))
+                    print(WeeklyBuyer(ecfg, make_client(ecfg), None, load_state(p), log=lambda *_: None).summary())
         if not found:
             print("No buys yet. Start with: python main.py dca")
         return 0
@@ -104,7 +149,9 @@ def main(argv=None):
     if problems:
         print("Please fix config.json:\n- " + "\n- ".join(problems))
         return 2
-    state_path = os.path.join(HERE, STATE_FILES[1] if args.live else STATE_FILES[0])
+    client = make_client(cfg)
+    paper_file, live_file = state_files(cfg["exchange"])
+    state_path = os.path.join(HERE, live_file if args.live else paper_file)
     lock = acquire_lock(state_path)
     if lock is None:
         print("Another copy of the bot is already running (check your other Termux sessions). "
@@ -116,10 +163,11 @@ def main(argv=None):
             print("Refusing to use real money: set \"live_trading_acknowledged\": true in config.json "
                   "after you have run practice mode and read the README.")
             return 2
-        if not os.environ.get("BINANCE_API_KEY"):
-            print("Set BINANCE_API_KEY and BINANCE_API_SECRET first.")
+        key, secret = EXCHANGES[cfg["exchange"]]["keys"]
+        if not (os.environ.get(key) and os.environ.get(secret)):
+            print("Set %s and %s first." % (key, secret))
             return 2
-        broker = LiveBroker(client, cfg)
+        broker = CoinDCXBroker(client, cfg) if cfg["exchange"] == "coindcx" else LiveBroker(client, cfg)
     else:
         broker = PaperBroker(client, cfg)
 
