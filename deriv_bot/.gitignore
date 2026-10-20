@@ -1,0 +1,7 @@
+.env
+data/
+logs/
+KILL_SWITCH
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
