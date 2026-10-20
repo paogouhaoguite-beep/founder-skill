@@ -82,6 +82,12 @@ def main(argv=None):
     client = BinanceClient(cfg["base_url"], os.environ.get("BINANCE_API_KEY", ""),
                            os.environ.get("BINANCE_API_SECRET", ""))
 
+    if args.command in ("learn", "run", "dca"):
+        try:
+            client.sync_time()  # so "is this candle closed?" uses Binance's clock, not this computer's
+        except Exception:
+            pass
+
     if args.command == "learn":
         history = {s: client.closed_klines(s, cfg["interval"], cfg["learn_candles"]) for s in cfg["symbols"]}
         print(learner.format_report(learner.learn(history, cfg)))

@@ -9,6 +9,7 @@ import hashlib
 import hmac
 import json
 import time
+import uuid
 from decimal import ROUND_DOWN, Decimal
 from urllib.error import HTTPError
 from urllib.parse import urlencode
@@ -19,7 +20,9 @@ INTERVAL_MS = {"15m": 900_000, "30m": 1_800_000, "1h": 3_600_000, "2h": 7_200_00
 
 
 class BinanceError(Exception):
-    pass
+    def __init__(self, message, status=None):
+        super().__init__(message)
+        self.status = status
 
 
 def floor_to_step(value, step):
@@ -59,7 +62,7 @@ class BinanceClient:
             with urlopen(Request(url, method=method, headers=headers), timeout=20) as resp:
                 return json.loads(resp.read().decode())
         except HTTPError as e:
-            raise BinanceError("%s %s: %s" % (e.code, path, e.read().decode(errors="replace"))) from None
+            raise BinanceError("%s %s: %s" % (e.code, path, e.read().decode(errors="replace")), e.code) from None
 
     def sync_time(self):
         server = self._request("GET", "/api/v3/time")["serverTime"]
@@ -76,7 +79,7 @@ class BinanceClient:
 
     def closed_klines(self, symbol, interval, total):
         """The most recent `total` CLOSED candles (the still-forming one is dropped)."""
-        now = int(time.time() * 1000)
+        now = int(time.time() * 1000) + self.time_offset
         out, end = [], None
         while len(out) < total + 1:
             page = self.klines(symbol, interval, min(1000, total + 1 - len(out)), end)
@@ -120,8 +123,13 @@ class BinanceClient:
     def cancel_order(self, symbol, order_id):
         return self._request("DELETE", "/api/v3/order", {"symbol": symbol, "orderId": order_id}, signed=True)
 
-    def get_order(self, symbol, order_id):
-        return self._request("GET", "/api/v3/order", {"symbol": symbol, "orderId": order_id}, signed=True)
+    def get_order(self, symbol, order_id=None, client_order_id=None):
+        params = {"symbol": symbol}
+        if client_order_id is not None:
+            params["origClientOrderId"] = client_order_id
+        else:
+            params["orderId"] = order_id
+        return self._request("GET", "/api/v3/order", params, signed=True)
 
 
 class PaperBroker:
@@ -151,8 +159,8 @@ class PaperBroker:
     def place_stop(self, symbol, qty, stop_price):
         return None
 
-    def cancel_stop(self, symbol, stop_id):
-        pass
+    def exit_position(self, position):
+        return self.sell(position["symbol"], position["qty"])
 
     def stop_fill(self, position, last_price):
         """Proceeds if the stop was hit, else None."""
@@ -180,11 +188,32 @@ class LiveBroker:
     def quote_balance(self):
         return self.client.balances().get(self._quote_asset(), 0.0)
 
+    def _place(self, **params):
+        """Send an order. If the reply is lost (timeout, dropped connection,
+        Binance 5xx) look the order up by its client id instead of guessing,
+        so a lost reply never turns into a second order."""
+        params["newClientOrderId"] = "bot" + uuid.uuid4().hex[:24]
+        try:
+            return self.client.order(**params)
+        except (OSError, BinanceError) as e:
+            if isinstance(e, BinanceError) and (e.status or 0) < 500:
+                raise  # Binance rejected it; nothing was placed
+            for _ in range(3):
+                time.sleep(1)
+                try:
+                    return self.client.get_order(params["symbol"], client_order_id=params["newClientOrderId"])
+                except BinanceError as lookup:
+                    if (lookup.status or 0) < 500:
+                        raise e from None  # the order never reached Binance
+                except OSError:
+                    pass
+            raise
+
     def buy(self, symbol, quote_amount):
         info = self.client.symbol_info(symbol)
         decimals = 2 if info["quote"] in ("USDT", "USDC", "FDUSD") else min(info["quote_precision"], 8)
         amount = floor_to_step(quote_amount, 10 ** -decimals)
-        res = self.client.order(symbol=symbol, side="BUY", type="MARKET", quoteOrderQty=fmt(amount))
+        res = self._place(symbol=symbol, side="BUY", type="MARKET", quoteOrderQty=fmt(amount))
         filled = float(res["executedQty"])
         fee_in_base = sum(float(f["commission"]) for f in res.get("fills", []) if f["commissionAsset"] == info["base"])
         avg = float(res["cummulativeQuoteQty"]) / filled if filled else 0.0
@@ -196,7 +225,7 @@ class LiveBroker:
         q = floor_to_step(min(qty, held), info["step"])
         if q <= 0 or float(q) < info["min_qty"]:
             return 0.0
-        res = self.client.order(symbol=symbol, side="SELL", type="MARKET", quantity=fmt(q))
+        res = self._place(symbol=symbol, side="SELL", type="MARKET", quantity=fmt(q))
         return float(res["cummulativeQuoteQty"]) * (1 - self.cfg["fee_rate"])
 
     def place_stop(self, symbol, qty, stop_price):
@@ -206,27 +235,42 @@ class LiveBroker:
         limit = floor_to_step(stop_price * (1 - self.cfg["stop_limit_buffer"]), info["tick"])
         if q <= 0 or limit <= 0:
             return None
-        res = self.client.order(symbol=symbol, side="SELL", type="STOP_LOSS_LIMIT", timeInForce="GTC",
+        res = self._place(symbol=symbol, side="SELL", type="STOP_LOSS_LIMIT", timeInForce="GTC",
                                 quantity=fmt(q), stopPrice=fmt(stop), price=fmt(limit))
         return res["orderId"]
 
-    def cancel_stop(self, symbol, stop_id):
-        if stop_id is None:
-            return
-        try:
-            self.client.cancel_order(symbol, stop_id)
-        except BinanceError:
-            pass  # already filled or gone; stop_fill() will notice
+    def exit_position(self, position):
+        """Cancel the resting stop and sell what is left. Counts any part of
+        the stop that had already filled, so the proceeds are always real."""
+        symbol, got, sold = position["symbol"], 0.0, 0.0
+        stop_id = position.get("stop_id")
+        if stop_id is not None:
+            try:
+                self.client.cancel_order(symbol, stop_id)
+            except BinanceError:
+                pass  # already filled or gone; its status below says which
+            o = self.client.get_order(symbol, stop_id)
+            sold = float(o["executedQty"])
+            got = float(o["cummulativeQuoteQty"]) * (1 - self.cfg["fee_rate"])
+            position["stop_id"] = None
+        if position["qty"] - sold > 0:
+            got += self.sell(symbol, position["qty"] - sold)
+        return got
 
     def stop_fill(self, position, last_price):
+        """Proceeds if the position has been stopped out, else None."""
         stop_id = position.get("stop_id")
         if stop_id is None:
-            if last_price <= position["stop"]:
-                return self.sell(position["symbol"], position["qty"])
-            return None
+            return self.exit_position(position) if last_price <= position["stop"] else None
         o = self.client.get_order(position["symbol"], stop_id)
         if o["status"] == "FILLED":
             return float(o["cummulativeQuoteQty"]) * (1 - self.cfg["fee_rate"])
         if o["status"] in ("CANCELED", "EXPIRED", "REJECTED"):
+            if float(o["executedQty"]) > 0:
+                return self.exit_position(position)
             position["stop_id"] = None
+            return self.stop_fill(position, last_price)
+        if last_price < float(o["price"]):
+            # price gapped through the stop AND its limit, so the order cannot fill
+            return self.exit_position(position)
         return None

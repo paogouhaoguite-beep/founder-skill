@@ -92,8 +92,7 @@ class Trader:
         strat = STRATEGIES[pos["strategy"]]
         _, exits = strat.signals(candles, params_from_json(pos["params"]))
         if exits[-1]:
-            self.broker.cancel_stop(pos["symbol"], pos.get("stop_id"))
-            self.close_position(self.broker.sell(pos["symbol"], pos["qty"]), "strategy exit")
+            self.close_position(self.broker.exit_position(pos), "strategy exit")
 
     def maybe_enter(self):
         champ = (self.state["report"] or {}).get("champion")
@@ -152,8 +151,7 @@ class Trader:
         if peak and (peak - equity) / peak >= self.cfg["max_drawdown"]:
             pos = self.state["position"]
             if pos:
-                self.broker.cancel_stop(pos["symbol"], pos.get("stop_id"))
-                self.close_position(self.broker.sell(pos["symbol"], pos["qty"]), "kill switch")
+                self.close_position(self.broker.exit_position(pos), "kill switch")
             self.state["halted"] = True
             self.log("KILL SWITCH: equity fell %.1f%% from its peak. Trading stopped." % (100 * (peak - equity) / peak))
             self.save()
