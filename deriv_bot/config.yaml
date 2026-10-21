@@ -1,0 +1,55 @@
+# Deriv trading bot configuration.
+# EDUCATIONAL USE ONLY. Trading binary options/synthetic indices carries a high
+# risk of loss. You are responsible for complying with Deriv's Terms of Service.
+
+api:
+  endpoint: "wss://ws.binaryws.com/websockets/v3"
+  app_id: 1089                  # Deriv's public test app_id; register your own at api.deriv.com
+  token_env: "DERIV_API_TOKEN"  # name of the env var holding the API token (never put the token here)
+  request_timeout: 15.0         # seconds to wait for any single API response
+  max_retries: 5                # reconnect / rate-limit retries before giving up
+  reconnect_base_delay: 1.0     # exponential backoff: base * 2^attempt, capped below
+  reconnect_max_delay: 30.0
+  rate_limit_backoff: 5.0       # seconds (multiplied by attempt) after a RateLimit error
+
+trading:
+  symbol: "R_100"               # Volatility 100 Index. Forex example: "frxEURUSD"
+  currency: "USD"
+  contract_duration: 5          # contract length...
+  duration_unit: "m"            # ...in t (ticks), s, m or h
+  poll_interval: 5.0            # seconds between bot loop iterations
+  min_payout_ratio: 0.75        # skip trades whose (payout - stake) / stake is below this
+
+strategy:
+  name: "ema_crossover"
+  fast_period: 9
+  slow_period: 21
+  granularity: 60               # candle size in seconds (60 = 1 minute)
+  candle_count: 100             # candles requested per evaluation
+  min_ema_gap_pct: 0.0          # require |fast-slow|/slow * 100 >= this after the cross (whipsaw filter)
+
+risk:
+  risk_per_trade_pct: 1.0       # stake = balance * pct / 100 (hard-capped at 2%)
+  daily_loss_limit_pct: 5.0     # kill switch when today's realized loss reaches this % of day-start equity
+  max_consecutive_losses: 3     # pause after this many losses in a row...
+  cooldown_minutes: 60          # ...for this long
+  min_stake: 0.35               # Deriv's minimum stake; if risk % is below it the trade is SKIPPED
+  max_stake: 50.0               # absolute ceiling per trade
+  max_trades_per_day: 20
+  max_open_positions: 1
+  max_critical_errors: 5        # consecutive unexpected errors before the kill switch fires
+
+paper:
+  starting_balance: 100.0       # virtual balance used in --paper mode
+
+database:
+  path: "data/trades.db"
+
+logging:
+  level: "INFO"
+  file: "logs/bot.log"
+
+safety:
+  allow_real_account: false     # refuse to trade unless the authorized account is virtual (demo)
+  kill_switch_file: "KILL_SWITCH"   # create this file to stop the bot immediately
+  close_positions_on_kill: false    # live mode: try to sell open contracts when the kill switch fires
