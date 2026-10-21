@@ -1,0 +1,230 @@
+{
+  "source": "BERKSHIRE HATHAWAY INC 13F-HR, quarter ending 2026-06-30, filed 2026-08-14 (accession 0001193125-26-352200)",
+  "as_of": "2026-06-30",
+  "filed": "2026-08-14",
+  "cik": "0001067983",
+  "method": "all stock positions by value, share classes combined, pct_of_13f scaled to 100",
+  "weights": [
+    {
+      "ticker": "AAPL",
+      "name": "Apple",
+      "weight": 22.91,
+      "pct_of_13f": 22.04,
+      "value": 65950296923.0,
+      "shares": 227917808.0,
+      "cusips": [
+        "037833100"
+      ]
+    },
+    {
+      "ticker": "AXP",
+      "name": "American Express",
+      "weight": 17.82,
+      "pct_of_13f": 17.14,
+      "value": 51282319275.0,
+      "shares": 151610700.0,
+      "cusips": [
+        "025816109"
+      ]
+    },
+    {
+      "ticker": "GOOGL",
+      "name": "Alphabet",
+      "weight": 13.12,
+      "pct_of_13f": 12.62,
+      "value": 37764088383.0,
+      "shares": 105979600.0,
+      "cusips": [
+        "02079K305",
+        "02079K107"
+      ],
+      "classes": [
+        "GOOGL",
+        "GOOG"
+      ]
+    },
+    {
+      "ticker": "KO",
+      "name": "Coca Cola",
+      "weight": 11.29,
+      "pct_of_13f": 10.86,
+      "value": 32508000000.0,
+      "shares": 400000000.0,
+      "cusips": [
+        "191216100"
+      ]
+    },
+    {
+      "ticker": "BAC",
+      "name": "Bank of America",
+      "weight": 9.56,
+      "pct_of_13f": 9.2,
+      "value": 27543790975.0,
+      "shares": 483394015.0,
+      "cusips": [
+        "060505104"
+      ]
+    },
+    {
+      "ticker": "CVX",
+      "name": "Chevron",
+      "weight": 4.85,
+      "pct_of_13f": 4.67,
+      "value": 13986141890.0,
+      "shares": 84375856.0,
+      "cusips": [
+        "166764100"
+      ]
+    },
+    {
+      "ticker": "OXY",
+      "name": "Occidental Petroleum",
+      "weight": 4.47,
+      "pct_of_13f": 4.3,
+      "value": 12868205304.0,
+      "shares": 264941431.0,
+      "cusips": [
+        "674599105"
+      ]
+    },
+    {
+      "ticker": "CB",
+      "name": "Chubb",
+      "weight": 4.05,
+      "pct_of_13f": 3.9,
+      "value": 11670066615.0,
+      "shares": 34249183.0,
+      "cusips": [
+        "H1467J104"
+      ]
+    },
+    {
+      "ticker": "MCO",
+      "name": "Moodys",
+      "weight": 3.88,
+      "pct_of_13f": 3.73,
+      "value": 11173435852.0,
+      "shares": 24669778.0,
+      "cusips": [
+        "615369105"
+      ]
+    },
+    {
+      "ticker": "KHC",
+      "name": "Kraft Heinz",
+      "weight": 2.67,
+      "pct_of_13f": 2.57,
+      "value": 7691494401.0,
+      "shares": 325634818.0,
+      "cusips": [
+        "500754106"
+      ]
+    },
+    {
+      "ticker": "DVA",
+      "name": "Davita",
+      "weight": 2.23,
+      "pct_of_13f": 2.15,
+      "value": 6425268898.0,
+      "shares": 28880209.0,
+      "cusips": [
+        "23918K108"
+      ]
+    },
+    {
+      "ticker": "DAL",
+      "name": "Delta Air Lines",
+      "weight": 1.86,
+      "pct_of_13f": 1.79,
+      "value": 5368591200.0,
+      "shares": 57320000.0,
+      "cusips": [
+        "247361702"
+      ]
+    },
+    {
+      "ticker": "SIRI",
+      "name": "Sirius Xm Holdings",
+      "weight": 1.28,
+      "pct_of_13f": 1.23,
+      "value": 3686802237.0,
+      "shares": 124807117.0,
+      "cusips": [
+        "829933100"
+      ]
+    }
+  ],
+  "skipped": [
+    {
+      "issuer": "VERISIGN INC",
+      "ticker": "VRSN",
+      "why": "below --min-pct 1.00"
+    },
+    {
+      "issuer": "KROGER CO",
+      "ticker": "KR",
+      "why": "below --min-pct 1.00"
+    },
+    {
+      "issuer": "LIBERTY LIVE HOLDINGS INC",
+      "ticker": "LLYVK",
+      "why": "below --min-pct 1.00"
+    },
+    {
+      "issuer": "ALLY FINL INC",
+      "ticker": "ALLY",
+      "why": "below --min-pct 1.00"
+    },
+    {
+      "issuer": "LENNAR CORP",
+      "ticker": "LEN",
+      "why": "below --min-pct 1.00"
+    },
+    {
+      "issuer": "NEW YORK TIMES CO MTN BE",
+      "ticker": "NYT",
+      "why": "below --min-pct 1.00"
+    },
+    {
+      "issuer": "CAPITAL ONE FINL CORP",
+      "ticker": "COF",
+      "why": "below --min-pct 1.00"
+    },
+    {
+      "issuer": "LOUISIANA PAC CORP",
+      "ticker": "LPX",
+      "why": "below --min-pct 1.00"
+    },
+    {
+      "issuer": "NUCOR CORP",
+      "ticker": "NUE",
+      "why": "below --min-pct 1.00"
+    },
+    {
+      "issuer": "MACYS INC",
+      "ticker": "M",
+      "why": "below --min-pct 1.00"
+    },
+    {
+      "issuer": "NVR INC",
+      "ticker": "NVR",
+      "why": "below --min-pct 1.00"
+    },
+    {
+      "issuer": "JEFFERIES FINANCIAL GROUP IN",
+      "ticker": "JEF",
+      "why": "below --min-pct 1.00"
+    },
+    {
+      "issuer": "D R HORTON INC",
+      "ticker": "DHI",
+      "why": "below --min-pct 1.00"
+    }
+  ],
+  "caveats": [
+    "A 13F is a snapshot of the last day of the quarter, filed up to 45 days later. The investor may have sold or added since.",
+    "It shows long positions in US-listed stocks only: no shorts, cash, bonds, foreign stocks, private companies or trades made inside the quarter.",
+    "It is filed by the firm, not by the person it is known for.",
+    "Education and tooling, not financial advice. Nothing here places an order."
+  ]
+}
