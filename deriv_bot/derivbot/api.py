@@ -199,6 +199,10 @@ class DerivClient:
             raise ConnectionLostError(str(exc)) from exc
         finally:
             self._pending.pop(req_id, None)
+            # The reader may have failed this future while send() was still running;
+            # mark its exception as retrieved so asyncio doesn't log it as lost.
+            if fut.done() and not fut.cancelled():
+                fut.exception()
         raise_for_error(msg)
         return msg
 
@@ -287,3 +291,14 @@ class DerivClient:
     async def sell(self, contract_id: int | str, price: float = 0) -> JSON:
         msg = await self.request({"sell": int(contract_id), "price": price}, idempotent=False)
         return dict(msg["sell"])
+
+    async def portfolio(self) -> list[JSON]:
+        """Open contracts on the authorized account."""
+        msg = await self.request({"portfolio": 1})
+        return list(msg.get("portfolio", {}).get("contracts", []))
+
+    async def profit_table(self, date_from: int, limit: int = 50) -> list[JSON]:
+        """Closed contracts bought at or after `date_from` (epoch seconds)."""
+        msg = await self.request({"profit_table": 1, "description": 1,
+                                  "date_from": date_from, "limit": limit})
+        return list(msg.get("profit_table", {}).get("transactions", []))

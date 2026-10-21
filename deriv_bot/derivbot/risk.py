@@ -43,6 +43,7 @@ class RiskManager:
         self.halted = False
         self.halt_reason = ""
         self.critical_errors = 0
+        self.last_reset_at: datetime | None = None  # when the last cooldown ended
 
     # --- position sizing -------------------------------------------------
     def calculate_stake(self, balance: float) -> float:
@@ -61,6 +62,12 @@ class RiskManager:
         return stake
 
     # --- daily limit -----------------------------------------------------
+    def daily_loss_headroom(self, snap: AccountSnapshot) -> float:
+        """How much more can be lost today (counting open stakes as already lost)."""
+        day_start_equity = snap.equity - snap.daily_realized_pnl
+        limit = day_start_equity * self.cfg.daily_loss_limit_pct / 100.0
+        return limit + snap.daily_realized_pnl - snap.open_stakes
+
     def daily_loss_limit_hit(self, snap: AccountSnapshot) -> bool:
         if snap.daily_realized_pnl >= 0:
             return False
@@ -83,6 +90,12 @@ class RiskManager:
                 self.consecutive_losses, self.paused_until.isoformat(),
             )
 
+    def restore_streak(self, losses: int, last_loss_at: datetime | None) -> None:
+        """Rebuild loss-streak state after a restart so a restart cannot skip a cooldown."""
+        self.consecutive_losses = losses
+        if losses >= self.cfg.max_consecutive_losses and last_loss_at is not None:
+            self.paused_until = last_loss_at + timedelta(minutes=self.cfg.cooldown_minutes)
+
     def is_paused(self, now: datetime) -> bool:
         if self.paused_until is None:
             return False
@@ -90,6 +103,7 @@ class RiskManager:
             log.info("Loss-streak cooldown over; resuming")
             self.paused_until = None
             self.consecutive_losses = 0
+            self.last_reset_at = now
             return False
         return True
 
@@ -133,6 +147,10 @@ class RiskManager:
             return RiskDecision(False, "max open positions reached")
         if snap.trades_today >= self.cfg.max_trades_per_day:
             return RiskDecision(False, "max trades per day reached")
-        if self.calculate_stake(snap.balance) <= 0:
+        stake = self.calculate_stake(snap.balance)
+        if stake <= 0:
             return RiskDecision(False, "balance too small for minimum stake within risk limit")
+        if stake > self.daily_loss_headroom(snap) + 1e-9:
+            return RiskDecision(False, "paused for today: losing the next stake could breach "
+                                       "the daily loss limit")
         return RiskDecision(True)

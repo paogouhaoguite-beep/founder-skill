@@ -131,6 +131,10 @@ class TradeDatabase:
             c.execute("INSERT INTO meta(key, value) VALUES(?, ?) "
                       "ON CONFLICT(key) DO UPDATE SET value=excluded.value", (key, value))
 
+    def delete_meta(self, key: str) -> None:
+        with self._tx() as c:
+            c.execute("DELETE FROM meta WHERE key=?", (key,))
+
     # --- writes ------------------------------------------------------------
     def open_trade(
         self,
@@ -239,13 +243,21 @@ class TradeDatabase:
             (mode, day.isoformat())).fetchone()
         return int(row["n"])
 
-    def trailing_consecutive_losses(self, mode: str) -> int:
+    def trailing_losses(self, mode: str, since: str | None = None) -> tuple[int, datetime | None]:
+        """Losses in a row at the end of the journal (only those closed after `since`)
+        and when the most recent of them closed."""
         n = 0
+        last: datetime | None = None
         for t in reversed(self.closed_trades(mode)):
-            if t.status != "lost":
+            if t.status != "lost" or (since and (t.closed_at or "") <= since):
                 break
+            if last is None and t.closed_at:
+                last = datetime.fromisoformat(t.closed_at)
             n += 1
-        return n
+        return n, last
+
+    def trailing_consecutive_losses(self, mode: str) -> int:
+        return self.trailing_losses(mode)[0]
 
     # --- analytics ---------------------------------------------------------
     def stats(self, mode: str, initial_balance: float) -> PerformanceStats:
@@ -295,26 +307,26 @@ class TradeDatabase:
             max_drawdown_pct=round(max_dd_pct, 2),
         )
 
-    def _summaries(self, mode: str, key_sql: str, limit: int) -> list[PeriodSummary]:
-        rows = self.conn.execute(
-            f"""SELECT {key_sql} AS period, COUNT(*) AS trades,
-                       SUM(status='won') AS wins, SUM(status='lost') AS losses,
-                       COALESCE(SUM(pnl), 0) AS pnl
-                FROM trades WHERE mode=? AND status!='open'
-                GROUP BY period ORDER BY period DESC LIMIT ?""",
-            (mode, limit))
+    @staticmethod
+    def _summarize(groups: dict[str, list[TradeRecord]], limit: int) -> list[PeriodSummary]:
         out = []
-        for r in rows:
-            trades = int(r["trades"])
-            wins = int(r["wins"] or 0)
-            out.append(PeriodSummary(str(r["period"]), trades, wins, int(r["losses"] or 0),
-                                     wins / trades * 100 if trades else 0.0,
-                                     round(float(r["pnl"]), 2)))
+        for period in sorted(groups, reverse=True)[:limit]:
+            ts = groups[period]
+            wins = sum(t.status == "won" for t in ts)
+            out.append(PeriodSummary(period, len(ts), wins, len(ts) - wins,
+                                     wins / len(ts) * 100, round(sum(t.pnl or 0 for t in ts), 2)))
         return out
 
     def daily_summary(self, mode: str, days: int = 7) -> list[PeriodSummary]:
-        return self._summaries(mode, "substr(closed_at, 1, 10)", days)
+        groups: dict[str, list[TradeRecord]] = {}
+        for t in self.closed_trades(mode):
+            groups.setdefault((t.closed_at or "")[:10], []).append(t)
+        return self._summarize(groups, days)
 
     def weekly_summary(self, mode: str, weeks: int = 4) -> list[PeriodSummary]:
-        # SQLite's %W is Monday-based week of year; prefix with %Y for sorting.
-        return self._summaries(mode, "strftime('%Y-W%W', substr(closed_at, 1, 19))", weeks)
+        """Grouped by ISO week (Monday start; a week spanning New Year stays whole)."""
+        groups: dict[str, list[TradeRecord]] = {}
+        for t in self.closed_trades(mode):
+            year, week, _ = datetime.fromisoformat(t.closed_at or "").isocalendar()
+            groups.setdefault(f"{year}-W{week:02d}", []).append(t)
+        return self._summarize(groups, weeks)

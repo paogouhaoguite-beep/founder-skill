@@ -60,6 +60,7 @@ class MockDerivServer:
     rate_limit_next: int = 0  # respond RateLimit to the next N requests
     reject_connections: int = 0  # refuse the next N handshakes (HTTP 503)
     drop_after_messages: int | None = None  # close the socket after N more messages
+    lose_reply_to: str | None = None  # execute this request type, then close without replying
     requests: list[JSON] = field(default_factory=list)
     connections: int = 0
 
@@ -114,6 +115,10 @@ class MockDerivServer:
                         return
                     self.drop_after_messages -= 1
                 resp, authorized = self._dispatch(req, authorized)
+                if self.lose_reply_to and self.lose_reply_to in req:
+                    self.lose_reply_to = None
+                    await ws.close()  # the request ran, but the client never hears back
+                    return
                 resp["req_id"] = req.get("req_id")
                 resp.setdefault("echo_req", req)
                 await ws.send(json.dumps(resp))
@@ -132,7 +137,8 @@ class MockDerivServer:
         handler = getattr(self, f"_h_{mtype}", None)
         if handler is None:
             return self._err(mtype, "UnrecognisedRequest", "Unrecognised request"), authorized
-        if mtype in ("balance", "buy", "sell", "proposal_open_contract") and not authorized:
+        private = ("balance", "buy", "sell", "proposal_open_contract", "portfolio", "profit_table")
+        if mtype in private and not authorized:
             return self._err(mtype, "AuthorizationRequired", "Please log in."), authorized
         if mtype == "authorize":
             resp = self._h_authorize(req)
@@ -218,6 +224,30 @@ class MockDerivServer:
         c.sold, c.exit = True, exit_price
         c.profit = round(c.payout - c.stake, 2) if won else -c.stake
         self.balance += c.payout if won else 0.0
+
+    def _settle_expired(self) -> None:
+        for c in self._contracts.values():
+            if not c.sold and self.now() >= c.expiry:
+                self._settle(c, synthetic_price(c.expiry, c.symbol))
+
+    def _h_portfolio(self, req: JSON) -> JSON:
+        self._settle_expired()
+        return {"msg_type": "portfolio", "portfolio": {"contracts": [
+            {"contract_id": c.contract_id, "contract_type": c.contract_type,
+             "buy_price": c.stake, "payout": c.payout, "symbol": c.symbol,
+             "date_start": c.start, "expiry_time": c.expiry}
+            for c in self._contracts.values() if not c.sold]}}
+
+    def _h_profit_table(self, req: JSON) -> JSON:
+        self._settle_expired()
+        since = int(req.get("date_from", 0))
+        rows = [{"contract_id": c.contract_id, "buy_price": c.stake, "payout": c.payout,
+                 "sell_price": round(c.stake + c.profit, 2), "purchase_time": c.start,
+                 "sell_time": c.expiry,
+                 "shortcode": f"{c.contract_type}_{c.symbol}_{c.payout}_{c.start}_{c.expiry}_S0P_0"}
+                for c in self._contracts.values() if c.sold and c.start >= since]
+        return {"msg_type": "profit_table",
+                "profit_table": {"count": len(rows), "transactions": rows}}
 
     def _h_proposal_open_contract(self, req: JSON) -> JSON:
         c = self._contracts.get(int(req["contract_id"]))

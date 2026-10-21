@@ -118,6 +118,11 @@ class EmaCrossoverStrategy:
         return None
 
 
-def closed_candles(candles: Sequence[Candle], granularity: int, now_epoch: float) -> list[Candle]:
-    """Drop the still-forming candle (Deriv returns it as the last element)."""
-    return [c for c in candles if c.epoch + granularity <= now_epoch]
+def drop_forming(candles: Sequence[Candle]) -> list[Candle]:
+    """Drop the still-forming candle.
+
+    With ``end: "latest"`` Deriv always returns the current, unfinished candle as
+    the last element. Removing it by position (rather than comparing epochs to the
+    local clock) stays correct even when the local clock drifts from Deriv's.
+    """
+    return list(candles[:-1])

@@ -3,7 +3,7 @@ import math
 import pytest
 
 from derivbot.config import StrategyConfig
-from derivbot.strategy import Candle, Direction, EmaCrossoverStrategy, closed_candles, ema
+from derivbot.strategy import Candle, Direction, EmaCrossoverStrategy, ema
 
 
 def candles_from(closes, start=0, g=60):
@@ -78,9 +78,3 @@ def test_last_crossover_and_trend():
 def test_invalid_periods():
     with pytest.raises(ValueError):
         EmaCrossoverStrategy(StrategyConfig(fast_period=21, slow_period=9))
-
-
-def test_closed_candles_drops_forming_candle():
-    cs = candles_from([1, 2, 3], start=0, g=60)  # epochs 0, 60, 120
-    assert [c.epoch for c in closed_candles(cs, 60, now_epoch=150)] == [0, 60]
-    assert [c.epoch for c in closed_candles(cs, 60, now_epoch=180)] == [0, 60, 120]
