@@ -17,6 +17,19 @@
         "tanvo-mcp@0.2.1"
       ],
       "env": {}
+    },
+    "alpaca": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "alpaca-mcp-server==2.4.0"
+      ],
+      "env": {
+        "ALPACA_API_KEY": "${ALPACA_API_KEY}",
+        "ALPACA_SECRET_KEY": "${ALPACA_SECRET_KEY}",
+        "ALPACA_PAPER_TRADE": "true",
+        "ALPACA_TOOLSETS": "account,trading,stock-data"
+      }
     }
   }
 }
