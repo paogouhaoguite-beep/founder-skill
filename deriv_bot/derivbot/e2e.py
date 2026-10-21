@@ -22,7 +22,7 @@ from .config import Config
 from .database import TradeDatabase
 from .executor import PaperExecutor, Settlement
 from .risk import RiskManager
-from .strategy import Candle, EmaCrossoverStrategy, Signal, closed_candles
+from .strategy import Candle, EmaCrossoverStrategy, Signal, drop_forming
 
 log = logging.getLogger(__name__)
 
@@ -119,9 +119,9 @@ async def run_e2e(
         step = "market_data"
         s = cfg.strategy
         raw = await client.get_candles(trading.symbol, s.granularity, s.candle_count + 1)
-        candles = closed_candles(
+        candles = drop_forming(
             [Candle(int(c["epoch"]), float(c["open"]), float(c["high"]), float(c["low"]),
-                    float(c["close"])) for c in raw], s.granularity, time.time())
+                    float(c["close"])) for c in raw])
         if len(candles) < strategy.min_candles:
             raise RuntimeError(f"only {len(candles)} closed candles; need {strategy.min_candles}")
         res.add("market_data", f"{len(candles)} closed {s.granularity}s candles for "

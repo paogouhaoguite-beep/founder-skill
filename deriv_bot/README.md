@@ -20,10 +20,11 @@ a pause after a losing streak, and a kill switch.
 |---|---|
 | API | Async WebSocket client with `req_id` request matching, authorization, exponential-backoff reconnect plus re-authorize, rate-limit backoff and request timeouts. A `buy` or `sell` is **never re-sent** after a dropped connection, because it may already have executed. |
 | Strategy | EMA 9/21 crossover on **closed** candles. CALL when the fast EMA crosses above the slow one, PUT when it crosses below. Optional gap filter against whipsaws. Each candle produces at most one signal. All parameters are configurable. |
-| Risk | Stake = balance × risk % (hard cap 2%), rounded **down**, with min/max stake. If the minimum stake would exceed the risk budget, the trade is **skipped** rather than over-risked. Also: daily loss limit (kill switch), pause after N consecutive losses with a cooldown, max trades per day, max open positions, and a minimum payout ratio. |
+| Risk | Stake = balance × risk % (hard cap 2%), rounded **down**, with min/max stake. If the minimum stake would exceed the risk budget, the trade is **skipped** rather than over-risked. Also: daily loss limit (kill switch), and a new trade is refused if losing its stake could push today's loss past that limit (open stakes count as already lost). Pause after N consecutive losses with a cooldown that survives restarts, max trades per day, max open positions, and a minimum payout ratio. |
 | Kill switch | Stops trading immediately on a daily loss limit, an authorization error, a lost connection, an ambiguous buy, repeated errors, or when a `KILL_SWITCH` file is created. Can optionally sell open live contracts. |
-| Journal | Every trade goes to SQLite with timestamps, symbol, direction, stake, payout, entry and exit price, result and P/L. Reports cover realized and unrealized P/L, win rate, profit factor, current and max drawdown, and daily and weekly summaries. Risk state is rebuilt from the DB after a restart. |
-| Paper mode | `--paper` prices every trade with the real `proposal` endpoint, **never calls `buy`**, and settles from the real tick at expiry. |
+| Journal | Every trade goes to SQLite with timestamps, symbol, direction, stake, payout, entry and exit price, result and P/L. Reports cover realized and unrealized P/L, win rate, profit factor, current and max drawdown, and daily and ISO-weekly summaries. Risk state (loss streak, cooldown, last traded signal) is rebuilt from the DB after a restart. |
+| Interrupted buys | If the connection drops during a `buy`, the bot stops. On the next start it checks `portfolio` and `profit_table` and adopts any contract that did execute, so the trade isn't lost from the journal. |
+| Paper mode | `--paper` prices every trade with the real `proposal` endpoint, **never calls `buy`**, and settles from the real tick at expiry. Settlement uses Deriv's tick timestamps, so drift in your computer's clock can't settle a trade early or on the wrong tick. |
 | Dashboard | A `rich` live view showing balance, status, today's P/L and win rate, open positions, recent trades, performance, and the kill-switch reason. |
 | Offline simulator | `--mock-server` runs a local server that speaks Deriv's protocol, for testing without network access or an account. |
 
@@ -46,7 +47,7 @@ deriv_bot/
 │   ├── dashboard.py        # rich dashboard + report
 │   ├── e2e.py              # automatic end-to-end test trade
 │   └── mock_server.py      # local Deriv-protocol simulator (tests / offline)
-├── tests/                  # pytest suite (104 tests)
+├── tests/                  # pytest suite (117 tests)
 └── TEST_REPORT.md
 ```
 
@@ -122,9 +123,11 @@ a clear message.
    durations) or the Nth tick after entry (tick durations). In live mode it uses
    `proposal_open_contract`. Results update the loss-streak counter.
 2. **Risk gate**: kill-switch file, halted state, daily loss limit, cooldown, open
-   positions, trades per day, and minimum-stake affordability.
-3. **Signal**: fetch candles, drop the candle that is still forming, then evaluate
-   the EMA crossover on the latest closed candle (once per candle).
+   positions, trades per day, minimum-stake affordability, and whether losing
+   this stake could breach today's loss limit.
+3. **Signal**: fetch candles, drop the candle that is still forming (always the
+   last one Deriv returns), then evaluate the EMA crossover on the latest closed
+   candle. Each candle is traded at most once, even across restarts.
 4. **Size**: `floor(balance × risk%)`, capped at `max_stake`. Skipped if below
    `min_stake`.
 5. **Price** with `proposal`. Rejected if the payout ratio is too low.
@@ -141,7 +144,7 @@ Unrealized P/L for an open paper trade is its intrinsic value at the current spo
 
 ```bash
 pip install -r requirements.txt
-python -m pytest            # 104 tests, ~5 s, fully offline (uses the local simulator)
+python -m pytest            # 117 tests, ~5 s, fully offline (uses the local simulator)
 ruff check .                # lint (flake8-compatible rules + bugbear, pyupgrade, isort)
 mypy                        # strict type-check of the derivbot package
 ```

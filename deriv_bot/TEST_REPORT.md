@@ -1,6 +1,6 @@
 # Test Report
 
-**Date:** 2026-10-20 (UTC)
+**Date:** 2026-10-20, updated 2026-10-21 after a post-merge bug review (UTC)
 **Environment:** Linux, Python 3.13.16, websockets 17.3, rich 15.0.0, PyYAML 6.0.3,
 pytest 9.1.1, ruff 0.16.9, mypy 2.3.1
 
@@ -8,8 +8,9 @@ pytest 9.1.1, ruff 0.16.9, mypy 2.3.1
 
 | Check | Result |
 |---|---|
-| Unit and integration tests (`python -m pytest`) | **104 passed, 0 failed** (~5 s). Stable across 3 consecutive runs. |
-| Line coverage (`pytest --cov=derivbot`) | **95%** (1561 statements) |
+| Unit and integration tests (`python -m pytest`) | **117 passed, 0 failed** (~5 s). Stable across 3 consecutive runs. Includes 13 regression tests for the bugs in section 3. |
+| Line coverage (`pytest --cov=derivbot`) | **95%** (1678 statements) |
+| Soak test (120 iterations each, paper and demo-live, injected disconnect and rate limits) | **31 trades, 0 error-log lines.** Balances reconcile to the cent. |
 | Lint (`ruff check .`) | **All checks passed** (E, F, W, I, B, UP, SIM rule sets) |
 | Types (`mypy`, `strict = true`, package `derivbot`) | **No issues found in 12 source files** |
 | E2E test trade, offline simulator (`--e2e-test --mock-server`) | **SUCCESS.** Full lifecycle completed. |
@@ -124,6 +125,30 @@ cat data/e2e_result.json               # full machine-readable result
 If you set `DERIV_API_TOKEN` (demo), the E2E test also verifies authorization and
 reports `virtual=1`. Before running demo-account trading, confirm that Deriv's
 current minimum stake for your currency matches `risk.min_stake`.
+
+## 3. Post-merge bug review (2026-10-21)
+
+I re-read the merged code for behaviour that real Deriv conditions would expose
+but the first test suite didn't cover. For each bug, I first wrote a test that
+**failed on the merged code** (13 of the 14 new tests failed). Then I fixed the
+code until every test passed.
+
+| # | Bug | Impact | Fix |
+|---|---|---|---|
+| 1 | Restarting the bot reset the loss-streak cooldown | After 3 losses you could restart and trade straight away, bypassing the pause | The cooldown is restored from the journal (time of the last loss). The time a cooldown ends is saved so a later restart doesn't re-pause. |
+| 2 | A restart within the same candle re-traded the same signal | Duplicate trade on one signal | The last traded candle is saved in the DB |
+| 3 | A trade could push today's loss past the daily limit | With 1% stakes, today's loss could end at about 5.9% against a 5% limit | A trade is refused if losing its stake (plus open stakes) would breach the limit |
+| 4 | Paper settlement used the local clock | A fast clock settled trades **early on a stale tick**, giving wrong results | Expiry is judged from Deriv's latest tick timestamp |
+| 5 | Tick contracts settled long after expiry could use the wrong tick | Wrong exit price after downtime | Tick history is requested over a bounded window from entry |
+| 6 | The forming candle was detected with the local clock | A fast clock let the strategy act on an unfinished candle | The last candle (always the forming one) is dropped by position |
+| 7 | A failed startup left the WebSocket open, and unexpected startup errors escaped | Leaked connection or crash instead of a clean halt | Any startup error halts cleanly and closes the socket |
+| 8 | Weekly summary used `%W`, which restarts at week 00 on 1 January | A week spanning New Year was split in two | ISO weeks |
+| 9 | A `buy` whose reply was lost (dropped connection) was never journaled | A real demo contract went untracked, so P/L, limits and open positions were wrong | Pending-buy marker plus reconciliation from `portfolio` and `profit_table` on the next start |
+| 10 | "Future exception was never retrieved" logged when the socket died mid-send | Noisy error log during reconnects | The exception on the failed future is consumed |
+
+After the fixes: 117 tests passed (3 runs), ruff and mypy are clean, and the
+offline E2E test trade succeeded again. The soak test above exercised all of
+this together.
 
 ## Reproducing this report
 
