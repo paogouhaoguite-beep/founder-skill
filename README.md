@@ -138,6 +138,34 @@ expensiveness, the optimal and the indifference price.
 python3 -m unittest discover -s tests -v
 ```
 
+## The Day Trader skills
+
+This repo also carries the Day Trader pack, eleven `trader-*` skills from
+[github.com/Jakeschincariol/day-trader-skill](https://github.com/Jakeschincariol/day-trader-skill).
+They install with the founder skills, live in `skills/trader-*`, and keep
+their own files in `trader/` in your project. Their full guide is that repo's README.
+
+| command | job | what it does |
+| --- | --- | --- |
+| `/trader-scanner` | Chart Scanner | Scans thousands of charts for setups: opening-range breakouts, flags, oversold bounces. |
+| `/trader-news` | News Monitor | Tracks breaking news on every stock you watch and flags what moves it. |
+| `/trader-entry` | Entry Timer | Watches a setup bar by bar and tells you the moment to get in. |
+| `/trader-exit` | Exit Planner | Sets your stop and your target before you enter, so you know when to get out. |
+| `/trader-timemachine` | Time Machine | Replays every possible outcome of a trade before you risk a dollar: 10,000 simulated sessions plus every past time the setup fired. |
+| `/trader-risk` | Risk Manager | Checks every trade against your limits and stops anything over them. |
+| `/trader-budget` | Budget Manager | Sizes every position to your budget and your max loss per trade. |
+| `/trader-broker` | Order Executor | Sends approved orders to your broker, paper trading by default, never without your yes. |
+| `/trader-alerts` | Price Alerts | Rings when a price, a stop or the opening bell hits. |
+| `/trader-analyst` | Earnings Analyst | Reads earnings reports and sums up what changed. |
+| `/trader-pelosi` | Pelosi Tracker | Reads Congress's stock-trade disclosures the minute they are filed. |
+
+Nothing in the pack places an order on its own: paper trading is the default
+and every order waits for your yes. The tools need Python 3.8 or newer and read
+free public data (Yahoo Finance, Nasdaq Trader, SEC EDGAR, the House Clerk).
+The SEC tools want your name and email in `trader/config.json`
+(`"sec_user_agent": "Your Name you@example.com"`) or `SEC_USER_AGENT`.
+Not financial advice.
+
 ## Fine print
 
 **The board applies published frameworks. It is not those people.** The three
@@ -177,7 +205,8 @@ skills/founder-brand/        SKILL.md
 skills/founder-ops/          SKILL.md
 skills/founder-launch/       SKILL.md
 skills/founder-plan/         SKILL.md, compile.py
-tests/                       the tests for every tool
+skills/trader-*/             the eleven Day Trader skills and their tools
+tests/                       the tests for every tool (fixtures in tests/fixtures/)
 ```
 
 Your own files live in `founder/` in your project. The skills read each other's.

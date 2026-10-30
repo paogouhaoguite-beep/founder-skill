@@ -5,11 +5,12 @@ import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS_DIR = os.path.join(ROOT, "skills")
+FIX = os.path.join(ROOT, "tests", "fixtures")
 
 
 def load(folder, name):
     path = os.path.join(SKILLS_DIR, folder, name + ".py")
-    spec = importlib.util.spec_from_file_location("founder_" + name, path)
+    spec = importlib.util.spec_from_file_location(folder.split("-")[0] + "_" + name, path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod

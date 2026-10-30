@@ -31,7 +31,8 @@ def text_files():
 
 class Repo(unittest.TestCase):
     def test_eleven_skill_folders(self):
-        found = sorted(d for d in os.listdir(SKILLS_DIR) if os.path.isfile(os.path.join(SKILLS_DIR, d, "SKILL.md")))
+        found = sorted(d for d in os.listdir(SKILLS_DIR) if d.startswith("founder-")
+                       and os.path.isfile(os.path.join(SKILLS_DIR, d, "SKILL.md")))
         self.assertEqual(found, sorted(SKILLS))
 
     def test_frontmatter_name_and_description(self):
