@@ -1,4 +1,4 @@
-"""Your yes, one order at a time.
+"""Your yes, one order at a time (or, with "auto_approve": true, the bot's).
 
 The bot finds, plans, replays, sizes and risk-checks a trade on its own, then
 stops here. The reply goes word for word to trader-broker (ticket.py approve),
@@ -31,6 +31,23 @@ class TerminalApprover(object):
             return None
         line = self.stream_in.readline()
         return line.strip() if line else None
+
+
+class AutoApprover(object):
+    """"auto_approve": true in trader/bot.json: every ticket that reached this
+    point (trader-risk PASS) gets a yes without asking. The ticket is still
+    printed and the yes still goes through ticket.py approve, so trader/state/
+    broker.json says who said yes."""
+
+    REPLY = "yes (auto-approved by traderbot)"
+
+    def __init__(self, stream_out=None):
+        self.stream_out = stream_out or sys.stdout
+
+    def ask(self, ticket_text):
+        self.stream_out.write("\n" + ticket_text.rstrip() + "\nAuto-approved (auto_approve is on).\n")
+        self.stream_out.flush()
+        return self.REPLY
 
 
 class ScriptedApprover(object):

@@ -5,6 +5,7 @@
     python -m traderbot run                  # Alpaca PAPER (ALPACA_API_KEY / ALPACA_SECRET_KEY)
     python -m traderbot run --once           # one pass, then exit
     python -m traderbot run --live           # real money: also needs "paper": false in trader/config.json
+    python -m traderbot run   (with "auto_approve": true in trader/bot.json: no yes asked)
     python -m traderbot status               # the open trade and today's decisions
     touch trader/STOP                        # the kill switch: no new entries until you delete it
 """
@@ -17,7 +18,7 @@ import sys
 import time
 
 from .alpaca import Alpaca, BrokerError
-from .approval import TerminalApprover
+from .approval import AutoApprover, TerminalApprover
 from .bot import BOT_CONFIG, DEFAULTS, KILL, STATE, Bot
 from .sim import SimBroker
 from .skills import SKILLS_DIR, Skills
@@ -86,6 +87,15 @@ def preflight(skills, live, dry_run):
     return broker
 
 
+def pick_approver(settings, live):
+    if not settings.get("auto_approve"):
+        return TerminalApprover(timeout=int(settings["approval_timeout_s"]))
+    if live and not settings.get("auto_approve_live"):
+        raise SetupError('"auto_approve" is on but this is real money: set "auto_approve_live": true in '
+                         'trader/bot.json as well to place live orders without asking you, or turn auto_approve off')
+    return AutoApprover()
+
+
 def cmd_run(a):
     skills = Skills(a.workdir)
     try:
@@ -94,11 +104,17 @@ def cmd_run(a):
         print("traderbot: %s" % e, file=sys.stderr)
         return 2
     settings = load_settings(skills)
-    bot = Bot(skills, broker, TerminalApprover(timeout=int(settings["approval_timeout_s"])), settings,
+    try:
+        approver = pick_approver(settings, a.live)
+    except SetupError as e:
+        print("traderbot: %s" % e, file=sys.stderr)
+        return 2
+    bot = Bot(skills, broker, approver, settings,
               check_market=not a.dry_run)
     mode = "LIVE MONEY" if a.live else ("DRY RUN (simulated broker)" if a.dry_run else "Alpaca PAPER")
-    bot.log("traderbot started: %s. Every entry waits for your yes. Kill switch: touch %s. Ctrl+C stops."
-            % (mode, KILL))
+    who = ("Entries are AUTO-APPROVED (auto_approve)" if isinstance(approver, AutoApprover)
+           else "Every entry waits for your yes")
+    bot.log("traderbot started: %s. %s. Kill switch: touch %s. Ctrl+C stops." % (mode, who, KILL))
     every = a.interval or int(settings["interval_s"])
     try:
         while True:

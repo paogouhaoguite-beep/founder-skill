@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(HERE))
 
 from traderbot import __main__ as cli  # noqa: E402
 from traderbot.alpaca import order_body  # noqa: E402
-from traderbot.approval import ScriptedApprover, TerminalApprover  # noqa: E402
+from traderbot.approval import AutoApprover, ScriptedApprover, TerminalApprover  # noqa: E402
 from traderbot.bot import Bot, hhmm, parse_ny, time_machine_edge  # noqa: E402
 from traderbot.sim import SimBroker  # noqa: E402
 from traderbot.skills import SKILLS_DIR, Skills  # noqa: E402
@@ -127,6 +127,23 @@ class YourYes(Base):
         finally:
             os.close(w)
 
+
+    def test_auto_approve_places_without_asking(self):
+        bot = self.bot()
+        bot.approver = AutoApprover(stream_out=io.StringIO())
+        self.assertEqual(bot.cycle(), "placed", self.log())
+        self.assertEqual(len(self.broker.placed), 1)
+        approved = [r for r in self.read("trader/state/broker.json")["orders"] if r["status"] == "approved"]
+        self.assertEqual(approved[0]["reply"], AutoApprover.REPLY)  # the record says the bot said yes
+
+    def test_auto_approve_on_live_needs_its_own_opt_in(self):
+        with self.assertRaises(cli.SetupError):
+            cli.pick_approver({"auto_approve": True, "approval_timeout_s": 1}, live=True)
+        self.assertIsInstance(cli.pick_approver({"auto_approve": True, "auto_approve_live": True,
+                                                 "approval_timeout_s": 1}, live=True), AutoApprover)
+        self.assertIsInstance(cli.pick_approver({"auto_approve": True, "approval_timeout_s": 1}, live=False),
+                              AutoApprover)
+        self.assertIsInstance(cli.pick_approver({"approval_timeout_s": 1}, live=False), TerminalApprover)
 
 class Guards(Base):
     def test_kill_switch_stops_new_entries(self):
