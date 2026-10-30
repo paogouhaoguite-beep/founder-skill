@@ -1,7 +1,7 @@
 {
   "name": "founder-skill",
-  "description": "Eleven free Claude skills that test a business before you launch it: a board trained on Hormozi, Thiel and Jobs, a marketing director, a CFO, and a consumer panel of 100 buyer agents. Free, MIT.",
-  "version": "1.0.0",
+  "description": "Eleven free Claude skills that test a business before you launch it: a board trained on Hormozi, Thiel and Jobs, a marketing director, a CFO, and a consumer panel of 100 buyer agents. Plus the Day Trader pack: eleven skills that scan charts, track news, time every entry and exit, and replay every outcome before you risk a dollar. Free, MIT.",
+  "version": "1.1.0",
   "author": {
     "name": "Jake Schincariol",
     "url": "https://opusjake.ai"
@@ -16,6 +16,9 @@
     "business-plan",
     "unit-economics",
     "market-validation",
-    "subagents"
+    "subagents",
+    "day-trading",
+    "stock-market",
+    "paper-trading"
   ]
 }

@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "founder-skill",
-  "description": "The Founder skill pack for Claude",
+  "description": "The Founder skill pack for Claude, plus the Day Trader pack",
   "owner": {
     "name": "Jake Schincariol",
     "url": "https://opusjake.ai"
@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "founder-skill",
-      "description": "Eleven Claude skills that test a business before you launch it: a board, a competitor scout, a consumer panel of 100 buyer agents, pricing, the offer, a CFO, marketing, brand, operations, a launch plan and the business plan.",
+      "description": "Eleven Claude skills that test a business before you launch it: a board, a competitor scout, a consumer panel of 100 buyer agents, pricing, the offer, a CFO, marketing, brand, operations, a launch plan and the business plan. Plus eleven Day Trader skills: a chart scanner, a news monitor, an entry timer, an exit planner, a time machine that replays 10,000 sessions, a risk manager, a budget manager, an order executor (paper by default, never without your yes), price alerts, an earnings analyst and a Pelosi tracker.",
       "source": "./",
       "category": "productivity",
       "homepage": "https://github.com/Jakeschincariol/founder-skill"
