@@ -102,7 +102,10 @@ def cmd_run(a):
     every = a.interval or int(settings["interval_s"])
     try:
         while True:
-            bot.cycle()
+            try:
+                bot.cycle()
+            except Exception as e:  # keep watching an open trade whatever one pass hit
+                bot.log("This pass failed, trying again next pass: %r" % e)
             if a.once:
                 return 0
             time.sleep(every)

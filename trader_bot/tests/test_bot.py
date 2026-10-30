@@ -175,6 +175,30 @@ class Guards(Base):
         self.assertNotIn("open", late.state)
 
 
+    def unfilled(self, bot, **kw):
+        bot.cycle()
+        oid = bot.state["open"]["order_id"]
+        self.broker.orders[oid].update(kw)
+        return oid
+
+    def test_an_entry_unfilled_at_flat_by_is_canceled(self):
+        bot = self.bot()
+        oid = self.unfilled(bot, status="new", filled_qty="0")
+        late = self.bot(now="2026-10-19 15:55", broker=self.broker)
+        late.state = bot.state
+        late.cycle()
+        self.assertEqual(self.broker.orders[oid]["status"], "canceled")
+        self.assertIn("never filled", self.log())
+        late.cycle()
+        self.assertNotIn("open", late.state)
+
+    def test_a_partial_fill_then_cancel_is_a_position(self):
+        bot = self.bot()
+        self.unfilled(bot, status="canceled", filled_qty="3")
+        bot.cycle()
+        self.assertTrue(bot.state["open"]["entry_filled"])
+        self.assertIn("buy 3 at", self.log())
+
 class Pieces(unittest.TestCase):
     def test_rest_body_nests_the_bracket(self):
         body = order_body({"symbol": "TSLA", "side": "buy", "qty": "8", "type": "market", "time_in_force": "day",

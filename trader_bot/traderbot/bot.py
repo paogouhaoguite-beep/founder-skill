@@ -314,13 +314,24 @@ class Bot(object):
         except BrokerError as e:
             self.log("%s: cannot read the order: %s" % (sym, e))
             return
+        flat_by = hhmm(o.get("flat_by"))
+        late = bool(flat_by) and to_eastern(self.clock()).time() >= flat_by
         if not o["entry_filled"]:
-            if order.get("status") == "filled":
-                self.record_fill(sym, "buy", order)
+            filled = float(order.get("filled_qty") or 0)
+            if order.get("status") == "filled" or (order.get("status") in DONE and filled):
+                self.record_fill(sym, "buy", order)  # a partial fill that was then canceled still counts
                 o["entry_filled"] = True
-            elif order.get("status") in DONE and not float(order.get("filled_qty") or 0):
+            elif order.get("status") in DONE:
                 self.log("%s: the entry was %s with nothing filled; no position." % (sym, order["status"]))
                 self.state.pop("open")
+                return
+            elif late:
+                try:
+                    self.broker.cancel(o["order_id"])
+                except BrokerError as e:
+                    self.log("%s: could not cancel the unfilled entry, CHECK ALPACA: %s" % (sym, e))
+                    return
+                self.log("%s: the entry never filled by flat_by %s; canceled it." % (sym, o.get("flat_by")))
                 return
         for leg in order.get("legs") or []:
             if leg.get("status") == "filled" and leg["id"] not in o["exits"]:
@@ -340,8 +351,7 @@ class Bot(object):
                 self.log("%s: flat by %s, trade closed." % (sym, o.get("flat_by")))
                 self.state.pop("open")
             return
-        flat_by = hhmm(o.get("flat_by"))
-        if o["entry_filled"] and flat_by and to_eastern(self.clock()).time() >= flat_by:
+        if o["entry_filled"] and late:
             self.flatten(o)
 
     def flatten(self, o):

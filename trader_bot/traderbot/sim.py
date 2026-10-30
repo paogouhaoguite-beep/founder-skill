@@ -73,6 +73,8 @@ class SimBroker(object):
 
     def cancel(self, order_id):
         for o in self.orders.values():
+            if o["id"] == order_id and o["status"] != "filled":
+                o["status"] = "canceled"
             for leg in o.get("legs") or []:
                 if leg["id"] == order_id:
                     leg["status"] = "canceled"
