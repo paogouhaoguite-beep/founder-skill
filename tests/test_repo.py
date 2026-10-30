@@ -8,7 +8,9 @@ from _load import ROOT, SKILLS_DIR
 SKILLS = ["founder-board", "founder-marketing", "founder-cfo", "founder-consumer", "founder-launch",
           "founder-pricing", "founder-offer", "founder-competitors", "founder-brand", "founder-ops", "founder-plan"]
 ABOUT = ("Eleven free Claude skills that test a business before you launch it: a board trained on Hormozi, "
-         "Thiel and Jobs, a marketing director, a CFO, and a consumer panel of 100 buyer agents. Free, MIT.")
+         "Thiel and Jobs, a marketing director, a CFO, and a consumer panel of 100 buyer agents. Plus the Day Trader "
+         "pack: eleven skills that scan charts, track news, time every entry and exit, and replay every outcome before "
+         "you risk a dollar. Free, MIT.")
 
 
 def frontmatter(path):
