@@ -166,6 +166,10 @@ The SEC tools want your name and email in `trader/config.json`
 (`"sec_user_agent": "Your Name you@example.com"`) or `SEC_USER_AGENT`.
 Not financial advice.
 
+To run them on a timer, see [`trader_bot/`](trader_bot/README.md): it runs the
+same pipeline by itself on Alpaca (paper by default) and stops for your yes
+before every entry.
+
 ## Fine print
 
 **The board applies published frameworks. It is not those people.** The three
@@ -206,6 +210,7 @@ skills/founder-ops/          SKILL.md
 skills/founder-launch/       SKILL.md
 skills/founder-plan/         SKILL.md, compile.py
 skills/trader-*/             the eleven Day Trader skills and their tools
+trader_bot/                  the skills on a timer, Alpaca, your yes before every entry
 tests/                       the tests for every tool (fixtures in tests/fixtures/)
 ```
 
