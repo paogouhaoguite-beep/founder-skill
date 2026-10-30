@@ -18,6 +18,7 @@ import hmac
 import json
 import time
 from decimal import Decimal
+from email.utils import parsedate_to_datetime
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -52,6 +53,18 @@ class CoinDCXClient:
         self.ticker_seconds = 20
         self._markets = (0.0, {})
         self._ticker = (0.0, {})
+        self.time_offset = 0  # ms to add to this device's clock to match CoinDCX's
+
+    def _learn_clock(self, date_header):
+        """CoinDCX rejects requests whose timestamp is too far off and offers no
+        clock to sync with, so read its time from the Date header of each reply.
+        It is accurate to about a second, so only a clear drift is corrected."""
+        try:
+            server = parsedate_to_datetime(date_header).timestamp() * 1000
+        except (TypeError, ValueError, IndexError):
+            return
+        offset = int(server - time.time() * 1000)
+        self.time_offset = offset if abs(offset) > 5000 else 0
 
     def _request(self, method, path, body=None):
         # CoinDCX's firewall rejects Python's default User-Agent (error 1010), so name the bot
@@ -60,15 +73,17 @@ class CoinDCXClient:
         if body is not None:
             if not self.api_key:
                 raise ExchangeError("This call needs COINDCX_API_KEY and COINDCX_API_SECRET.")
-            body = dict(body, timestamp=int(time.time() * 1000))
+            body = dict(body, timestamp=int(time.time() * 1000) + self.time_offset)
             payload = dumps(body)
             headers["X-AUTH-APIKEY"] = self.api_key
             headers["X-AUTH-SIGNATURE"] = hmac.new(self.api_secret, payload.encode(), hashlib.sha256).hexdigest()
             data = payload.encode()
         try:
             with urlopen(Request(self.base_url + path, data=data, method=method, headers=headers), timeout=20) as r:
+                self._learn_clock((getattr(r, "headers", None) or {}).get("Date"))
                 return json.loads(r.read().decode())
         except HTTPError as e:
+            self._learn_clock((e.headers or {}).get("Date"))
             raise ExchangeError("%s %s: %s" % (e.code, path, e.read().decode(errors="replace")), e.code) from None
 
     # ---- market data -------------------------------------------------
@@ -103,16 +118,26 @@ class CoinDCXClient:
             raise ExchangeError("404 no price for %s" % symbol, 404)
         return t
 
+    def _positive(self, symbol, *values):
+        for v in values:
+            try:
+                if v is not None and float(v) > 0:
+                    return float(v)
+            except ValueError:
+                pass
+        # a zero or missing price happens briefly during maintenance; never trade on it
+        raise ExchangeError("CoinDCX shows no valid price for %s right now" % symbol)
+
     def price(self, symbol):
-        return float(self._tick(symbol)["last_price"])
+        return self._positive(symbol, self._tick(symbol).get("last_price"))
 
     def buy_price(self, symbol):
         t = self._tick(symbol)
-        return float(t.get("ask") or t["last_price"])
+        return self._positive(symbol, t.get("ask"), t.get("last_price"))
 
     def sell_price(self, symbol):
         t = self._tick(symbol)
-        return float(t.get("bid") or t["last_price"])
+        return self._positive(symbol, t.get("bid"), t.get("last_price"))
 
     # ---- account and orders (signed) ----------------------------------
     def balances(self):
@@ -140,11 +165,14 @@ class CoinDCXBroker:
 
     def _lookup(self, order_id):
         try:
-            return self.client.order_status(order_id)
+            order = self.client.order_status(order_id)
         except ExchangeError as e:
             if refused(e):
                 return None  # CoinDCX has no such order: it was never placed
             raise
+        if not isinstance(order, dict) or "status" not in order:
+            return None  # an answer with no order in it: there is no such order
+        return order
 
     def _place_and_wait(self, order_id, **body):
         """Place an order and wait for it to finish filling. If the outcome cannot
@@ -181,14 +209,18 @@ class CoinDCXBroker:
         return qty, avg, qty * avg + fee  # the fee on rupee markets is charged in rupees
 
     def _sell_result(self, order):
+        """(rupees received, coins sold, coins sent). Rupees are after the fee and
+        the 1% TDS CoinDCX withholds on sales. A rejected order sold nothing."""
         qty, avg, fee = self._filled(order)
-        # rupees received after the fee and the 1% TDS CoinDCX withholds on sales
-        return qty * avg - fee - qty * avg * self.cfg.get("tds_rate", 0.0)
+        got = qty * avg - fee - qty * avg * self.cfg.get("tds_rate", 0.0)
+        return got, qty, float(order.get("total_quantity", qty))
 
     def buy(self, symbol, quote_amount, order_id):
         """Returns (coins received, average price, rupees spent). Coins is 0 if unfilled."""
         info = self.client.symbol_info(symbol)
         ask = self.client.buy_price(symbol)
+        if not ask > 0:
+            raise ExchangeError("no valid price for %s right now; not buying" % symbol)
         budget = quote_amount / (1 + self.cfg["fee_rate"] + self.cfg["slippage"])
         qty = floor_to_step(floor_to_step(budget / ask, info["step"]), 10 ** -info["qty_precision"])
         if float(qty) < info["min_qty"] or float(qty) * ask < info["min_notional"]:
@@ -202,7 +234,7 @@ class CoinDCXBroker:
         held = self.client.balances().get(info["base"], 0.0)
         q = floor_to_step(floor_to_step(min(qty, held), info["step"]), 10 ** -info["qty_precision"])
         if float(q) < info["min_qty"]:
-            return 0.0
+            return 0.0, 0.0, float(q)
         order = self._place_and_wait(order_id, side="sell", order_type="market_order", market=symbol,
                                      total_quantity=q)
         return self._sell_result(order)

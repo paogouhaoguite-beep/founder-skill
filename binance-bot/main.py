@@ -9,6 +9,7 @@ import argparse
 import json
 import os
 import sys
+import time
 
 from bot.binance import BinanceClient, LiveBroker, PaperBroker
 from bot.coindcx import CoinDCXBroker, CoinDCXClient
@@ -52,6 +53,20 @@ def make_client(cfg):
     key, secret = EXCHANGES["binance"]["keys"]
     return BinanceClient(cfg.get("binance_url") or cfg.get("base_url") or "https://api.binance.com",
                          os.environ.get(key, ""), os.environ.get(secret, ""))
+
+
+def make_logger(path):
+    """Print each message with the date and time, and keep a copy in bot.log,
+    so weeks later you can still see what the bot did and when."""
+    def log(message):
+        line = "%s  %s" % (time.strftime("%Y-%m-%d %H:%M"), message)
+        print(line, flush=True)
+        try:
+            with open(path, "a") as fh:
+                fh.write(line + "\n")
+        except OSError:
+            pass
+    return log
 
 
 def load_config(path, exchange=None):
@@ -172,7 +187,7 @@ def main(argv=None):
         broker = PaperBroker(client, cfg)
 
     try:
-        WeeklyBuyer(cfg, client, broker, state, state_path).run()
+        WeeklyBuyer(cfg, client, broker, state, state_path, log=make_logger(os.path.join(HERE, "bot.log"))).run()
     except KeyboardInterrupt:
         print("\nStopped. History saved in %s" % state_path)
     return 0

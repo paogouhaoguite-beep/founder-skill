@@ -27,6 +27,7 @@ from datetime import datetime, timezone
 from .exchange import ExchangeError, refused
 
 DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+SELL_TRIES = 5  # a coin whose sale fails this many checks in a row is handed to you
 
 
 def week_and_day(now):
@@ -102,27 +103,60 @@ class WeeklyBuyer:
             value = sum(self.state["holdings"][s] * p for s, p in prices.items())
             if value * self._keep() < invested * (1 + target):
                 return False
+            if not any(self.state["holdings"][s] * p >= self.client.symbol_info(s)["min_notional"]
+                       for s, p in prices.items()):
+                return False  # every coin is under the exchange's minimum order: nothing can be sold yet
             self.state["selling"] = {"invested": invested, "proceeds": 0.0, "carried": {},
-                                     "carried_value": 0.0, "pending": {}}
+                                     "carried_value": 0.0, "pending": {}, "tries": {}}
             self.save()
-        self._finish_sale(now)
-        return True
+        return self._finish_sale(now)
+
+    def _settle(self, s, q, price, result):
+        """Book one coin's sale. Returns True if that coin is done, False if part
+        of it did not sell and should be tried again at the next check."""
+        sale, holdings = self.state["selling"], self.state["holdings"]
+        got, sold, sent = result
+        sale["proceeds"] += got
+        if q - sent > 1e-12:
+            self.log("%.8g %s was no longer in your account (sold or moved outside the bot); left out." % (
+                q - sent, s))
+        unsold = sent - sold
+        if unsold <= 1e-12:
+            del holdings[s]
+            self.save()
+            return True
+        if price is None or unsold * price < self.client.symbol_info(s)["min_notional"]:
+            # too little left for the exchange to sell: keep it for the next round
+            sale["carried"][s] = sale["carried"].get(s, 0.0) + unsold
+            sale["carried_value"] += unsold * (price or 0.0)
+            del holdings[s]
+            self.save()
+            return True
+        tries = sale.setdefault("tries", {})
+        tries[s] = tries.get(s, 0) + 1
+        if tries[s] >= SELL_TRIES:
+            holdings[s] = unsold
+            self._strand(s, unsold, "the exchange did not fill the sale %d times" % tries[s])
+            return True
+        holdings[s] = unsold
+        self.save()
+        self.log("The exchange did not fill all of the %s sale; will try again at the next check." % s)
+        return False
 
     def _finish_sale(self, now):
         """Sell coin by coin, saving after each one, so an interrupted sale
         resumes where it stopped instead of selling anything twice."""
         sale, holdings = self.state["selling"], self.state["holdings"]
         prices = self.prices()
+        finished = True
         for s in list(holdings):
             q = holdings[s]
             pending = sale["pending"].get(s)
             if pending:  # a sell was sent but its outcome is unknown: ask the exchange
-                got = self.broker.recover_sell(s, pending)
+                result = self.broker.recover_sell(s, pending)
                 del sale["pending"][s]
-                if got is not None:
-                    sale["proceeds"] += got
-                    del holdings[s]
-                    self.save()
+                if result is not None:
+                    finished &= self._settle(s, q, prices.get(s), result)
                     continue
                 self.save()
             if not q:
@@ -142,7 +176,7 @@ class WeeklyBuyer:
             sale["pending"][s] = oid
             self.save()
             try:
-                got = self.broker.sell(s, q, oid)
+                result = self.broker.sell(s, q, oid)
             except Exception as e:
                 if not refused(e):
                     raise  # outcome unknown; the order id is saved and checked next time
@@ -150,10 +184,10 @@ class WeeklyBuyer:
                 self._strand(s, q, str(e))
                 continue
             del sale["pending"][s]
-            sale["proceeds"] += got
-            del holdings[s]
-            self.save()
+            finished &= self._settle(s, q, prices[s], result)
 
+        if not finished:
+            return False
         invested = sale["invested"]
         profit = sale["proceeds"] + sale["carried_value"] - invested
         self.state["sales"].append({"time": int(now), "invested": invested, "proceeds": sale["proceeds"],
@@ -165,6 +199,7 @@ class WeeklyBuyer:
         self.save()
         self.log("Take profit: sold for %.2f %s, profit %+.2f (%+.1f%%). Starting a new round." % (
             sale["proceeds"], self.currency, profit, 100 * profit / invested))
+        return True
 
     def _strand(self, s, q, why):
         self.state["stranded"][s] = self.state["stranded"].get(s, 0.0) + q
@@ -181,7 +216,8 @@ class WeeklyBuyer:
         self.state["next_index"] += 1
         self.state["buys"].append({"time": int(when), "symbol": symbol, "spent": spent, "qty": qty, "price": price})
         self.save()
-        self.log("Weekly buy: %.2f %s of %s at %.6g" % (spent, self.currency, symbol, price))
+        shown = "%.2f" % price if price >= 1 else "%.8f" % price  # 7843830.00, never 7.84383e+06
+        self.log("Weekly buy: %.2f %s of %s at %s" % (spent, self.currency, symbol, shown))
 
     def _resolve_pending_buy(self):
         """A buy was sent but its outcome is unknown: ask the exchange about that exact order."""
@@ -197,6 +233,8 @@ class WeeklyBuyer:
         if self.state.get("pending_buy"):
             self._resolve_pending_buy()
         self.take_profit(now)
+        if self.state.get("selling"):
+            return False  # finish the sale before buying again, so the two rounds never mix
         if not self.due(now):
             return False
         symbols = self.cfg["dca_symbols"]
@@ -243,10 +281,17 @@ class WeeklyBuyer:
         return True
 
     def summary(self):
-        invested, value = self.state["invested"], self.value()
-        ret = (value / invested - 1) if invested else 0.0
-        lines = ["this round: put in %.2f, worth now %.2f (%+.1f%%), holdings %s" % (
-            invested, value, 100 * ret, {s: round(q, 8) for s, q in self.state["holdings"].items()})]
+        invested = self.state["invested"]
+        holdings = {s: round(q, 8) for s, q in self.state["holdings"].items()}
+        try:
+            value = self.value()
+        except (ExchangeError, OSError):
+            lines = ["this round: put in %.2f, worth now: unavailable (could not reach the exchange), "
+                     "holdings %s" % (invested, holdings)]
+        else:
+            ret = (value / invested - 1) if invested else 0.0
+            lines = ["this round: put in %.2f, worth now %.2f (%+.1f%%), holdings %s" % (
+                invested, value, 100 * ret, holdings)]
         target = self.cfg.get("dca_take_profit")
         if target and invested:
             lines.append("sells everything when worth %.2f (+%.0f%% after fees)" % (
@@ -271,5 +316,8 @@ class WeeklyBuyer:
             except KeyboardInterrupt:
                 raise
             except Exception as e:  # keep running through network blips
-                self.log("Error: %s" % e)
+                hint = ""
+                if isinstance(e, ExchangeError) and e.status == 401:
+                    hint = " (the exchange rejected the API key: check the key, secret and any IP restriction)"
+                self.log("Error: %s%s" % (e, hint))
             time.sleep(self.cfg["dca_poll_seconds"])

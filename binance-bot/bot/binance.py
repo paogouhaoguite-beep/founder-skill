@@ -51,7 +51,10 @@ class BinanceClient:
         self.time_offset = server - int(time.time() * 1000)
 
     def price(self, symbol):
-        return float(self._request("GET", "/api/v3/ticker/price", {"symbol": symbol})["price"])
+        p = float(self._request("GET", "/api/v3/ticker/price", {"symbol": symbol})["price"])
+        if p <= 0:
+            raise ExchangeError("Binance shows no valid price for %s right now" % symbol)
+        return p
 
     def _signed(self, method, path, params=None):
         try:
@@ -108,8 +111,9 @@ class PaperBroker:
         return quote_amount / price * (1 - self.cfg["fee_rate"]), price, quote_amount
 
     def sell(self, symbol, qty, order_id=None):
+        """Returns (money received, coins sold, coins sent)."""
         price = getattr(self.client, "sell_price", self.client.price)(symbol) * (1 - self.cfg["slippage"])
-        return qty * price * (1 - self.cfg["fee_rate"]) * (1 - self.cfg.get("tds_rate", 0.0))
+        return qty * price * (1 - self.cfg["fee_rate"]) * (1 - self.cfg.get("tds_rate", 0.0)), qty, qty
 
     def recover_buy(self, symbol, order_id):
         return None
@@ -125,7 +129,10 @@ class LiveBroker:
 
     def __init__(self, client, cfg):
         self.client, self.cfg = client, cfg
-        client.sync_time()
+        try:
+            client.sync_time()
+        except (ExchangeError, OSError):
+            pass  # no connection yet; requests resync by themselves if the clock is off
 
     def quote_balance(self, symbol):
         quote = self.client.symbol_info(symbol)["quote"]
@@ -155,11 +162,14 @@ class LiveBroker:
 
     def _lookup(self, symbol, order_id):
         try:
-            return self.client.get_order(symbol, order_id)
+            order = self.client.get_order(symbol, order_id)
         except BinanceError as e:
             if refused(e):
                 return None  # Binance has no such order: it was never placed
             raise
+        if not isinstance(order, dict) or "status" not in order:
+            return None
+        return order
 
     def _buy_result(self, symbol, res):
         info = self.client.symbol_info(symbol)
@@ -184,9 +194,15 @@ class LiveBroker:
         held = self.client.balances().get(info["base"], 0.0)
         q = floor_to_step(min(qty, held), info["step"])
         if q <= 0 or float(q) < info["min_qty"]:
-            return 0.0
+            return 0.0, 0.0, float(q)
         res = self._place(order_id, symbol=symbol, side="SELL", type="MARKET", quantity=fmt(q))
-        return float(res["cummulativeQuoteQty"]) * (1 - self.cfg["fee_rate"])
+        return self._sell_result(res)
+
+    def _sell_result(self, res):
+        """(USDT received, coins sold, coins sent). A market order that expired
+        unfilled (no buyers) sold nothing."""
+        got = float(res["cummulativeQuoteQty"]) * (1 - self.cfg["fee_rate"])
+        return got, float(res["executedQty"]), float(res.get("origQty") or res["executedQty"])
 
     def recover_buy(self, symbol, order_id):
         res = self._lookup(symbol, order_id)
@@ -194,6 +210,4 @@ class LiveBroker:
 
     def recover_sell(self, symbol, order_id):
         res = self._lookup(symbol, order_id)
-        if res is None:
-            return None
-        return float(res["cummulativeQuoteQty"]) * (1 - self.cfg["fee_rate"])
+        return None if res is None else self._sell_result(res)

@@ -65,6 +65,45 @@ class RequestFormat(unittest.TestCase):
         self.assertEqual(req.get_header("X-auth-apikey"), "k")
         self.assertNotIn("Python-urllib", req.get_header("User-agent", ""))  # blocked by CoinDCX's firewall
 
+    def test_a_drifted_device_clock_is_corrected_from_coindcx_replies(self):
+        import time as _time
+        from email.utils import formatdate
+        sent = []
+
+        class Resp:
+            def __init__(self, server_time):
+                self.headers = {"Date": formatdate(server_time, usegmt=True)}
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *a):
+                return False
+
+            def read(self):
+                return b"[]"
+
+        server_time = _time.time() + 600  # this device runs 10 minutes slow
+
+        def fake_urlopen(req, timeout):
+            sent.append(req)
+            return Resp(server_time)
+
+        c = CoinDCXClient(api_key="k", api_secret="s")
+        with mock.patch("bot.coindcx.urlopen", fake_urlopen):
+            c._request("GET", "/exchange/ticker")    # any reply tells it CoinDCX's time
+            c.balances()
+        stamp = json.loads(sent[-1].data)["timestamp"] / 1000
+        self.assertAlmostEqual(stamp, server_time, delta=3)
+
+    def test_small_clock_differences_are_left_alone(self):
+        from email.utils import formatdate
+        c = CoinDCXClient()
+        c._learn_clock(formatdate(usegmt=True))
+        self.assertEqual(c.time_offset, 0)
+        c._learn_clock("not a date")
+        self.assertEqual(c.time_offset, 0)
+
     def test_market_details_and_prices_are_read_correctly(self):
         c = CoinDCXClient()
         inactive = dict(BTCINR_MARKET, coindcx_name="OLDINR", status="inactive")

@@ -41,6 +41,9 @@ python main.py status                   # buys so far, money put in, what it is 
 Stop it with Ctrl+C (on Android in Termux: Volume Down + C). It remembers
 everything when you start it again.
 
+Every message is shown with its date and time and also saved in `bot.log`
+in the same folder, so you can look back at what the bot did and when.
+
 ### Real money on CoinDCX
 
 1. In the CoinDCX website, open the API dashboard (under your profile or
@@ -58,8 +61,9 @@ everything when you start it again.
 4. In `config.json` set `"live_trading_acknowledged": true`.
 5. `python main.py dca --live`
 
-Keep the device's clock on automatic time: CoinDCX rejects requests whose
-time is too far off.
+Keep the device's clock on automatic time if you can. CoinDCX rejects
+requests whose time is too far off; the bot corrects a drifting clock using
+the time in CoinDCX's replies.
 
 ### Using Binance instead
 
@@ -108,13 +112,20 @@ shows a small loss right after a buy.
   in 2025), the bot notices within an hour, skips it for buying, ignores the
   frozen price the exchange may keep showing for it, and lists anything it
   could not sell as STRANDED in `status` for you to handle in the exchange app.
+- **Sales that do not go through.** If the exchange rejects a sale or only
+  part of it fills (CoinDCX warns market orders can be rejected after being
+  accepted; Binance ones can expire half-filled), the unsold coins stay
+  tracked and are tried again at the next check. After 5 failed tries they
+  are listed as STRANDED for you. No weekly buy happens until a sale has
+  finished, so two rounds never mix. If you sold some of the bot's coins
+  yourself in the app, the bot notices they are gone and carries on.
 - **Small leftovers.** If one coin's share is under the exchange's minimum order
   when it is time to sell, it is kept and carried into the next round.
 - **Unfilled buys** (no sellers at that moment) are not recorded and are
   retried later the same week.
 - **Clock drift.** On Binance, if the clock drifts and requests are rejected,
-  the bot resyncs with Binance's clock by itself. CoinDCX offers no clock to
-  sync with, so keep the device on automatic time.
+  the bot resyncs with Binance's clock by itself. On CoinDCX the bot reads the
+  time from CoinDCX's replies and corrects a drift of more than 5 seconds.
 - **Mistakes in config.json** are listed in plain words at start-up. A damaged
   history file is reported and never overwritten.
 

@@ -104,7 +104,9 @@ class LiveOrders(unittest.TestCase):
 
     def test_sell_never_exceeds_what_is_held(self):
         self.broker.buy("BTCUSDT", 50.0, "id1")
-        self.assertGreater(self.broker.sell("BTCUSDT", 10.0, "id2"), 0)  # asks for far more than held
+        got, sold, sent = self.broker.sell("BTCUSDT", 10.0, "id2")  # asks for far more than held
+        self.assertGreater(got, 0)
+        self.assertEqual(sold, sent)
         self.assertLess(self.ex.bal["BTC"], 1e-4)
 
 
