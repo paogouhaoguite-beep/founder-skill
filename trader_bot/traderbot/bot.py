@@ -9,7 +9,8 @@ Every decision is made by the skills' own tools (skills.py runs them); the bot
 only moves between them, talks to Alpaca and asks you. The limits that matter
 (max loss per trade, daily loss, trades per day, the entry window, a stop on
 every order) are trader-risk's, from trader/config.json. On top, the bot:
-  - places nothing without your explicit yes for that one order,
+  - places nothing without your explicit yes for that one order (unless
+    "auto_approve": true; on real money it also needs "auto_approve_live": true),
   - holds one position at a time,
   - skips a breakout that triggered more than max_trigger_age_min ago,
   - skips a trade the Time Machine says leans toward the stop (min_tm_edge_pts),
@@ -38,6 +39,8 @@ DEFAULTS = {
     "news": True,
     "approval_timeout_s": 120,
     "auto_flatten": True,
+    "auto_approve": False,
+    "auto_approve_live": False,
 }
 BOT_CONFIG = "trader/bot.json"
 STATE = "trader/state/bot.json"

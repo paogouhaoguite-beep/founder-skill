@@ -9,6 +9,12 @@
 stops at one place: before every entry it shows you the ticket and waits for
 you to type `yes`. Silence is a no.
 
+Set `"auto_approve": true` in `trader/bot.json` and it does not stop there
+either: every ticket that trader-risk passed is placed without asking. The
+yes is still recorded by trader-broker, as `yes (auto-approved by traderbot)`.
+On real money auto-approve also needs `"auto_approve_live": true`, so turning
+on `--live` never quietly inherits it.
+
 ```
 every interval_s, while the market is open and you have no open trade:
   trader-scanner   opening-range breakouts in your symbols
@@ -58,7 +64,7 @@ does a paper key (`PK...`) with `--live`.
 
 | guard | where |
 | --- | --- |
-| your explicit `yes` for that one order ("ok", "sure", "yes to all" are a no); no answer in `approval_timeout_s` is a no | trader-broker `ticket.py approve` |
+| your explicit `yes` for that one order ("ok", "sure", "yes to all" are a no); no answer in `approval_timeout_s` is a no; off with `auto_approve` | trader-broker `ticket.py approve` |
 | a stop on every order, max loss per trade, daily loss at the stops, trades per day, the entry window, position size, cash | trader-risk |
 | one position at a time; each symbol tried once a day | the bot |
 | a breakout older than `max_trigger_age_min` (10) is skipped | the bot |
@@ -84,6 +90,8 @@ Alpaca, but nothing flattens it at the close: do that yourself.
 | `min_tm_edge_pts` | 0 | points the target must beat break-even by in the replays |
 | `news` | true | show the last 12 hours of headlines on the ticket |
 | `approval_timeout_s` | 120 | seconds to answer before it counts as a no |
+| `auto_approve` | false | place every trader-risk PASS without asking you |
+| `auto_approve_live` | false | also allow `auto_approve` with `--live` (real money) |
 | `auto_flatten` | true | sell what is open at `flat_by` |
 
 The limits themselves (`max_loss_per_trade_usd`, `max_daily_loss_usd`,
