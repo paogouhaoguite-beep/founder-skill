@@ -29,7 +29,7 @@ OFFLINE = {
     "news": {"": ["--offline", os.path.join(FIX, "trader-news"), "--no-sec"]},
     "alerts": {"quote": ["--offline", os.path.join(FIX, "trader-alerts")]},
 }
-SETTINGS = {"symbols": ["TSLA"], "target": "1R", "replays": 2000}
+SETTINGS = {"symbols": ["TSLA"], "replays": 2000}  # the default target, 1R, is the README trade's
 
 
 class Base(unittest.TestCase):

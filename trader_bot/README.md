@@ -79,7 +79,7 @@ Alpaca, but nothing flattens it at the close: do that yourself.
 | `interval_s` | 60 | seconds between passes |
 | `max_candidates` | 5 | breakouts looked at per pass, newest first |
 | `max_trigger_age_min` | 10 | skip a breakout that closed longer ago |
-| `stop`, `target` | `or-mid`, `2R` | trader-exit's rules (`or-low`, `pct:1`, `atr:1.5`; `1R`, `1.5R`) |
+| `stop`, `target` | `or-mid`, `1R` | trader-exit's rules (`or-low`, `pct:1`, `atr:1.5`; `1.5R`, `2R`) |
 | `replays` | 10000 | Time Machine replays |
 | `min_tm_edge_pts` | 0 | points the target must beat break-even by in the replays |
 | `news` | true | show the last 12 hours of headlines on the ticket |

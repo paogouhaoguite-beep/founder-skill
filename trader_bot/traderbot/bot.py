@@ -32,7 +32,7 @@ DEFAULTS = {
     "interval_s": 60,
     "max_trigger_age_min": 10,
     "stop": "or-mid",
-    "target": "2R",
+    "target": "1R",
     "replays": 10000,
     "min_tm_edge_pts": 0.0,
     "news": True,
