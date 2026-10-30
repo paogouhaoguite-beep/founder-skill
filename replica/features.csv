@@ -1,0 +1,33 @@
+feature,area,priority,original,clone,notes
+Text to image generation,create,must,yes,no,S02 / F01
+Text to video generation,create,must,yes,no,S03 / F02
+Image to video (start frame),create,must,yes,no,F03
+Start + end frame control,create,should,yes,no,gated to Plus+ on original; only some models support it
+Camera motion presets,create,must,yes,no,own preset set; S04
+Visual effect presets,create,should,yes,no,own preset set
+Multi-model picker (image + video),create,must,yes,no,S05; via inference API providers
+Model capability matrix (disable unsupported options),create,must,yes,no,hard part #2
+Aspect ratio / duration / resolution / count controls,create,must,yes,no,
+Cost shown before generate,create,must,yes,no,real provider $ instead of credits
+Reference images for image gen (multi reference),create,should,yes,no,
+Async job queue with live progress,platform,must,yes,no,hard part #1
+Concurrency limit,platform,should,yes,no,per plan on original; one setting in clone
+Library / history with filters,library,must,yes,no,S06
+Asset detail: download / delete,library,must,yes,no,S07
+Reuse settings from a past generation,library,must,yes,no,F04
+Animate this image (image → video handoff),library,should,yes,no,F03
+Upscale image / video,tools,should,yes,no,S08
+Inpaint / edit image,tools,could,yes,no,
+Face swap / character swap,tools,could,yes,no,out of first slice
+Provider API key settings + spend cap,settings,must,no,no,clone-specific; S09
+Mobile-friendly layout,platform,should,yes,no,
+Subscription plans and credit wallet,billing,could,yes,no,skip for personal tool
+Marketing Studio / UGC ads,other,could,yes,no,out of slice
+AI Influencer / consistent characters,other,could,yes,no,out of slice
+Lipsync / Speak,other,could,yes,no,out of slice
+Cinema Studio,other,could,yes,no,out of slice
+Teams / shared workspaces,platform,could,yes,no,out of slice
+Higgsfield proprietary models (Soul / Popcorn / Speak / Genjutsu),models,skip,yes,no,proprietary; use public models
+Original preset library and preview videos,content,skip,yes,no,their content; make your own
+Community feed,social,skip,yes,no,network effect; not needed for personal tool
+Bundled unlimited model deals,billing,skip,yes,no,partner deals
