@@ -11,10 +11,10 @@ from datetime import datetime, timezone
 
 from .api import AuthorizationError, ConnectionLostError, DerivAPIError, DerivClient
 from .config import Config
-from .database import PerformanceStats, TradeDatabase
+from .database import PerformanceStats, TradeDatabase, iso
 from .executor import Executor, Settlement, TradeRejected
 from .risk import AccountSnapshot, RiskManager
-from .strategy import Candle, EmaCrossoverStrategy, Signal, closed_candles
+from .strategy import Candle, EmaCrossoverStrategy, Signal, drop_forming
 
 log = logging.getLogger(__name__)
 
@@ -63,6 +63,8 @@ class TradingBot:
         self.state = BotState(mode=self.mode, symbol=cfg.trading.symbol)
         self._last_signal_epoch: int | None = None
         self._initial_balance_key = f"initial_balance_{self.mode}"
+        self._streak_reset_key = f"streak_reset_{self.mode}"
+        self._signal_key = f"last_signal_epoch_{self.mode}_{cfg.trading.symbol}"
 
     # --- helpers -----------------------------------------------------------
     def now(self) -> datetime:
@@ -109,6 +111,11 @@ class TradingBot:
                 raise UnsafeAccountError(
                     f"account {auth.get('loginid')} is a REAL-money account. Use a demo "
                     "(virtual) token, or set safety.allow_real_account: true at your own risk.")
+        if auth and auth.get("currency") and auth["currency"] != self.cfg.trading.currency:
+            raise UnsafeAccountError(
+                f"account currency is {auth['currency']} but trading.currency is "
+                f"{self.cfg.trading.currency}; stakes and limits would be wrong. Set "
+                "trading.currency (and check risk.min_stake) to match the account.")
         if auth:
             kind = "demo" if auth.get("is_virtual") else "REAL"
             self.state.account = f"{auth.get('loginid')} ({kind})"
@@ -117,7 +124,16 @@ class TradingBot:
         balance, _ = await self.executor.balance()
         if self.db.get_meta(self._initial_balance_key) is None:
             self.db.set_meta(self._initial_balance_key, str(balance))
-        self.risk.consecutive_losses = self.db.trailing_consecutive_losses(self.mode)
+        # Restore risk state from the journal so a restart cannot skip a cooldown
+        # or re-trade a signal that was already acted on.
+        losses, last_loss = self.db.trailing_losses(self.mode,
+                                                    self.db.get_meta(self._streak_reset_key))
+        self.risk.restore_streak(losses, last_loss)
+        last_sig = self.db.get_meta(self._signal_key)
+        self._last_signal_epoch = int(last_sig) if last_sig else None
+        reconciled = await self.executor.reconcile()
+        if reconciled:
+            self.state.message = "reconciled after interrupted buy: " + "; ".join(reconciled)
         self.state.status = "RUNNING"
         log.info("Bot started in %s mode on %s; balance %.2f", self.mode.upper(),
                  self.cfg.trading.symbol, balance)
@@ -129,7 +145,7 @@ class TradingBot:
                                             s.candle_count + 1)
         candles = [Candle(int(c["epoch"]), float(c["open"]), float(c["high"]),
                           float(c["low"]), float(c["close"])) for c in raw]
-        return closed_candles(candles, s.granularity, self.clock())
+        return drop_forming(candles)
 
     async def settle_open_trades(self) -> list[Settlement]:
         settled = []
@@ -159,6 +175,9 @@ class TradingBot:
             await self.settle_open_trades()
             snap = await self.snapshot()
             decision = self.risk.check(snap, self.now())
+            if self.risk.last_reset_at is not None:
+                self.db.set_meta(self._streak_reset_key, iso(self.risk.last_reset_at))
+                self.risk.last_reset_at = None
             if not decision.allowed:
                 self.state.message = decision.reason
                 if self.risk.halted:
@@ -174,6 +193,7 @@ class TradingBot:
                 signal = self.strategy.evaluate(candles)
                 if signal and signal.candle_epoch != self._last_signal_epoch:
                     self._last_signal_epoch = signal.candle_epoch
+                    self.db.set_meta(self._signal_key, str(signal.candle_epoch))
                     self.state.last_signal = (f"{signal.direction.value} @ {signal.price} "
                                               f"({signal.reason})")
                     log.info("Signal: %s", self.state.last_signal)
@@ -203,10 +223,14 @@ class TradingBot:
     async def run(self, max_iterations: int | None = None) -> None:
         try:
             await self.start()
-        except (AuthorizationError, UnsafeAccountError, ConnectionLostError) as exc:
+        except Exception as exc:
+            if not isinstance(exc, (AuthorizationError, UnsafeAccountError,
+                                    ConnectionLostError, DerivAPIError)):
+                log.exception("Unexpected error during startup")
             self.risk.engage_kill_switch(f"startup failed: {exc}")
             self.state.status = "HALTED"
             self.state.halt_reason = self.risk.halt_reason
+            await self.client.close()  # never leave the socket open after a failed start
             self._notify()
             return
         try:

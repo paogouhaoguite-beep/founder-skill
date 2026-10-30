@@ -16,8 +16,10 @@ from derivbot.api import (
 from derivbot.mock_server import DEMO_TOKEN, REAL_TOKEN, MockDerivServer
 
 
-def api_for(cfg, url, **kw):
-    return dataclasses.replace(cfg.api, endpoint=url, **kw)
+def api_for(cfg, server_or_url, **kw):
+    if isinstance(server_or_url, MockDerivServer):
+        return server_or_url.api_config(cfg.api, **kw)
+    return dataclasses.replace(cfg.api, endpoint=server_or_url, **kw)
 
 
 @pytest.fixture
@@ -27,10 +29,10 @@ async def server():
 
 
 async def test_connect_authorize_and_basic_calls(cfg, server):
-    c = DerivClient(api_for(cfg, server.url), DEMO_TOKEN)
+    c = DerivClient(api_for(cfg, server), DEMO_TOKEN)
     await c.connect()
     try:
-        assert c.authorized["is_virtual"] == 1 and c.authorized["loginid"].startswith("VRTC")
+        assert c.authorized["is_virtual"] == 1 and c.authorized["loginid"].startswith("DOT")
         assert await c.ping()
         bal, cur = await c.get_balance()
         assert bal == 1000.0 and cur == "USD"
@@ -44,21 +46,86 @@ async def test_connect_authorize_and_basic_calls(cfg, server):
         await c.close()
 
 
-async def test_url_includes_app_id(cfg, server):
-    c = DerivClient(api_for(cfg, server.url, app_id=4242))
-    assert c.cfg.url.endswith("?app_id=4242")
+async def test_new_protocol_login_uses_rest_otp_and_no_authorize(cfg, server):
+    c = DerivClient(api_for(cfg, server), DEMO_TOKEN)
+    await c.connect()
+    assert server.rest_calls == ["GET /trading/v1/options/accounts",
+                                 "POST /trading/v1/options/accounts/DOT90000001/otp"]
+    assert not any("authorize" in r for r in server.requests)
+    assert c.authorized["currency"] == "USD"
+    await c.close()
+
+
+async def test_new_protocol_sends_underlying_symbol(cfg, server):
+    c = DerivClient(api_for(cfg, server))
+    await c.connect()
+    await c.get_proposal(symbol="R_100", contract_type="CALL", amount=1, currency="USD",
+                         duration=5, duration_unit="t")
+    sent = [r for r in server.requests if "proposal" in r][0]
+    assert sent["underlying_symbol"] == "R_100" and "symbol" not in sent
+    await c.close()
 
 
 async def test_invalid_token_is_authorization_error_and_not_retried(cfg, server):
-    c = DerivClient(api_for(cfg, server.url), "bad-token")
+    c = DerivClient(api_for(cfg, server), "bad-token")
     with pytest.raises(AuthorizationError) as ei:
         await c.connect()
-    assert ei.value.code == "InvalidToken"
-    assert server.connections == 1
+    assert ei.value.code == "HTTP401"
+    assert server.connections == 0 and len(server.rest_calls) == 1
+
+
+async def test_missing_app_id_is_a_clear_error(cfg, server):
+    c = DerivClient(dataclasses.replace(api_for(cfg, server), app_id=""), DEMO_TOKEN)
+    with pytest.raises(AuthorizationError, match="app_id"):
+        await c.connect()
+
+
+async def test_wrong_app_id_rejected(cfg, server):
+    c = DerivClient(dataclasses.replace(api_for(cfg, server), app_id="nope"), DEMO_TOKEN)
+    with pytest.raises(AuthorizationError, match="Deriv-App-ID"):
+        await c.connect()
+
+
+async def test_no_matching_account_lists_what_exists(cfg, server):
+    c = DerivClient(api_for(cfg, server), REAL_TOKEN)  # wants demo, token only has real
+    with pytest.raises(AuthorizationError, match=r"ROT90000001 \(real\)"):
+        await c.connect()
+
+
+async def test_rest_outage_is_retried(cfg, server):
+    server.rest_fail_next = 2
+    c = DerivClient(api_for(cfg, server, max_retries=3), DEMO_TOKEN)
+    await c.connect()
+    assert c.connected
+    await c.close()
+
+
+async def test_otp_is_single_use(cfg, server):
+    c = DerivClient(api_for(cfg, server), DEMO_TOKEN)
+    await c.connect()
+    url = server.rest_calls[-1]
+    await c.close()
+    assert url.endswith("/otp") and server._otps == {}  # consumed by the first connect
+
+
+async def test_legacy_protocol_still_supported(cfg):
+    async with MockDerivServer(protocol="legacy") as srv:
+        c = DerivClient(srv.api_config(cfg.api), DEMO_TOKEN)
+        await c.connect()
+        assert c.authorized["loginid"].startswith("VRTC")
+        await c.get_proposal(symbol="R_100", contract_type="CALL", amount=1, currency="USD",
+                             duration=5, duration_unit="t")
+        assert [r for r in srv.requests if "proposal" in r][0]["symbol"] == "R_100"
+        assert srv.rest_calls == []
+        await c.close()
+        bad = DerivClient(srv.api_config(cfg.api), "bad-token")
+        with pytest.raises(AuthorizationError) as ei:
+            await bad.connect()
+        assert ei.value.code == "InvalidToken"
 
 
 async def test_auth_required_for_private_calls(cfg, server):
-    c = DerivClient(api_for(cfg, server.url))
+    c = DerivClient(api_for(cfg, server))
     await c.connect()
     with pytest.raises(AuthorizationError):
         await c.get_balance()
@@ -71,7 +138,7 @@ async def test_rate_limit_is_retried_with_backoff(cfg, server):
     async def fake_sleep(s):
         sleeps.append(s)
 
-    c = DerivClient(api_for(cfg, server.url), sleep=fake_sleep)
+    c = DerivClient(api_for(cfg, server), sleep=fake_sleep)
     await c.connect()
     server.rate_limit_next = 2
     assert await c.ping()
@@ -80,7 +147,7 @@ async def test_rate_limit_is_retried_with_backoff(cfg, server):
 
 
 async def test_rate_limit_gives_up_after_max_retries(cfg, server):
-    c = DerivClient(api_for(cfg, server.url))
+    c = DerivClient(api_for(cfg, server))
     await c.connect()
     server.rate_limit_next = 100
     with pytest.raises(RateLimitError):
@@ -88,18 +155,28 @@ async def test_rate_limit_gives_up_after_max_retries(cfg, server):
     await c.close()
 
 
-async def test_reconnects_and_reauthorizes_after_disconnect(cfg, server):
-    c = DerivClient(api_for(cfg, server.url), DEMO_TOKEN)
+async def test_reconnects_with_fresh_otp_after_disconnect(cfg, server):
+    c = DerivClient(api_for(cfg, server), DEMO_TOKEN)
     await c.connect()
     server.drop_after_messages = 0  # server closes the socket on the next message
     assert await c.ping()
     assert c.reconnects == 1 and server.connections == 2
-    assert sum(1 for r in server.requests if "authorize" in r) == 2
+    assert sum(1 for r in server.rest_calls if r.endswith("/otp")) == 2  # OTPs are single-use
     await c.close()
 
 
+async def test_legacy_reconnects_and_reauthorizes(cfg):
+    async with MockDerivServer(protocol="legacy") as srv:
+        c = DerivClient(srv.api_config(cfg.api), DEMO_TOKEN)
+        await c.connect()
+        srv.drop_after_messages = 0
+        assert await c.ping()
+        assert sum(1 for r in srv.requests if "authorize" in r) == 2
+        await c.close()
+
+
 async def test_buy_is_never_resent_after_disconnect(cfg, server):
-    c = DerivClient(api_for(cfg, server.url), DEMO_TOKEN)
+    c = DerivClient(api_for(cfg, server), DEMO_TOKEN)
     await c.connect()
     p = await c.get_proposal(symbol="R_100", contract_type="CALL", amount=1, currency="USD",
                              duration=5, duration_unit="t")
@@ -112,7 +189,7 @@ async def test_buy_is_never_resent_after_disconnect(cfg, server):
 
 async def test_connect_retries_rejected_handshakes(cfg, server):
     server.reject_connections = 2
-    c = DerivClient(api_for(cfg, server.url, max_retries=3), DEMO_TOKEN)
+    c = DerivClient(api_for(cfg, server, max_retries=3), DEMO_TOKEN)
     await c.connect()
     assert c.connected
     await c.close()
@@ -120,7 +197,7 @@ async def test_connect_retries_rejected_handshakes(cfg, server):
 
 async def test_connect_gives_up(cfg, server):
     server.reject_connections = 100
-    c = DerivClient(api_for(cfg, server.url, max_retries=2))
+    c = DerivClient(api_for(cfg, server, max_retries=2))
     with pytest.raises(ConnectionLostError, match="3 attempts"):
         await c.connect()
 
@@ -136,7 +213,7 @@ async def test_unreachable_endpoint(cfg):
 
 
 async def test_concurrent_requests_are_correlated(cfg, server):
-    c = DerivClient(api_for(cfg, server.url))
+    c = DerivClient(api_for(cfg, server))
     await c.connect()
     now = int(server.clock())
     ends = [now - i * 10 for i in range(10)]
@@ -146,7 +223,7 @@ async def test_concurrent_requests_are_correlated(cfg, server):
 
 
 async def test_api_error_surfaces(cfg, server):
-    c = DerivClient(api_for(cfg, server.url))
+    c = DerivClient(api_for(cfg, server))
     await c.connect()
     with pytest.raises(DerivAPIError) as ei:
         await c.get_proposal(symbol="R_100", contract_type="CALL", amount=0.01,
@@ -194,7 +271,7 @@ async def test_request_timeout_triggers_reconnect_then_failure(cfg):
 
 
 async def test_real_account_token_reports_not_virtual(cfg, server):
-    c = DerivClient(api_for(cfg, server.url), REAL_TOKEN)
+    c = DerivClient(api_for(cfg, server, account_type="real"), REAL_TOKEN)
     await c.connect()
     assert c.authorized["is_virtual"] == 0
     await c.close()

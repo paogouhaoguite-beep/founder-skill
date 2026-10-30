@@ -16,8 +16,15 @@ class ConfigError(ValueError):
 
 @dataclass(frozen=True)
 class ApiConfig:
-    endpoint: str = "wss://ws.binaryws.com/websockets/v3"
-    app_id: int = 1089
+    # "new": Deriv's current Options API (api.derivws.com). Login = REST one-time password.
+    # "legacy": the old ws.binaryws.com / ws.derivws.com v3 API with the `authorize` call,
+    # which Deriv is retiring as accounts migrate to the new platform.
+    protocol: str = "new"
+    endpoint: str = "wss://api.derivws.com/trading/v1/options/ws/public"
+    rest_base: str = "https://api.derivws.com"
+    app_id: str = ""  # new: Deriv-App-ID (required with a personal access token)
+    account_type: str = "demo"  # new: which account the token's OTP is issued for
+    account_id: str = ""  # new: pick a specific account (optional)
     token_env: str = "DERIV_API_TOKEN"
     request_timeout: float = 15.0
     max_retries: int = 5
@@ -27,8 +34,10 @@ class ApiConfig:
 
     @property
     def url(self) -> str:
+        if self.protocol == "new":
+            return self.endpoint
         sep = "&" if "?" in self.endpoint else "?"
-        return f"{self.endpoint}{sep}app_id={self.app_id}"
+        return f"{self.endpoint}{sep}app_id={self.app_id or LEGACY_PUBLIC_APP_ID}"
 
 
 @dataclass(frozen=True)
@@ -99,6 +108,7 @@ class Config:
     safety: SafetyConfig = field(default_factory=SafetyConfig)
 
 
+LEGACY_PUBLIC_APP_ID = "1089"
 MAX_RISK_PER_TRADE_PCT = 2.0
 VALID_DURATION_UNITS = {"t", "s", "m", "h"}
 VALID_LOG_LEVELS = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
@@ -118,6 +128,8 @@ def _coerce(section: str, key: str, value: Any, expected: Any) -> Any:
         return float(value)
     if expected is str and isinstance(value, str):
         return value
+    if expected is str and isinstance(value, int) and not is_bool:
+        return str(value)  # e.g. `app_id: 1089` written without quotes
     raise ConfigError(
         f"{section}.{key}: expected {expected.__name__}, got {type(value).__name__} ({value!r})"
     )
@@ -141,8 +153,14 @@ def _validate(cfg: Config) -> None:
     errors: list[str] = []
     a, t, s, r = cfg.api, cfg.trading, cfg.strategy, cfg.risk
 
+    if a.protocol not in ("new", "legacy"):
+        errors.append("api.protocol must be 'new' or 'legacy'")
     if not a.endpoint.startswith(("wss://", "ws://")):
         errors.append("api.endpoint must be a ws:// or wss:// URL")
+    if not a.rest_base.startswith(("https://", "http://")):
+        errors.append("api.rest_base must be an http(s):// URL")
+    if a.account_type not in ("demo", "real"):
+        errors.append("api.account_type must be 'demo' or 'real'")
     if a.request_timeout <= 0:
         errors.append("api.request_timeout must be > 0")
     if a.max_retries < 0:
@@ -228,4 +246,21 @@ def load_config(path: str | Path) -> Config:
         raw = yaml.safe_load(p.read_text(encoding="utf-8"))
     except yaml.YAMLError as exc:
         raise ConfigError(f"could not parse {p}: {exc}") from exc
-    return config_from_dict(raw)
+    return resolve_paths(config_from_dict(raw), p.resolve().parent)
+
+
+def resolve_paths(cfg: Config, base: Path) -> Config:
+    """Make relative file paths relative to the config file's folder, not the current
+    directory, so the bot behaves the same when started from cron, a service or
+    another folder (otherwise it would silently use a fresh, empty journal)."""
+
+    def fix(path: str) -> str:
+        return str(base / path) if path and not Path(path).is_absolute() else path
+
+    return dataclasses.replace(
+        cfg,
+        database=dataclasses.replace(cfg.database, path=fix(cfg.database.path)),
+        logging=dataclasses.replace(cfg.logging, file=fix(cfg.logging.file)),
+        safety=dataclasses.replace(cfg.safety,
+                                   kill_switch_file=fix(cfg.safety.kill_switch_file)),
+    )

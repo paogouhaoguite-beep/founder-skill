@@ -1,3 +1,20 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "derivbot"
+version = "1.1.0"
+description = "Educational Deriv Rise/Fall trading bot with strict risk controls"
+requires-python = ">=3.10"
+dependencies = ["websockets>=13.0,<18", "rich>=13.0,<16", "PyYAML>=6.0,<7"]
+
+[project.scripts]
+derivbot = "derivbot.__main__:main"
+
+[tool.setuptools]
+packages = ["derivbot"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"

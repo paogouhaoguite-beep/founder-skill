@@ -10,7 +10,8 @@
 > unless you explicitly opt in.
 
 An autonomous Python bot that trades Deriv Rise/Fall (CALL/PUT) contracts through
-Deriv's official WebSocket API (`wss://ws.binaryws.com/websockets/v3`). It is built
+Deriv's official Options API (`api.derivws.com`). It also still supports Deriv's
+older `ws.binaryws.com` v3 API via `api.protocol: legacy`. It is built
 to **preserve capital first**: small fixed-fraction stakes, a daily loss limit,
 a pause after a losing streak, and a kill switch.
 
@@ -18,12 +19,14 @@ a pause after a losing streak, and a kill switch.
 
 | Area | What it does |
 |---|---|
-| API | Async WebSocket client with `req_id` request matching, authorization, exponential-backoff reconnect plus re-authorize, rate-limit backoff and request timeouts. A `buy` or `sell` is **never re-sent** after a dropped connection, because it may already have executed. |
+| API | Async WebSocket client for Deriv's current Options API: login via the REST one-time-password flow (a fresh single-use login URL on every reconnect), `underlying_symbol` requests, `req_id` request matching, exponential-backoff reconnect, rate-limit backoff and request timeouts. The legacy `authorize`-based protocol is still selectable. A `buy` or `sell` is **never re-sent** after a dropped connection, because it may already have executed. |
 | Strategy | EMA 9/21 crossover on **closed** candles. CALL when the fast EMA crosses above the slow one, PUT when it crosses below. Optional gap filter against whipsaws. Each candle produces at most one signal. All parameters are configurable. |
-| Risk | Stake = balance × risk % (hard cap 2%), rounded **down**, with min/max stake. If the minimum stake would exceed the risk budget, the trade is **skipped** rather than over-risked. Also: daily loss limit (kill switch), pause after N consecutive losses with a cooldown, max trades per day, max open positions, and a minimum payout ratio. |
-| Kill switch | Stops trading immediately on a daily loss limit, an authorization error, a lost connection, an ambiguous buy, repeated errors, or when a `KILL_SWITCH` file is created. Can optionally sell open live contracts. |
-| Journal | Every trade goes to SQLite with timestamps, symbol, direction, stake, payout, entry and exit price, result and P/L. Reports cover realized and unrealized P/L, win rate, profit factor, current and max drawdown, and daily and weekly summaries. Risk state is rebuilt from the DB after a restart. |
-| Paper mode | `--paper` prices every trade with the real `proposal` endpoint, **never calls `buy`**, and settles from the real tick at expiry. |
+| Risk | Stake = balance × risk % (hard cap 2%), rounded **down**, with min/max stake. If the minimum stake would exceed the risk budget, the trade is **skipped** rather than over-risked. Also: daily loss limit (kill switch), and a new trade is refused if losing its stake could push today's loss past that limit (open stakes count as already lost). Pause after N consecutive losses with a cooldown that survives restarts, max trades per day, max open positions, and a minimum payout ratio. |
+| Kill switch | Stops trading immediately on a daily loss limit, an authorization error, a lost connection, an ambiguous buy, repeated errors, or when a `KILL_SWITCH` file is created. Can optionally sell open live contracts. A closed market (e.g. forex at the weekend) is **not** an error: the bot waits. |
+| Safety at startup | Refuses a real-money account unless you opt in, refuses an account whose currency differs from `trading.currency`, and refuses to start a second copy on the same journal (two bots would double-trade and each apply the risk limits separately). |
+| Journal | Every trade goes to SQLite with timestamps, symbol, direction, stake, payout, entry and exit price, result and P/L. Reports cover realized and unrealized P/L, win rate, profit factor, current and max drawdown, and daily and ISO-weekly summaries. Risk state (loss streak, cooldown, last traded signal) is rebuilt from the DB after a restart. |
+| Interrupted buys | If the connection drops during a `buy`, the bot stops. On the next start it checks `portfolio` and `profit_table` and adopts any contract that did execute, so the trade isn't lost from the journal. |
+| Paper mode | `--paper` prices every trade with the real `proposal` endpoint, **never calls `buy`**, and settles from the real tick at expiry. Settlement uses Deriv's tick timestamps, so drift in your computer's clock can't settle a trade early or on the wrong tick. |
 | Dashboard | A `rich` live view showing balance, status, today's P/L and win rate, open positions, recent trades, performance, and the kill-switch reason. |
 | Offline simulator | `--mock-server` runs a local server that speaks Deriv's protocol, for testing without network access or an account. |
 
@@ -46,7 +49,7 @@ deriv_bot/
 │   ├── dashboard.py        # rich dashboard + report
 │   ├── e2e.py              # automatic end-to-end test trade
 │   └── mock_server.py      # local Deriv-protocol simulator (tests / offline)
-├── tests/                  # pytest suite (104 tests)
+├── tests/                  # pytest suite (135 tests)
 └── TEST_REPORT.md
 ```
 
@@ -54,17 +57,37 @@ deriv_bot/
 
 ```bash
 cd deriv_bot
-python -m venv .venv && source .venv/bin/activate     # Python 3.10+
+python -m venv .venv && source .venv/bin/activate     # Python 3.10+ (Windows: .venv\Scripts\activate)
 pip install -r requirements.txt
-cp .env.example .env    # then paste your DEMO account token
+pip install -e .        # optional: adds a `derivbot` command usable from any folder
 ```
 
-To create the token, log in to your **demo** account at
-<https://app.deriv.com/account/api-token> and create a token with the **Read** and
-**Trade** scopes. The bot reads it from the environment variable named in
-`api.token_env` (default `DERIV_API_TOKEN`) or from `.env`. Never put a token in
-`config.yaml`. For production use, register your own `app_id` at
-<https://api.deriv.com> and set `api.app_id`.
+With `pip install -e .`, `derivbot --config /path/to/deriv_bot/config.yaml --paper`
+works from anywhere (cron, a service). Without it, run `python -m derivbot` from
+inside `deriv_bot/`.
+
+**Paper trading and the E2E test need nothing else**: no account, no token. They use
+Deriv's public, unauthenticated endpoint for real prices.
+
+**Demo-account trading** needs two things from Deriv's new API platform. See Deriv's
+[authentication guide](https://developers.deriv.com/docs/intro/authentication/).
+
+1. An **App ID**: register an app at <https://developers.deriv.com> and put its ID
+   in `config.yaml` as `api.app_id`. Deriv requires it with personal tokens; it is
+   sent as the `Deriv-App-ID` header.
+2. A **Personal Access Token** with the `trade` scope. Put it in `.env` as
+   `DERIV_API_TOKEN=...` (`cp .env.example .env`), never in `config.yaml`.
+
+On start the bot lists your Options accounts, picks the **demo** one
+(`api.account_type`, or a specific `api.account_id`), and logs in with a one-time
+password. If no matching account exists, it stops and lists the accounts the
+token can see.
+
+Accounts still on Deriv's old platform can set `api.protocol: legacy` and
+`api.endpoint: wss://ws.derivws.com/websockets/v3`. They then use a classic API
+token from <https://app.deriv.com/account/api-token> (Read + Trade scopes). Deriv
+says the legacy API "will be removed once all users have been fully migrated", so
+treat it as temporary.
 
 ## Usage
 
@@ -86,16 +109,23 @@ touch KILL_SWITCH                    # emergency stop; delete the file to allow 
 ```
 
 Exit codes: `0` normal, `1` E2E failed, `2` config error or missing token, `3`
-stopped by the kill switch, `130` Ctrl-C.
+stopped by the kill switch, `4` another copy of the bot is already running, `130` Ctrl-C.
 
 Logs go to `logs/bot.log` (rotating). Trades go to `data/trades.db`, with paper
 and live trades kept apart by a `mode` column. The E2E test uses its own
-`data/e2e_trades.db` and writes `data/e2e_result.json`.
+`data/e2e_trades.db` and writes `data/e2e_result.json`. All of these paths, the
+`KILL_SWITCH` file and `.env` are relative to the folder that holds `config.yaml`,
+not the folder you start the bot from. So `python -m derivbot --config
+/path/to/deriv_bot/config.yaml` from cron or a service uses the same journal and
+risk history.
 
 ## Configuration (`config.yaml`)
 
 | Key | Default | Meaning |
 |---|---|---|
+| `api.protocol` | `new` | `new` = Deriv's current Options API; `legacy` = old v3 API (being retired). |
+| `api.app_id` | `""` | Your App ID from developers.deriv.com. Needed for demo trading, not for paper. |
+| `api.account_type` / `account_id` | `demo` / `""` | Which Options account the token logs in to. |
 | `trading.symbol` | `R_100` | Volatility 100 Index. Forex example: `frxEURUSD` (closed on weekends). |
 | `trading.contract_duration` / `duration_unit` | `5` / `m` | Contract length. Units: `t`, `s`, `m`, `h`. |
 | `trading.min_payout_ratio` | `0.75` | Skip a trade if (payout − stake) / stake is lower. |
@@ -105,7 +135,7 @@ and live trades kept apart by a `mode` column. The E2E test uses its own
 | `risk.risk_per_trade_pct` | `1.0` | Stake as % of balance. Validated to (0, 2]. |
 | `risk.daily_loss_limit_pct` | `5.0` | Kill switch once today's realized loss reaches this % of day-start equity (UTC day). |
 | `risk.max_consecutive_losses` / `cooldown_minutes` | `3` / `60` | Pause after a losing streak. |
-| `risk.min_stake` / `max_stake` | `0.35` / `50` | Stake bounds. Check Deriv's current minimum for your currency. |
+| `risk.min_stake` / `max_stake` | `0.35` / `50` | Stake bounds. 0.35 USD matches the minimum Deriv's API reported on 2026-10-30 (`validation_params.stake.min`). |
 | `risk.max_trades_per_day` / `max_open_positions` | `20` / `1` | Exposure limits. |
 | `risk.max_critical_errors` | `5` | Consecutive unexpected errors before the kill switch fires. |
 | `paper.starting_balance` | `100` | Virtual balance for `--paper`. |
@@ -122,9 +152,11 @@ a clear message.
    durations) or the Nth tick after entry (tick durations). In live mode it uses
    `proposal_open_contract`. Results update the loss-streak counter.
 2. **Risk gate**: kill-switch file, halted state, daily loss limit, cooldown, open
-   positions, trades per day, and minimum-stake affordability.
-3. **Signal**: fetch candles, drop the candle that is still forming, then evaluate
-   the EMA crossover on the latest closed candle (once per candle).
+   positions, trades per day, minimum-stake affordability, and whether losing
+   this stake could breach today's loss limit.
+3. **Signal**: fetch candles, drop the candle that is still forming (always the
+   last one Deriv returns), then evaluate the EMA crossover on the latest closed
+   candle. Each candle is traded at most once, even across restarts.
 4. **Size**: `floor(balance × risk%)`, capped at `max_stake`. Skipped if below
    `min_stake`.
 5. **Price** with `proposal`. Rejected if the payout ratio is too low.
@@ -141,7 +173,7 @@ Unrealized P/L for an open paper trade is its intrinsic value at the current spo
 
 ```bash
 pip install -r requirements.txt
-python -m pytest            # 104 tests, ~5 s, fully offline (uses the local simulator)
+python -m pytest            # 135 tests, ~5 s, fully offline (uses the local simulator)
 ruff check .                # lint (flake8-compatible rules + bugbear, pyupgrade, isort)
 mypy                        # strict type-check of the derivbot package
 ```
@@ -157,3 +189,8 @@ See [TEST_REPORT.md](TEST_REPORT.md) for the latest results.
   considering real money.
 - Only one strategy is implemented. `EmaCrossoverStrategy` is the extension point.
 - Daily limits use UTC days, matching Deriv's GMT trading day.
+- Demo trading through the **new** API login (REST one-time password) is built from
+  Deriv's published schemas and tested against the simulator, but has not yet been
+  run against a real Deriv account. Run `python -m derivbot` on a demo account
+  once and check the first trade before relying on it. Paper mode and the E2E test
+  *have* been run against Deriv's real servers.

@@ -25,6 +25,7 @@ from .dashboard import DISCLAIMER, render_dashboard, render_report
 from .database import TradeDatabase
 from .e2e import E2EResult, run_e2e, save_result
 from .executor import Executor, LiveExecutor, PaperExecutor
+from .lock import AlreadyRunningError, InstanceLock
 from .mock_server import DEMO_TOKEN, MockDerivServer
 from .risk import RiskManager
 from .strategy import EmaCrossoverStrategy
@@ -72,7 +73,7 @@ async def maybe_mock(cfg: Config, use_mock: bool) -> AsyncIterator[tuple[Config,
         yield cfg, token
         return
     async with MockDerivServer() as srv:
-        mocked = dataclasses.replace(cfg, api=dataclasses.replace(cfg.api, endpoint=srv.url))
+        mocked = dataclasses.replace(cfg, api=srv.api_config(cfg.api))
         yield mocked, DEMO_TOKEN
 
 
@@ -146,6 +147,13 @@ async def main_async(args: argparse.Namespace, cfg: Config) -> int:
                           "Use --paper to trade without a token.")
             return 2
 
+        mode = "paper" if args.paper else "live"
+        lock = InstanceLock(f"{run_cfg.database.path}.{mode}.lock")
+        try:
+            lock.acquire()
+        except AlreadyRunningError as exc:
+            console.print(f"[red]{exc}")
+            return 4
         db = TradeDatabase(run_cfg.database.path)
         client = DerivClient(run_cfg.api, token)
         executor: Executor = (
@@ -163,6 +171,7 @@ async def main_async(args: argparse.Namespace, cfg: Config) -> int:
                                  on_update=lambda b: live.update(render_dashboard(b)))
                 await bot.run(args.max_iterations)
         db.close()
+        lock.release()
         if bot.state.halt_reason:
             console.print(f"[bold red]Stopped by kill switch: {bot.state.halt_reason}")
             return 3
@@ -171,12 +180,17 @@ async def main_async(args: argparse.Namespace, cfg: Config) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    load_dotenv()
+    base = Path(args.config).resolve().parent
+    load_dotenv(str(base / ".env"))
     try:
         cfg = load_config(args.config)
     except ConfigError as exc:
         console.print(f"[red]{exc}")
         return 2
+    for attr in ("e2e_db", "e2e_output"):  # same rule as config paths: relative to config
+        value = getattr(args, attr)
+        if not Path(value).is_absolute():
+            setattr(args, attr, str(base / value))
     setup_logging(cfg, to_console=args.no_dashboard or args.e2e_test)
     console.print(f"[dim italic]{DISCLAIMER}")
     try:
