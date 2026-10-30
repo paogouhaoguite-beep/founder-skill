@@ -39,8 +39,8 @@ async def srv(clock):
 
 
 def make_bot(cfg, db, clock, srv, *, mode="paper", token=DEMO_TOKEN, strategy=None,
-             kill_file=None, **cfg_overrides):
-    cfg = dataclasses.replace(cfg, api=dataclasses.replace(cfg.api, endpoint=srv.url),
+             kill_file=None, account_type="demo", **cfg_overrides):
+    cfg = dataclasses.replace(cfg, api=srv.api_config(cfg.api, account_type=account_type),
                               **cfg_overrides)
     client = DerivClient(cfg.api, token)
     ex = (PaperExecutor(client, db, cfg.trading, cfg.paper.starting_balance, clock=clock)
@@ -97,7 +97,7 @@ async def test_loss_streak_restored_from_db(cfg, db, clock, srv):
 async def test_invalid_token_engages_kill_switch(cfg, db, clock, srv):
     bot = make_bot(cfg, db, clock, srv, mode="live", token="bad")
     await bot.run(max_iterations=3)
-    assert bot.state.status == "HALTED" and "InvalidToken" in bot.state.halt_reason
+    assert bot.state.status == "HALTED" and "HTTP401" in bot.state.halt_reason
 
 
 async def test_live_mode_requires_token(cfg, db, clock, srv):
@@ -107,7 +107,7 @@ async def test_live_mode_requires_token(cfg, db, clock, srv):
 
 
 async def test_real_account_refused_by_default(cfg, db, clock, srv):
-    bot = make_bot(cfg, db, clock, srv, mode="live", token=REAL_TOKEN)
+    bot = make_bot(cfg, db, clock, srv, mode="live", token=REAL_TOKEN, account_type="real")
     await bot.run(max_iterations=1)
     assert bot.state.status == "HALTED" and "REAL-money" in bot.state.halt_reason
     assert not any("buy" in r for r in srv.requests)
@@ -115,7 +115,8 @@ async def test_real_account_refused_by_default(cfg, db, clock, srv):
 
 async def test_real_account_allowed_only_when_opted_in(cfg, db, clock, srv):
     safety = dataclasses.replace(cfg.safety, allow_real_account=True)
-    bot = make_bot(cfg, db, clock, srv, mode="live", token=REAL_TOKEN, safety=safety)
+    bot = make_bot(cfg, db, clock, srv, mode="live", token=REAL_TOKEN, account_type="real",
+                   safety=safety)
     await bot.start()
     assert "REAL" in bot.state.account
     await bot.shutdown()

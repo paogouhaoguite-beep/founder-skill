@@ -45,6 +45,13 @@ class Executor(Protocol):
     async def close_all(self) -> None: ...
 
 
+MARKET_CLOSED_CODES = frozenset({"MarketIsClosed", "MarketIsClosedTryVolatility"})
+
+
+def is_market_closed(exc: DerivAPIError) -> bool:
+    return exc.code in MARKET_CLOSED_CODES or "market is presently closed" in exc.message.lower()
+
+
 def rise_fall_won(direction: str, entry: float, exit_: float) -> bool:
     """Deriv Rise/Fall: a tie (exit == entry) is a loss."""
     if direction == Direction.CALL.value:
@@ -66,11 +73,17 @@ class _Base:
         return float(self._clock())
 
     async def _priced_proposal(self, signal: Signal, stake: float) -> dict[str, Any]:
-        proposal = await self.client.get_proposal(
-            symbol=self.cfg.symbol, contract_type=signal.direction.value, amount=stake,
-            currency=self.cfg.currency, duration=self.cfg.contract_duration,
-            duration_unit=self.cfg.duration_unit,
-        )
+        try:
+            proposal = await self.client.get_proposal(
+                symbol=self.cfg.symbol, contract_type=signal.direction.value, amount=stake,
+                currency=self.cfg.currency, duration=self.cfg.contract_duration,
+                duration_unit=self.cfg.duration_unit,
+            )
+        except DerivAPIError as exc:
+            if is_market_closed(exc):
+                # e.g. forex at the weekend: wait for the market, don't count an error
+                raise TradeRejected(f"market closed: {exc.message}") from exc
+            raise
         ask = float(proposal["ask_price"])
         payout = float(proposal["payout"])
         ratio = (payout - ask) / ask if ask else 0.0
@@ -240,9 +253,11 @@ class LiveExecutor(_Base):
         notes: list[str] = []
         for c in await self.client.portfolio():
             cid = str(c.get("contract_id"))
-            if (cid in known or c.get("symbol") != self.cfg.symbol
-                    or int(c.get("date_start", 0)) < int(since)
-                    or c.get("contract_type") not in ("CALL", "PUT")):
+            symbol = c.get("underlying_symbol") or c.get("symbol")  # renamed in the new API
+            # contract_type names changed in the new API, so adopt any type: an
+            # untracked open contract is the risk being fixed here.
+            if cid in known or symbol != self.cfg.symbol or \
+                    int(c.get("date_start", 0)) < int(since):
                 continue
             start = int(c["date_start"])
             self.db.open_trade(
@@ -256,8 +271,10 @@ class LiveExecutor(_Base):
             cid = str(c.get("contract_id"))
             code = str(c.get("shortcode", ""))
             direction = code.split("_", 1)[0]
-            if cid in known or direction not in ("CALL", "PUT") \
-                    or f"_{self.cfg.symbol}_" not in code:
+            symbol = c.get("underlying_symbol")
+            on_symbol = symbol == self.cfg.symbol if symbol else f"_{self.cfg.symbol}_" in code
+            direction = str(c.get("contract_type") or direction or "?")
+            if cid in known or not on_symbol:
                 continue
             buy, sell = float(c["buy_price"]), float(c.get("sell_price") or 0.0)
             tid = self.db.open_trade(

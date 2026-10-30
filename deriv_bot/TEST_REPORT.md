@@ -1,6 +1,6 @@
 # Test Report
 
-**Date:** 2026-10-20, updated 2026-10-21 after a post-merge bug review (UTC)
+**Date:** 2026-10-20. Updated 2026-10-21 (bug review) and 2026-10-30 (future-use review, Deriv API migration) (UTC)
 **Environment:** Linux, Python 3.13.16, websockets 17.3, rich 15.0.0, PyYAML 6.0.3,
 pytest 9.1.1, ruff 0.16.9, mypy 2.3.1
 
@@ -8,13 +8,15 @@ pytest 9.1.1, ruff 0.16.9, mypy 2.3.1
 
 | Check | Result |
 |---|---|
-| Unit and integration tests (`python -m pytest`) | **117 passed, 0 failed** (~5 s). Stable across 3 consecutive runs. Includes 13 regression tests for the bugs in section 3. |
-| Line coverage (`pytest --cov=derivbot`) | **95%** (1678 statements) |
-| Soak test (120 iterations each, paper and demo-live, injected disconnect and rate limits) | **31 trades, 0 error-log lines.** Balances reconcile to the cent. |
+| Unit and integration tests (`python -m pytest`) | **135 passed, 0 failed** (~5 s). Stable across 3 consecutive runs. Includes regression tests for every bug in sections 3 and 4. |
+| Line coverage (`pytest --cov=derivbot`) | **95%** |
+| Soak test, new protocol (120 iterations each in paper and demo-live; injected disconnects, rate limits and a REST login outage) | **33 trades, 0 error-log lines.** Each reconnect logged in with a fresh one-time URL. Balances reconcile to the cent. |
 | Lint (`ruff check .`) | **All checks passed** (E, F, W, I, B, UP, SIM rule sets) |
-| Types (`mypy`, `strict = true`, package `derivbot`) | **No issues found in 12 source files** |
+| Types (`mypy`, `strict = true`, package `derivbot`) | **No issues found in 13 source files** |
 | E2E test trade, offline simulator (`--e2e-test --mock-server`) | **SUCCESS.** Full lifecycle completed. |
-| E2E test trade, real Deriv API (`--e2e-test`) | **Not completed from the build sandbox.** The sandbox's egress proxy rejects WebSocket upgrades (HTTP 520 from `ws.binaryws.com`). The bot produced the expected detailed failure report. **Run this command on your own machine.** |
+| **E2E test trade, real Deriv servers** (`--e2e-test`) | **SUCCESS (2026-10-30)** on Deriv's new public API with live Volatility 100 prices. The exit tick was checked independently against Deriv's tick history (section 4). |
+| Bot main loop, real Deriv servers (`--paper --no-dashboard`) | **Ran cleanly**, 0 errors in the log. |
+| Demo-account trading via the new API login | **Not run against a real account.** No token is available in the build environment. It is built from Deriv's published schemas and tested against the simulator. |
 
 ## 1. Test suite
 
@@ -88,7 +90,7 @@ the most recent crossover in the window and labels it, so that a single test
 trade always happens. The normal bot loop **never** does this: it trades only on
 a fresh cross.
 
-### 2b. Real Deriv API: could not connect from the build sandbox
+### 2b. Real Deriv API, 2026-10-20: could not connect from the build sandbox (superseded by section 4)
 
 ```
 $ python -m derivbot --e2e-test
@@ -150,12 +152,81 @@ After the fixes: 117 tests passed (3 runs), ruff and mypy are clean, and the
 offline E2E test trade succeeded again. The soak test above exercised all of
 this together.
 
+## 4. Future-use review (2026-10-30)
+
+### 4a. Deriv is retiring the API the bot was built on
+
+Deriv now runs a new Options API at `api.derivws.com`. Its docs describe the
+legacy options platform as "read-only access to a user's pre-upgrade options
+trading data" and say the legacy endpoints "will be removed once all users have
+been fully migrated". I tested the new API's public endpoint from the build
+environment (it is reachable, unlike the legacy one):
+
+| Check against the real new API | Result | Effect on the bot as merged |
+|---|---|---|
+| `proposal` with `symbol` | `InputValidationFailed: "symbol": "field is not allowed"` | **Every trade would fail.** The new API requires `underlying_symbol`. |
+| `authorize` call | `UnknownMethod` | **Demo-trading login would fail.** Login is now REST: list accounts, then request a single-use WebSocket URL (one-time password, valid 120 s). |
+| `portfolio` symbol field | renamed `underlying_symbol` (per Deriv's comparison docs) | Interrupted-buy recovery would skip the contract |
+| Minimum stake | `validation_params.stake.min = "0.35"` | Matches `risk.min_stake` |
+| Candles | the forming candle is still the last element | `drop_forming` is correct |
+
+**Fix:** `api.protocol: new` is now the default. The client logs in with
+`GET /trading/v1/options/accounts` and `POST .../accounts/{id}/otp` (Bearer token
+plus `Deriv-App-ID`), fetches a **fresh** one-time URL on every reconnect, and
+sends `underlying_symbol`. Recovery reads either field name. `protocol: legacy`
+keeps the old flow for accounts that haven't migrated. The simulator now speaks
+both protocols, including single-use OTPs and the REST login, so the whole test
+suite exercises the new flow.
+
+### 4b. First test trade on Deriv's real servers: SUCCESS
+
+```
+$ python -m derivbot --e2e-test          # no token, paper mode, 2026-10-30 17:55 UTC
+   ✔ connect     connected to wss://api.derivws.com/trading/v1/options/ws/public
+   ✔ market_data 100 closed 60s candles for R_100; last close 590.42
+   ✔ signal      CALL - EMA9 crossed above EMA21 14 candle(s) ago [most recent crossover]
+   ✔ risk        paper balance 100.00 USD; risk 1.0% -> stake 1.00
+   ✔ proposal    simulated execution logged as trade #1: CALL stake 1.00 payout 1.95
+                 entry 591.06 (5t)
+   ✔ settlement  LOST: entry 591.06 exit 590.94 P/L -1.00
+   ✔ verify      DB row closed, P/L matches, balance 100.00 -> 99.00
+exit=0
+```
+
+**Independent check** against Deriv's tick history for R_100: the entry tick at
+epoch 1793382910 was 591.06. The ticks after it were 590.89, 590.92, 591.19,
+590.90 and **590.94** (5th), so the 5-tick CALL correctly lost. The bot's main loop
+(`--paper --no-dashboard`, 4 iterations) also ran against the real servers with 0
+errors.
+
+### 4c. Other problems that would hinder future use, now fixed
+
+| # | Problem | Impact | Fix |
+|---|---|---|---|
+| 11 | Closed market counted as an error | Trading forex (e.g. `frxEURUSD`): at the weekend, 5 refused proposals fired the **kill switch** | `MarketIsClosed` is treated as "skip and wait", with no error count |
+| 12 | Account currency not checked | A non-USD account: every proposal fails, or stakes and limits are in the wrong currency | The bot refuses to start and explains the mismatch |
+| 13 | File paths relative to the *current folder* | Started from cron, a service or another folder, the bot silently used a **new, empty journal**: risk limits and loss streak reset, history missing | Paths in `config.yaml`, `.env` and the E2E outputs resolve against the config file's folder |
+| 14 | Two copies could run at once | Double trades, and each copy applies the daily limit separately (2× the intended risk) | OS-level single-instance lock per journal and mode (Linux, macOS, Windows), exit code 4 |
+| 15 | Recovery filtered contract types `CALL`/`PUT` | Deriv renamed contract types in the new API, so an interrupted buy could stay untracked | Adopts any contract on the configured symbol |
+| 16 | Dependencies had no upper bounds | A future major release of `websockets`, `rich` or `PyYAML` could break installs | Bounded to tested major versions |
+| 17 | The bot was not an installable package | `python -m derivbot` only worked from inside `deriv_bot/` (`No module named derivbot` elsewhere), which undermined #13 | `pip install -e .` adds a `derivbot` command. Verified from `/tmp` against Deriv's real servers: E2E SUCCESS (a CALL that **won** +0.95), with files written next to `config.yaml`. |
+
+### 4d. Risks that remain (not code bugs)
+
+- **No proven edge.** On random synthetic indices with a 95% payout, the expected
+  result per trade is about −2.5% of the stake.
+- **New-API demo login untested on a real account.** Run one demo session and
+  check the first trade.
+- **The legacy protocol will stop working** whenever Deriv completes migration.
+- **Regulation.** For Indian residents, Deriv may appear on the RBI Alert List of unauthorised forex platforms. Check RBI's current list
+  before depositing.
+
 ## Reproducing this report
 
 ```bash
 python -m pytest -v                       # suite
 python -m pytest --cov=derivbot -q        # coverage (needs pytest-cov)
 ruff check . && mypy                      # static analysis
-python -m derivbot --e2e-test --mock-server
-python -m derivbot --e2e-test
+python -m derivbot --e2e-test --mock-server   # offline
+python -m derivbot --e2e-test                 # real Deriv servers, no token needed
 ```

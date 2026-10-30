@@ -111,6 +111,11 @@ class TradingBot:
                 raise UnsafeAccountError(
                     f"account {auth.get('loginid')} is a REAL-money account. Use a demo "
                     "(virtual) token, or set safety.allow_real_account: true at your own risk.")
+        if auth and auth.get("currency") and auth["currency"] != self.cfg.trading.currency:
+            raise UnsafeAccountError(
+                f"account currency is {auth['currency']} but trading.currency is "
+                f"{self.cfg.trading.currency}; stakes and limits would be wrong. Set "
+                "trading.currency (and check risk.min_stake) to match the account.")
         if auth:
             kind = "demo" if auth.get("is_virtual") else "REAL"
             self.state.account = f"{auth.get('loginid')} ({kind})"

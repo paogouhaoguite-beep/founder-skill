@@ -3,9 +3,15 @@
 # risk of loss. You are responsible for complying with Deriv's Terms of Service.
 
 api:
-  endpoint: "wss://ws.binaryws.com/websockets/v3"
-  app_id: 1089                  # Deriv's public test app_id; register your own at api.deriv.com
-  token_env: "DERIV_API_TOKEN"  # name of the env var holding the API token (never put the token here)
+  # Deriv moved Options trading to a new API (api.derivws.com). "legacy" keeps the old
+  # ws.binaryws.com v3 protocol for accounts not yet migrated; Deriv is retiring it.
+  protocol: "new"
+  endpoint: "wss://api.derivws.com/trading/v1/options/ws/public"   # used without a token (paper)
+  rest_base: "https://api.derivws.com"
+  app_id: ""                    # your App ID from developers.deriv.com (needed for demo trading)
+  account_type: "demo"          # which Options account to trade: demo (default) or real
+  account_id: ""                # optional: a specific account id, e.g. DOT90004580
+  token_env: "DERIV_API_TOKEN"  # env var holding your Personal Access Token (never put it here)
   request_timeout: 15.0         # seconds to wait for any single API response
   max_retries: 5                # reconnect / rate-limit retries before giving up
   reconnect_base_delay: 1.0     # exponential backoff: base * 2^attempt, capped below

@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 async def test_e2e_succeeds_against_simulator(cfg, db):
     async with MockDerivServer() as srv:
-        run_cfg = dataclasses.replace(cfg, api=dataclasses.replace(cfg.api, endpoint=srv.url))
+        run_cfg = dataclasses.replace(cfg, api=srv.api_config(cfg.api))
         res = await run_e2e(run_cfg, DerivClient(run_cfg.api, DEMO_TOKEN), db,
                             duration=2, duration_unit="t", poll=0.5)
     assert res.success, res.traceback

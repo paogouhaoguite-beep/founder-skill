@@ -1,7 +1,7 @@
 # Runtime
-websockets>=13.0
-rich>=13.0
-PyYAML>=6.0
+websockets>=13.0,<18  # 13+ has the asyncio API used here
+rich>=13.0,<16
+PyYAML>=6.0,<7
 
 # Development / testing
 pytest>=8.0

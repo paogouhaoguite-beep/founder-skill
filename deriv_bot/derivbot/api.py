@@ -7,6 +7,8 @@ import contextlib
 import itertools
 import json
 import logging
+import urllib.error
+import urllib.request
 from collections.abc import Awaitable, Callable
 from typing import Any
 
@@ -20,6 +22,8 @@ log = logging.getLogger(__name__)
 JSON = dict[str, Any]
 ConnectFn = Callable[[str], Awaitable[Any]]
 SleepFn = Callable[[float], Awaitable[None]]
+# (method, url, headers) -> (http status, parsed JSON body)
+HttpFn = Callable[[str, str, dict[str, str]], Awaitable[tuple[int, JSON]]]
 
 AUTH_ERROR_CODES = frozenset({
     "InvalidToken", "AuthorizationRequired", "PermissionDenied", "InvalidAppID",
@@ -61,6 +65,32 @@ def describe(exc: BaseException) -> str:
     return f"{type(exc).__name__}: {exc}" if str(exc) else type(exc).__name__
 
 
+async def _default_http(method: str, url: str, headers: dict[str, str]) -> tuple[int, JSON]:
+    """Minimal JSON-over-HTTPS call (stdlib only; honours HTTPS_PROXY)."""
+
+    def call() -> tuple[int, JSON]:
+        req = urllib.request.Request(url, method=method, headers=headers,
+                                     data=b"" if method == "POST" else None)
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                return resp.status, json.loads(resp.read() or b"{}")
+        except urllib.error.HTTPError as exc:
+            try:
+                body = json.loads(exc.read() or b"{}")
+            except ValueError:
+                body = {}
+            return exc.code, body
+
+    return await asyncio.to_thread(call)
+
+
+def _rest_error(body: JSON) -> str:
+    errs = body.get("errors") or []
+    if errs and isinstance(errs, list) and isinstance(errs[0], dict):
+        return f"{errs[0].get('code', '')}: {errs[0].get('message', '')}".strip(": ")
+    return json.dumps(body)[:200]
+
+
 def raise_for_error(msg: JSON) -> None:
     err = msg.get("error")
     if not err:
@@ -83,11 +113,13 @@ class DerivClient:
         *,
         connect: ConnectFn = _default_connect,
         sleep: SleepFn = asyncio.sleep,
+        http: HttpFn = _default_http,
     ) -> None:
         self.cfg = cfg
         self._token = token
         self._connect_fn = connect
         self._sleep = sleep
+        self._http = http
         self._ws: Any = None
         self._reader: asyncio.Task[None] | None = None
         self._pending: dict[int, asyncio.Future[JSON]] = {}
@@ -110,10 +142,15 @@ class DerivClient:
         last: BaseException | None = None
         for attempt in range(self.cfg.max_retries + 1):
             try:
-                await self._open()
-                if self._token:
-                    msg = await self._request_once({"authorize": self._token})
-                    self.authorized = msg["authorize"]
+                if self.cfg.protocol == "new" and self._token:
+                    # The OTP is single-use, so every (re)connect needs a fresh one.
+                    await self._open(await self._otp_url())
+                else:
+                    await self._open(self.cfg.url)
+                    if self._token:
+                        msg = await self._request_once({"authorize": self._token})
+                        self.authorized = msg["authorize"]
+                if self.authorized:
                     log.info("Authorized as %s (virtual=%s)", self.authorized.get("loginid"),
                              self.authorized.get("is_virtual"))
                 return
@@ -135,11 +172,53 @@ class DerivClient:
             f"could not connect to {self.cfg.endpoint} after "
             f"{self.cfg.max_retries + 1} attempts: {describe(last) if last else '?'}")
 
-    async def _open(self) -> None:
-        log.debug("Connecting to %s", self.cfg.endpoint)
-        self._ws = await asyncio.wait_for(self._connect_fn(self.cfg.url),
-                                          self.cfg.request_timeout)
+    async def _open(self, url: str) -> None:
+        log.debug("Connecting to %s", url.split("?")[0])  # never log the OTP
+        self._ws = await asyncio.wait_for(self._connect_fn(url), self.cfg.request_timeout)
         self._reader = asyncio.create_task(self._read_loop())
+
+    async def _rest(self, method: str, path: str) -> JSON:
+        assert self._token
+        headers = {"Authorization": f"Bearer {self._token}", "Accept": "application/json"}
+        if self.cfg.app_id:
+            headers["Deriv-App-ID"] = self.cfg.app_id
+        status, body = await self._http(method, f"{self.cfg.rest_base}{path}", headers)
+        if status in (401, 403):
+            raise AuthorizationError(f"HTTP{status}", _rest_error(body), path)
+        if status == 429:
+            raise ConnectionLostError(f"REST rate limited on {path}")
+        if status >= 400:
+            if status < 500:
+                raise DerivAPIError(f"HTTP{status}", _rest_error(body), path)
+            raise ConnectionLostError(f"HTTP {status} from {path}: {_rest_error(body)}")
+        return body
+
+    async def _otp_url(self) -> str:
+        """New-API login: pick the account, then get a one-time WebSocket URL for it."""
+        if not self.cfg.app_id:
+            raise AuthorizationError(
+                "MissingAppID", "api.app_id is empty: register an app at "
+                "developers.deriv.com and put its App ID in config.yaml", "otp")
+        accounts = (await self._rest("GET", "/trading/v1/options/accounts")).get("data") or []
+        wanted = [a for a in accounts
+                  if (a.get("account_id") == self.cfg.account_id if self.cfg.account_id
+                      else a.get("account_type") == self.cfg.account_type)
+                  and a.get("status", "active") == "active"]
+        if not wanted:
+            have = ", ".join(f"{a.get('account_id')} ({a.get('account_type')})"
+                             for a in accounts) or "none"
+            raise AuthorizationError(
+                "NoMatchingAccount", f"no active {self.cfg.account_id or self.cfg.account_type}"
+                f" Options account for this token (accounts: {have})", "accounts")
+        acct = wanted[0]
+        body = await self._rest("POST", f"/trading/v1/options/accounts/{acct['account_id']}/otp")
+        url = (body.get("data") or {}).get("url")
+        if not url:
+            raise ConnectionLostError("OTP response had no WebSocket URL")
+        self.authorized = {"loginid": acct["account_id"],
+                           "is_virtual": int(acct.get("account_type") == "demo"),
+                           "currency": acct.get("currency"), "balance": acct.get("balance")}
+        return str(url)
 
     async def _drop(self) -> None:
         ws, self._ws = self._ws, None
@@ -245,6 +324,11 @@ class DerivClient:
                 await self._sleep(delay)
 
     # --- typed helpers -----------------------------------------------------
+    @property
+    def symbol_field(self) -> str:
+        """The new API renamed `symbol` to `underlying_symbol` (and rejects `symbol`)."""
+        return "underlying_symbol" if self.cfg.protocol == "new" else "symbol"
+
     async def ping(self) -> bool:
         return (await self.request({"ping": 1})).get("ping") == "pong"
 
@@ -276,7 +360,7 @@ class DerivClient:
         msg = await self.request({
             "proposal": 1, "amount": amount, "basis": "stake", "contract_type": contract_type,
             "currency": currency, "duration": duration, "duration_unit": duration_unit,
-            "symbol": symbol,
+            self.symbol_field: symbol,
         })
         return dict(msg["proposal"])
 

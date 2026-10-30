@@ -13,7 +13,17 @@ def test_shipped_config_yaml_is_valid():
     assert cfg.strategy.fast_period == 9 and cfg.strategy.slow_period == 21
     assert 1.0 <= cfg.risk.risk_per_trade_pct <= 2.0
     assert cfg.safety.allow_real_account is False
-    assert cfg.api.url.endswith("?app_id=1089")
+    assert cfg.api.protocol == "new"
+    assert cfg.api.url == "wss://api.derivws.com/trading/v1/options/ws/public"
+
+
+def test_legacy_protocol_url_carries_app_id():
+    legacy = config_from_dict({"api": {"protocol": "legacy",
+                                       "endpoint": "wss://ws.derivws.com/websockets/v3"}})
+    assert legacy.api.url.endswith("?app_id=1089")  # Deriv's public test app
+    own = config_from_dict({"api": {"protocol": "legacy", "app_id": 4242,
+                                    "endpoint": "wss://ws.derivws.com/websockets/v3"}})
+    assert own.api.app_id == "4242" and own.api.url.endswith("?app_id=4242")
 
 
 def test_defaults_when_empty():
@@ -37,6 +47,9 @@ def test_int_is_accepted_for_float_fields():
     ({"api": {"endpoint": "http://example.com"}}, "endpoint"),
     ({"strategy": {"candle_count": 10}}, "candle_count"),
     ({"logging": {"level": "LOUD"}}, "logging.level"),
+    ({"api": {"protocol": "v4"}}, "api.protocol"),
+    ({"api": {"account_type": "practice"}}, "account_type"),
+    ({"api": {"rest_base": "ftp://x"}}, "rest_base"),
     ({"paper": {"starting_balance": -1}}, "starting_balance"),
 ])
 def test_invalid_values_rejected(raw, message):

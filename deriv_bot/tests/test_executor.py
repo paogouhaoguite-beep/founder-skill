@@ -15,7 +15,7 @@ def sig(direction=Direction.CALL):
 @pytest.fixture
 async def env(cfg, clock):
     async with MockDerivServer(clock=clock) as srv:
-        api = dataclasses.replace(cfg.api, endpoint=srv.url)
+        api = srv.api_config(cfg.api)
         client = DerivClient(api, DEMO_TOKEN)
         await client.connect()
         yield srv, client

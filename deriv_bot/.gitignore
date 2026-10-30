@@ -6,3 +6,4 @@ KILL_SWITCH
 .mypy_cache/
 .ruff_cache/
 .coverage
+*.egg-info/
