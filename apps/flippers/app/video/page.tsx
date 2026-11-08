@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Studio from "@/components/Studio";
 
-export const metadata = { title: "Video studio · Frameforge" };
+export const metadata = { title: "Video studio · Flippers" };
 
 export default function VideoPage() {
   return (

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { costOf, getModel, modelsFor, type Mode } from "@/lib/models";
+import { getModel, modelsFor, type Mode } from "@/lib/models";
 import { PRESETS } from "@/lib/presets";
 import { useStore, type Generation } from "@/lib/store";
 import { demoImage } from "@/lib/demo";
@@ -47,14 +47,12 @@ export default function Studio({ mode }: { mode: Mode }) {
     if (model.durations && !model.durations.includes(duration)) setDuration(model.durations[0]);
   }, [modelId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const cost = costOf({ mode, modelId, count, duration });
   const feed = useMemo(() => store.items.filter((g) => g.mode === mode), [store.items, mode]);
 
   async function generate() {
     setError(null);
     if (!prompt.trim()) return setError("Write a prompt first.");
     if (model.needsReference && !reference) return setError(`${model.name} needs a reference image.`);
-    if (cost > store.credits) return setError("Not enough credits — top up on the Pricing page.");
 
     setBusy(true);
     const id = crypto.randomUUID();
@@ -62,7 +60,7 @@ export default function Studio({ mode }: { mode: Mode }) {
       id, mode, modelId, prompt, aspectRatio, presetId,
       createdAt: Date.now(), status: "pending", urls: [],
     };
-    store.add(g, cost);
+    store.add(g);
 
     try {
       const res = await fetch("/api/generate", {
@@ -104,7 +102,6 @@ export default function Studio({ mode }: { mode: Mode }) {
       throw new Error("Timed out waiting for the model");
     } catch (e) {
       store.patch(id, { status: "failed", error: (e as Error).message });
-      store.refund(cost);
       setError((e as Error).message);
     } finally {
       setBusy(false);
@@ -181,7 +178,6 @@ export default function Studio({ mode }: { mode: Mode }) {
           <div className="model-list">
             {models.map((m) => (
               <button key={m.id} className={`model ${m.id === modelId ? "on" : ""}`} onClick={() => setModelId(m.id)}>
-                <span className="cost">✦ {m.cost}{m.mode === "video" ? "/s" : ""}</span>
                 {m.name}
                 <small>{m.tagline}</small>
               </button>
@@ -233,7 +229,7 @@ export default function Studio({ mode }: { mode: Mode }) {
 
         {error && <div className="error">{error}</div>}
         <button className="btn-primary" disabled={busy} onClick={generate}>
-          {busy ? "Generating…" : "Generate"} <span>✦ {cost}</span>
+          {busy ? "Generating…" : "Generate"}
         </button>
         <div className="hint">⌘/Ctrl + Enter to generate</div>
       </aside>

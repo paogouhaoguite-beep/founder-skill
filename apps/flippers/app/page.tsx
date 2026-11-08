@@ -8,7 +8,6 @@ const TOOLS = [
   { href: "/video", tag: "Animate", title: "Video studio", body: "Turn a prompt or a still image into a short clip, with camera presets." },
   { href: "/video?preset=orbit", tag: "Presets", title: "Camera moves", body: "Orbit, push-in, crane, FPV and more, all in one click on any video model." },
   { href: "/library", tag: "Organize", title: "Library", body: "Every generation in one place. Search, download and reuse settings." },
-  { href: "/pricing", tag: "Credits", title: "Pay per result", body: "One credit balance for every model. You only spend on what you generate." },
 ];
 
 export default function Explore() {
@@ -19,7 +18,7 @@ export default function Explore() {
           Every frame,<br /><em>one studio.</em>
         </h1>
         <p>
-          Frameforge brings leading image and video models together behind one prompt box, with camera presets,
+          Flippers brings leading image and video models together behind one prompt box, with camera presets,
           reference images and a shared library.
         </p>
         <div className="cta">
@@ -49,7 +48,6 @@ export default function Explore() {
               <span className="tag">{m.mode}</span>
               <h3>{m.name}</h3>
               <p>{m.tagline}</p>
-              <p>✦ {m.cost}{m.mode === "video" ? " per second" : " per image"}</p>
             </Link>
           ))}
         </div>

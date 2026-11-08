@@ -3,7 +3,7 @@ import Nav from "@/components/Nav";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Frameforge",
+  title: "Flippers",
   description: "Generate images and video with the best AI models in one studio.",
 };
 

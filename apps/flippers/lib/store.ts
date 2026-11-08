@@ -1,5 +1,5 @@
 "use client";
-// Per-browser library + credit balance, kept in localStorage.
+// Per-browser library of generations, kept in localStorage.
 
 import { useCallback, useEffect, useState } from "react";
 import type { Mode } from "./models";
@@ -19,11 +19,9 @@ export interface Generation {
   favorite?: boolean;
 }
 
-const KEY = "frameforge:v1";
-const START_CREDITS = 500;
+const KEY = "flippers:v1";
 
 interface State {
-  credits: number;
   items: Generation[];
 }
 
@@ -32,7 +30,7 @@ function load(): State {
     const raw = localStorage.getItem(KEY);
     if (raw) return JSON.parse(raw);
   } catch {}
-  return { credits: START_CREDITS, items: [] };
+  return { items: [] };
 }
 
 function save(s: State) {
@@ -52,7 +50,7 @@ function set(update: (s: State) => State) {
 }
 
 export function useStore() {
-  const [s, setS] = useState<State>({ credits: START_CREDITS, items: [] });
+  const [s, setS] = useState<State>({ items: [] });
   useEffect(() => {
     state = state ?? load();
     setS(state);
@@ -63,22 +61,15 @@ export function useStore() {
   }, []);
 
   return {
-    credits: s.credits,
     items: s.items,
-    add: useCallback((g: Generation, cost: number) => {
-      set((st) => ({ credits: st.credits - cost, items: [g, ...st.items] }));
+    add: useCallback((g: Generation) => {
+      set((st) => ({ ...st, items: [g, ...st.items] }));
     }, []),
     patch: useCallback((id: string, p: Partial<Generation>) => {
       set((st) => ({ ...st, items: st.items.map((g) => (g.id === id ? { ...g, ...p } : g)) }));
     }, []),
-    refund: useCallback((amount: number) => {
-      set((st) => ({ ...st, credits: st.credits + amount }));
-    }, []),
     remove: useCallback((id: string) => {
       set((st) => ({ ...st, items: st.items.filter((g) => g.id !== id) }));
-    }, []),
-    topUp: useCallback((amount: number) => {
-      set((st) => ({ ...st, credits: st.credits + amount }));
     }, []),
   };
 }
