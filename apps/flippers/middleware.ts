@@ -10,7 +10,7 @@ export function middleware(req: NextRequest) {
   if (header.startsWith("Basic ")) {
     try {
       const decoded = atob(header.slice(6));
-      if (decoded.slice(decoded.indexOf(":") + 1) === password) return NextResponse.next();
+      if (safeEqual(decoded.slice(decoded.indexOf(":") + 1), password)) return NextResponse.next();
     } catch {
       // malformed header: fall through to the 401
     }
@@ -19,6 +19,13 @@ export function middleware(req: NextRequest) {
     status: 401,
     headers: { "WWW-Authenticate": 'Basic realm="Flippers"' },
   });
+}
+
+// Compare without returning early, so timing doesn't reveal how much matched.
+function safeEqual(a: string, b: string) {
+  let diff = a.length ^ b.length;
+  for (let i = 0; i < Math.max(a.length, b.length); i++) diff |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0);
+  return diff === 0;
 }
 
 export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"] };

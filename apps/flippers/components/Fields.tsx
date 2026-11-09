@@ -4,6 +4,13 @@ import { uploadFile } from "@/lib/upload";
 import { PRESETS } from "@/lib/presets";
 
 const ACCEPT = { image: "image/*", video: "video/*", audio: "audio/*" } as const;
+const EXT = {
+  image: /\.(png|jpe?g|webp|gif|heic|avif|bmp)$/i,
+  video: /\.(mp4|mov|webm|m4v|mkv|avi)$/i,
+  audio: /\.(mp3|wav|m4a|aac|ogg|flac|opus|webm)$/i,
+};
+// Some systems report no MIME type for valid files, so fall back to the extension.
+const isKind = (f: File, kind: keyof typeof EXT) => f.type ? f.type.startsWith(kind) : EXT[kind].test(f.name);
 
 function Preview({ kind, url }: { kind: keyof typeof ACCEPT; url: string }) {
   if (kind === "image") return <img src={url} alt="" />;
@@ -21,7 +28,7 @@ export function FileField({ kind, label, hint, value, onChange }: {
 
   async function take(file?: File) {
     if (!file) return;
-    if (!file.type.startsWith(kind)) return setError(`That isn't ${kind === "audio" ? "an audio" : `a ${kind}`} file`);
+    if (!isKind(file, kind)) return setError(`That isn't ${kind === "audio" ? "an audio" : `a ${kind}`} file`);
     setError(null);
     setBusy(true);
     try {
@@ -69,7 +76,7 @@ export function ImagesField({ label, hint, max, value, onChange }: {
     setError(null);
     setBusy(true);
     try {
-      const picked = [...files].filter((f) => f.type.startsWith("image")).slice(0, max - urls.length);
+      const picked = [...files].filter((f) => isKind(f, "image")).slice(0, max - urls.length);
       const uploaded = await Promise.all(picked.map(uploadFile));
       onChange([...urls, ...uploaded]);
     } catch (e) {
@@ -115,6 +122,7 @@ export function MaskPainter({ label, imageUrl, value, onChange }: {
   const [brush, setBrush] = useState(40);
   const [size, setSize] = useState<[number, number] | null>(null);
   const [status, setStatus] = useState("");
+  useEffect(() => () => clearTimeout(timer.current), []);
 
   useEffect(() => {
     setSize(null);
@@ -149,7 +157,8 @@ export function MaskPainter({ label, imageUrl, value, onChange }: {
   function commit() {
     clearTimeout(timer.current);
     timer.current = setTimeout(async () => {
-      const src = canvas.current!;
+      const src = canvas.current;
+      if (!src) return; // painter was closed before the save ran
       const out = document.createElement("canvas");
       out.width = src.width;
       out.height = src.height;

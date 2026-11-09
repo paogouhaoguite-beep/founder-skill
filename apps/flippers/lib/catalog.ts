@@ -17,7 +17,7 @@ export type Field =
   | { kind: "mask"; key: string; label: string; imageKey: string }
   | { kind: "video"; key: string; label: string; required?: boolean }
   | { kind: "audio"; key: string; label: string; required?: boolean }
-  | { kind: "select"; key: string; label: string; options: string[]; default: string }
+  | { kind: "select"; key: string; label: string; options: string[]; default: string; hideWith?: string }
   | { kind: "count"; key: string; label: string; max: number; default: number }
   | { kind: "toggle"; key: string; label: string; default: boolean }
   | { kind: "consent"; key: string; label: string }
@@ -134,7 +134,7 @@ export const MODELS: ModelDef[] = [
   m({
     id: "kling", tool: "video", name: "Kling 2.5 Turbo", tagline: "Smooth motion, strong prompt following", output: "video",
     fields: [startFrame, prompt("A fox runs through snowy pines, breath in the cold air"), preset,
-      aspect(["16:9", "9:16", "1:1"]), { kind: "select", key: "duration", label: "Duration", options: ["5", "10"], default: "5" }],
+      { ...aspect(["16:9", "9:16", "1:1"]), hideWith: "image" } as Field, { kind: "select", key: "duration", label: "Duration", options: ["5", "10"], default: "5" }],
     endpoints: ["fal-ai/kling-video/v2.5-turbo/pro/text-to-video", "fal-ai/kling-video/v2.5-turbo/pro/image-to-video"],
     endpoint: (v) => v.image ? "fal-ai/kling-video/v2.5-turbo/pro/image-to-video" : "fal-ai/kling-video/v2.5-turbo/pro/text-to-video",
     map: (v, P) => v.image

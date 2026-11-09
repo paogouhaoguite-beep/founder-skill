@@ -27,12 +27,18 @@ export default function MediaCard({ g, onRemove, onReuse }: {
   const isImage = g.output === "image";
   const isVideo = g.output === "video";
 
+  const [sendError, setSendError] = useState<string | null>(null);
   async function send(tool: string, modelId: string | undefined, key: string, url: string) {
-    const file = await urlToInput(url);
-    const values: Record<string, unknown> = { [key]: file };
-    if (key === "image") values.images = [file];
-    handoff(tool, { modelId, values });
-    router.push(`/${tool}`);
+    setSendError(null);
+    try {
+      const file = await urlToInput(url);
+      const values: Record<string, unknown> = { [key]: file };
+      if (key === "image") values.images = [file];
+      handoff(tool, { modelId, values });
+      router.push(`/${tool}`);
+    } catch (e) {
+      setSendError(`Couldn't send it: ${(e as Error).message}`);
+    }
   }
 
   function toCanvas(url: string) {
@@ -77,6 +83,7 @@ export default function MediaCard({ g, onRemove, onReuse }: {
                 {g.output !== "audio" && <button onClick={() => toCanvas(url)}>Add to canvas</button>}
               </div>
             )}
+            {sendError && <div className="error">{sendError}</div>}
           </div>
         </div>
       ))}

@@ -29,9 +29,11 @@ export default function StoryboardPage() {
   const [board, setBoard] = useState<Storyboard | null>(null);
   const [frameModel, setFrameModel] = useState(FRAME_MODELS[0]);
   const [clipModel, setClipModel] = useState(CLIP_MODELS[0]);
-  const [characters, setCharacters] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const byId = useMemo(() => new Map(store.items.map((g) => [g.id, g])), [store.items]);
+  const characters = board?.characters ?? [];
+  // A frame/clip needs (re)doing if it was never made, failed, or was deleted from the library.
+  const needs = (id?: string) => { const g = id ? byId.get(id) : undefined; return !g || g.status === "failed"; };
 
   const update = (b: Storyboard) => {
     const next = { ...b, updatedAt: Date.now() };
@@ -48,8 +50,9 @@ export default function StoryboardPage() {
   async function makeFrame(b: Storyboard, scene: Scene) {
     if (!scene.text.trim()) return;
     const prompt = `${scene.text.trim()}. Style: ${b.style}`;
-    const id = characters.length
-      ? await submitGeneration("character-multi", withAspect("character-multi", { prompt, images: characters }, b.aspect), store.add, store.patch)
+    const chars = (snapshot().boards.find((x) => x.id === b.id) ?? b).characters ?? [];
+    const id = chars.length
+      ? await submitGeneration("character-multi", withAspect("character-multi", { prompt, images: chars }, b.aspect), store.add, store.patch)
       : await submitGeneration(frameModel, withAspect(frameModel, { prompt }, b.aspect), store.add, store.patch);
     patchScene(b.id, scene.id, { frameGenId: id, clipGenId: undefined });
   }
@@ -117,12 +120,12 @@ export default function StoryboardPage() {
             {CLIP_MODELS.map((id) => <option key={id} value={id}>{getModel(id)!.name}</option>)}
           </select></div>
         <div style={{ gridColumn: "1 / -1" }}>
-          <ImagesField label="Recurring character (optional): keeps the same face in every frame" max={4} value={characters} onChange={setCharacters} />
+          <ImagesField label="Recurring character (optional): keeps the same face in every frame" max={4} value={characters} onChange={(c) => update({ ...b, characters: c })} />
         </div>
       </div>
       <div className="row-inline" style={{ margin: "14px 0" }}>
-        <button className="btn" onClick={() => run(() => Promise.all(b.scenes.filter((s) => !s.frameGenId).map((s) => makeFrame(b, s))))}>Generate missing frames</button>
-        <button className="btn" onClick={() => run(() => Promise.all(b.scenes.filter((s) => !s.clipGenId).map((s) => makeClip(b, s))))}>Animate all frames</button>
+        <button className="btn" onClick={() => run(() => Promise.all(b.scenes.filter((s) => needs(s.frameGenId)).map((s) => makeFrame(b, s))))}>Generate missing frames</button>
+        <button className="btn" onClick={() => run(() => Promise.all(b.scenes.filter((s) => needs(s.clipGenId)).map((s) => makeClip(b, s))))}>Animate all frames</button>
         {error && <span className="error">{error}</span>}
       </div>
       <div className="scenes">

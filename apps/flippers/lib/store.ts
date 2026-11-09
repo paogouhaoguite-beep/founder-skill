@@ -22,7 +22,7 @@ export interface Generation {
 }
 
 export interface Scene { id: string; text: string; frameGenId?: string; clipGenId?: string }
-export interface Storyboard { id: string; title: string; style: string; aspect: string; scenes: Scene[]; updatedAt: number }
+export interface Storyboard { id: string; title: string; style: string; aspect: string; scenes: Scene[]; characters?: string[]; updatedAt: number }
 export interface BoardItem { id: string; kind: "media" | "note"; genId?: string; url?: string; output?: Output; text?: string; x: number; y: number; w: number }
 
 interface State {

@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { defaultValues, getModel, getTool, modelsFor, validate, type Field, type ToolId, type Values } from "@/lib/catalog";
-import { useStore, type Generation } from "@/lib/store";
+import { lastSaveFailed, useStore, type Generation } from "@/lib/store";
 import { submitGeneration, useResumeJobs } from "@/lib/jobs";
 import { isDemo, takeHandoff } from "@/lib/upload";
 import { FileField, ImagesField, MaskPainter, PresetPicker } from "./Fields";
@@ -38,8 +38,14 @@ export default function ToolStudio({ tool }: { tool: ToolId }) {
   useEffect(() => {
     const h = takeHandoff(tool);
     if (!h) return;
-    if (typeof h.modelId === "string" && getModel(h.modelId)?.tool === tool) setModelId(h.modelId);
-    setValues((v) => ({ ...v, ...(h.values as Values) }));
+    const target = typeof h.modelId === "string" && getModel(h.modelId)?.tool === tool ? getModel(h.modelId)! : null;
+    if (target) {
+      // Switching model: start from its own defaults so every setting is valid.
+      setModelId(target.id);
+      setValues({ ...defaultValues(target), ...(h.values as Values) });
+    } else {
+      setValues((v) => ({ ...v, ...(h.values as Values) }));
+    }
   }, [tool]);
 
   // When the model changes, keep shared values and fill new defaults.
@@ -166,7 +172,7 @@ export default function ToolStudio({ tool }: { tool: ToolId }) {
             ))}
           </div>
         </div>
-        {model.fields.map(render)}
+        {model.fields.filter((f) => !("hideWith" in f && f.hideWith && values[f.hideWith])).map(render)}
         {error && <div className="error">{error}</div>}
         <button className="btn-primary" disabled={busy} onClick={generate}>
           {busy ? "Submitting…" : "Generate"}
@@ -182,6 +188,9 @@ export default function ToolStudio({ tool }: { tool: ToolId }) {
           </div>
           <span className="hint">{feed.length} results</span>
         </div>
+        {lastSaveFailed() && (
+          <div className="banner">Your browser storage is full, so new results won&apos;t be saved after you close this tab. Delete some items in the Library, or download what you want to keep.</div>
+        )}
         {demo && (
           <div className="banner">
             Demo mode: no <code>FAL_KEY</code> set on the server, so results are placeholders. Add a key to <code>.env.local</code> for real generations.
