@@ -1,43 +1,46 @@
 import { NextResponse } from "next/server";
-import { getModel, type GenRequest } from "@/lib/models";
+import { getModel, validate, withPreset, type Values } from "@/lib/catalog";
 import { PRESETS } from "@/lib/presets";
-import { hasFalKey, submit } from "@/lib/fal";
+import { falServer, hasFalKey } from "@/lib/fal-server";
 
 export async function POST(req: Request) {
-  let body: GenRequest & { presetId?: string };
+  let body: { modelId?: string; values?: Values };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
-  const model = getModel(body.modelId);
-  if (!model || model.mode !== body.mode) {
-    return NextResponse.json({ error: "Unknown model" }, { status: 400 });
-  }
-  if (!body.prompt?.trim()) {
-    return NextResponse.json({ error: "Write a prompt first" }, { status: 400 });
-  }
-  if (model.needsReference && !body.referenceImage) {
-    return NextResponse.json({ error: `${model.name} needs a reference image` }, { status: 400 });
+  const model = getModel(body.modelId ?? "");
+  if (!model) return NextResponse.json({ error: "Unknown model" }, { status: 400 });
+  const values: Values = { ...(body.values ?? {}) };
+
+  const problem = validate(model, values);
+  if (problem) return NextResponse.json({ error: problem }, { status: 400 });
+
+  if (!hasFalKey()) return NextResponse.json({ demo: true });
+
+  // Uploads made in demo mode are data: URLs; real runs need hosted files.
+  const files = Object.values(values).flat().filter((x) => typeof x === "string" && x.startsWith("data:"));
+  if (files.length) {
+    return NextResponse.json({ error: "Re-upload your files (they were added before the API key was set)" }, { status: 400 });
   }
 
-  const preset = PRESETS.find((p) => p.id === body.presetId);
-  const request: GenRequest = {
-    ...body,
-    count: Math.min(Math.max(body.count || 1, 1), 4),
-    duration: model.durations?.includes(body.duration) ? body.duration : model.durations?.[0] ?? 5,
-    presetPrompt: preset?.prompt,
-  };
-
-  if (!hasFalKey()) {
-    // Demo mode: no provider key configured, so the client renders placeholders.
-    return NextResponse.json({ demo: true });
-  }
+  const preset = PRESETS.find((p) => p.id === values.preset);
+  values._prompt = withPreset(values, preset?.prompt);
 
   try {
-    const job = await submit(model.falId(request), model.toInput(request));
-    return NextResponse.json({ statusUrl: job.status_url, responseUrl: job.response_url });
+    const endpoint = model.endpoint(values);
+    const { request_id } = await falServer().queue.submit(endpoint, { input: model.toInput(values) });
+    return NextResponse.json({ endpoint, requestId: request_id });
   } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 502 });
+    return NextResponse.json({ error: describe(e) }, { status: 502 });
   }
+}
+
+function describe(e: unknown) {
+  const err = e as { message?: string; body?: { detail?: unknown } };
+  const detail = err.body?.detail;
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail)) return detail.map((d) => (d as { msg?: string }).msg ?? JSON.stringify(d)).join("; ");
+  return err.message ?? "Request failed";
 }

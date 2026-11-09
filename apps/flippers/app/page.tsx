@@ -1,53 +1,66 @@
 import Link from "next/link";
-import { MODELS } from "@/lib/models";
+import { MODELS, TOOLS } from "@/lib/catalog";
 import { PRESETS } from "@/lib/presets";
 
-const TOOLS = [
-  { href: "/image", tag: "Create", title: "Image studio", body: "Text-to-image across several models, up to four variations per run." },
-  { href: "/image?model=kontext-edit", tag: "Edit", title: "Edit with words", body: "Upload a photo and describe the change: new background, outfit, lighting." },
-  { href: "/video", tag: "Animate", title: "Video studio", body: "Turn a prompt or a still image into a short clip, with camera presets." },
-  { href: "/video?preset=orbit", tag: "Presets", title: "Camera moves", body: "Orbit, push-in, crane, FPV and more, all in one click on any video model." },
-  { href: "/library", tag: "Organize", title: "Library", body: "Every generation in one place. Search, download and reuse settings." },
+const PROJECTS = [
+  { href: "/studios", tag: "Templates", title: "Studios", body: "Ready-made setups for ads, shorts, virtual influencers and marketing." },
+  { href: "/storyboard", tag: "Multi-shot", title: "Storyboard", body: "Write scenes, generate a frame for each, keep one character throughout, animate into clips." },
+  { href: "/canvas", tag: "Moodboard", title: "Canvas", body: "Collect generations and notes on a free board to plan a project." },
+  { href: "/library", tag: "Archive", title: "Library", body: "Everything you've made. Search, download, reuse, or send to another tool." },
 ];
 
 export default function Explore() {
   return (
     <main>
       <section className="hero">
-        <h1>
-          Every frame,<br /><em>one studio.</em>
-        </h1>
+        <h1>Make it.<br /><em>Flip it.</em></h1>
         <p>
-          Flippers brings leading image and video models together behind one prompt box, with camera presets,
-          reference images and a shared library.
+          Your own studio for images, video, voice and music: {MODELS.length} models behind one set of controls,
+          with every result one click away from being animated, edited, upscaled or given a voice.
         </p>
         <div className="cta">
           <Link href="/image" className="btn-primary" style={{ width: "auto" }}>Create an image</Link>
           <Link href="/video" className="btn">Make a video</Link>
+          <Link href="/studios" className="btn">Browse templates</Link>
         </div>
       </section>
 
+      {(["Create", "Edit"] as const).map((group) => (
+        <section className="section" key={group}>
+          <h2>{group}</h2>
+          <div className="tiles">
+            {TOOLS.filter((t) => t.group === group).map((t) => (
+              <Link key={t.id} href={`/${t.id}`} className="tile">
+                <span className="tag">{(() => { const c = MODELS.filter((m) => m.tool === t.id).length; return `${c} model${c === 1 ? "" : "s"}`; })()}</span>
+                <h3>{t.name}</h3>
+                <p>{t.blurb}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ))}
+
       <section className="section">
-        <h2>Tools</h2>
+        <h2>Projects</h2>
         <div className="tiles">
-          {TOOLS.map((t) => (
-            <Link key={t.title} href={t.href} className="tile">
-              <span className="tag">{t.tag}</span>
-              <h3>{t.title}</h3>
-              <p>{t.body}</p>
+          {PROJECTS.map((p) => (
+            <Link key={p.href} href={p.href} className="tile">
+              <span className="tag">{p.tag}</span>
+              <h3>{p.title}</h3>
+              <p>{p.body}</p>
             </Link>
           ))}
         </div>
       </section>
 
       <section className="section">
-        <h2>Models</h2>
-        <div className="tiles">
+        <h2>All models</h2>
+        <div className="model-table">
           {MODELS.map((m) => (
-            <Link key={m.id} href={`/${m.mode}?model=${m.id}`} className="tile">
-              <span className="tag">{m.mode}</span>
-              <h3>{m.name}</h3>
-              <p>{m.tagline}</p>
+            <Link key={m.id} href={`/${m.tool}?model=${m.id}`}>
+              <strong>{m.name}</strong>
+              <span>{m.tagline}</span>
+              <span className="tag">{TOOLS.find((t) => t.id === m.tool)!.name}</span>
             </Link>
           ))}
         </div>

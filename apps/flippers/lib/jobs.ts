@@ -1,19 +1,21 @@
 "use client";
-// Background polling for provider jobs. Polling isn't tied to the page that
-// started it: if you reload or come back later, pending jobs resume here.
+// Submitting generations and polling them in the background. Polling isn't
+// tied to the page that started it: pending jobs resume after a reload.
 
 import { useEffect } from "react";
+import { getModel, type ModelDef, type Values } from "./catalog";
 import { useStore, type Generation } from "./store";
+import { demoAudio, demoImage } from "./demo";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const active = new Set<string>();
-const MAX_AGE_MS = 15 * 60 * 1000;
+const MAX_AGE_MS = 30 * 60 * 1000; // video upscales and long clips can be slow
 
 type Patch = (id: string, p: Partial<Generation>) => void;
+type Add = (g: Generation) => void;
 
 export function newId() {
-  // crypto.randomUUID only exists in secure contexts (https or localhost);
-  // opening the dev server from a phone on the LAN is neither.
+  // crypto.randomUUID only exists in secure contexts (https or localhost).
   return typeof crypto !== "undefined" && "randomUUID" in crypto
     ? crypto.randomUUID()
     : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
@@ -58,4 +60,57 @@ export function useResumeJobs() {
       }
     }
   }, [items, patch]);
+}
+
+const displayText = (model: ModelDef, v: Values) =>
+  (typeof v.prompt === "string" && v.prompt.trim()) || model.name;
+
+/**
+ * Validate on the server and submit. Resolves with the new generation's id
+ * once it is queued (or finished, in demo mode); throws a readable error.
+ */
+export async function submitGeneration(modelId: string, values: Values, add: Add, patch: Patch): Promise<string> {
+  const model = getModel(modelId);
+  if (!model) throw new Error("Unknown model");
+  const res = await fetch("/api/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ modelId, values }),
+  });
+  const data = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+  if (!res.ok) throw new Error(data.error ?? "Request failed");
+
+  const g: Generation = {
+    id: newId(), tool: model.tool, modelId, output: model.output,
+    prompt: displayText(model, values), values,
+    createdAt: Date.now(), status: "pending", urls: [],
+  };
+  add(g);
+
+  if (data.demo) {
+    await sleep(900);
+    const n = Number(values.count) || 1;
+    const aspect = typeof values.aspect === "string" && values.aspect !== "auto" ? values.aspect : "1:1";
+    const urls = model.output === "audio"
+      ? [demoAudio(g.prompt)]
+      : Array.from({ length: model.output === "image" ? n : 1 }, (_, i) => demoImage(g.prompt, aspect, i));
+    patch(g.id, { status: "done", urls, demo: true });
+    return g.id;
+  }
+
+  const job = { endpoint: data.endpoint as string, requestId: data.requestId as string };
+  patch(g.id, { job });
+  pollJob({ ...g, job }, patch);
+  return g.id;
+}
+
+/** Wait for a generation to finish (used by storyboard batch runs). */
+export async function waitFor(id: string, read: () => Generation | undefined, timeoutMs = MAX_AGE_MS) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    const g = read();
+    if (g && g.status !== "pending") return g;
+    await sleep(1000);
+  }
+  return read();
 }

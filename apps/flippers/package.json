@@ -6,12 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:schemas": "npx -y tsx@4.19.2 scripts/check-schemas.ts"
   },
   "dependencies": {
+    "@fal-ai/client": "^1.10.1",
+    "@fal-ai/server-proxy": "^1.2.1",
     "next": "15.5.29",
     "react": "19.1.10",
-    "react-dom": "19.1.10"
+    "react-dom": "19.1.10",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
