@@ -18,7 +18,23 @@ are placeholders (gradient images, a chime for audio) and nothing is sent to
 a provider. With a key, fal.ai bills your account for each generation.
 
 If you deploy it anywhere public, set `APP_PASSWORD`. Otherwise anyone who
-finds the URL can generate on your fal.ai key.
+finds the URL can generate on your fal.ai key. With it set, Flippers shows a
+login page, and each device stays logged in for a year. Changing the password
+logs every device out.
+
+## Install it as an app
+
+Flippers is an installable web app (PWA). Once it's deployed on https:
+
+- **iPhone / iPad (Safari):** tap **Install app** (or Share → **Add to Home Screen**).
+- **Android (Chrome):** tap **Install app**, or ⋮ → **Install app**.
+- **Mac / Windows (Chrome or Edge):** click **Install app** in the top bar, or the
+  install icon in the address bar.
+
+It then opens full-screen from its own icon, with a phone-style tab bar on
+small screens. Long-press the icon for shortcuts (New image, New video, Audio,
+Library). Without a connection it shows an offline screen instead of a
+browser error. It never caches generations or API calls.
 
 ## What's in it
 
@@ -55,7 +71,10 @@ character, Make it talk, Add sound, Lipsync, Add to canvas.
   and resume after a reload.
 - `lib/store.ts`: library, storyboards and canvas, kept in your browser's
   localStorage (per browser, per device).
-- `middleware.ts`: optional `APP_PASSWORD` lock over every page and API route.
+- `middleware.ts` + `lib/session.ts`: optional `APP_PASSWORD` login (signed,
+  HttpOnly session cookie) over every page and API route.
+- `public/sw.js`, `app/manifest.ts`, `components/AppShell.tsx`: the installable-app
+  parts (service worker, manifest, install button).
 
 ## Notes
 
