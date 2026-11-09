@@ -28,4 +28,7 @@ function safeEqual(a: string, b: string) {
   return diff === 0;
 }
 
-export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"] };
+// Icons and the app manifest stay public: phones fetch them without the password.
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon.png|manifest.webmanifest|brand/).*)"],
+};

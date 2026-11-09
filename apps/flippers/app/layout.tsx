@@ -4,6 +4,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Flippers",
+  applicationName: "Flippers",
+  appleWebApp: { title: "Flippers", statusBarStyle: "black-translucent" },
   description: "Generate images and video with the best AI models in one studio.",
 };
 

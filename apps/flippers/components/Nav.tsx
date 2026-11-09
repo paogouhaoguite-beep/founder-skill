@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Logo from "./Logo";
 
 const GROUPS = [
   [{ href: "/", label: "Explore" }],
@@ -14,7 +15,7 @@ export default function Nav() {
   return (
     <nav className="nav">
       <Link href="/" className="brand">
-        <span className="brand-mark" /> Flippers
+        <Logo /> Flippers
       </Link>
       <div className="nav-links">
         {GROUPS.map((g, i) => (
