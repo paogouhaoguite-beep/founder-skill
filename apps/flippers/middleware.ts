@@ -8,8 +8,12 @@ export function middleware(req: NextRequest) {
 
   const header = req.headers.get("authorization") ?? "";
   if (header.startsWith("Basic ")) {
-    const decoded = atob(header.slice(6));
-    if (decoded.slice(decoded.indexOf(":") + 1) === password) return NextResponse.next();
+    try {
+      const decoded = atob(header.slice(6));
+      if (decoded.slice(decoded.indexOf(":") + 1) === password) return NextResponse.next();
+    } catch {
+      // malformed header: fall through to the 401
+    }
   }
   return new NextResponse("Password required", {
     status: 401,

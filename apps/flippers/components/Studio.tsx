@@ -5,6 +5,7 @@ import { getModel, modelsFor, type Mode } from "@/lib/models";
 import { PRESETS } from "@/lib/presets";
 import { useStore, type Generation } from "@/lib/store";
 import { demoImage } from "@/lib/demo";
+import { newId, pollJob, useResumeJobs } from "@/lib/jobs";
 import MediaCard from "./MediaCard";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -22,6 +23,7 @@ export default function Studio({ mode }: { mode: Mode }) {
   const params = useSearchParams();
   const models = modelsFor(mode);
   const store = useStore();
+  useResumeJobs();
 
   const [modelId, setModelId] = useState(() => {
     const q = params.get("model");
@@ -55,7 +57,7 @@ export default function Studio({ mode }: { mode: Mode }) {
     if (model.needsReference && !reference) return setError(`${model.name} needs a reference image.`);
 
     setBusy(true);
-    const id = crypto.randomUUID();
+    const id = newId();
     const g: Generation = {
       id, mode, modelId, prompt, aspectRatio, presetId,
       createdAt: Date.now(), status: "pending", urls: [],
@@ -78,28 +80,17 @@ export default function Studio({ mode }: { mode: Mode }) {
         setDemoNotice(true);
         await sleep(1200);
         const n = mode === "image" ? count : 1;
-        const urls = Array.from({ length: n }, (_, i) =>
-          mode === "image" || !reference ? demoImage(prompt, aspectRatio, i) : reference,
-        );
+        // Generated placeholders only: storing an uploaded photo here could
+        // fill localStorage and stop the library from saving.
+        const urls = Array.from({ length: n }, (_, i) => demoImage(prompt, aspectRatio, i));
         store.patch(id, { status: "done", urls, demo: true });
         return;
       }
 
-      // Poll the provider queue until the job finishes (max ~10 minutes).
-      for (let i = 0; i < 300; i++) {
-        await sleep(2000);
-        const s = await fetch("/api/status", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        }).then((r) => r.json());
-        if (s.status === "COMPLETED") {
-          store.patch(id, { status: "done", urls: s.urls });
-          return;
-        }
-        if (s.status === "FAILED") throw new Error(s.error ?? "Generation failed");
-      }
-      throw new Error("Timed out waiting for the model");
+      // Submitted: poll in the background so you can queue the next one.
+      const job = { statusUrl: data.statusUrl, responseUrl: data.responseUrl };
+      store.patch(id, { job });
+      pollJob({ ...g, job }, store.patch);
     } catch (e) {
       store.patch(id, { status: "failed", error: (e as Error).message });
       setError((e as Error).message);
@@ -229,7 +220,7 @@ export default function Studio({ mode }: { mode: Mode }) {
 
         {error && <div className="error">{error}</div>}
         <button className="btn-primary" disabled={busy} onClick={generate}>
-          {busy ? "Generating…" : "Generate"}
+          {busy ? "Submitting…" : "Generate"}
         </button>
         <div className="hint">⌘/Ctrl + Enter to generate</div>
       </aside>

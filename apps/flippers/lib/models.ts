@@ -90,7 +90,7 @@ export const MODELS: ModelDef[] = [
   {
     id: "kling",
     mode: "video",
-    name: "Kling",
+    name: "Kling 2.5 Turbo",
     tagline: "Smooth motion, strong prompt following",
     aspectRatios: ["16:9", "9:16", "1:1"],
     resolutions: ["720p"],
@@ -98,8 +98,8 @@ export const MODELS: ModelDef[] = [
     acceptsReference: true,
     falId: (r) =>
       r.referenceImage
-        ? "fal-ai/kling-video/v2.1/standard/image-to-video"
-        : "fal-ai/kling-video/v2.1/standard/text-to-video",
+        ? "fal-ai/kling-video/v2.5-turbo/pro/image-to-video"
+        : "fal-ai/kling-video/v2.5-turbo/pro/text-to-video",
     toInput: (r) => ({
       prompt: fullPrompt(r),
       duration: String(r.duration),

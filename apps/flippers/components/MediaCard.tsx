@@ -3,7 +3,6 @@ import { useState } from "react";
 import { getModel } from "@/lib/models";
 import type { Generation } from "@/lib/store";
 
-const isVideoUrl = (u: string) => /\.(mp4|webm|mov)(\?|$)/i.test(u);
 
 export default function MediaCard({
   g,
@@ -17,6 +16,7 @@ export default function MediaCard({
   const [open, setOpen] = useState<string | null>(null);
   const model = getModel(g.modelId);
   const urls = g.urls.length ? g.urls : [""];
+  const isVideo = (u: string) => g.mode === "video" && !u.startsWith("data:");
 
   return (
     <>
@@ -25,7 +25,7 @@ export default function MediaCard({
           <div className="media" onClick={() => url && setOpen(url)}>
             {g.status === "pending" && <div className="pending">Generating…</div>}
             {g.status === "failed" && <div className="pending error">{g.error ?? "Failed"}</div>}
-            {g.status === "done" && url && (isVideoUrl(url) ? (
+            {g.status === "done" && url && (isVideo(url) ? (
               <video src={url} muted loop autoPlay playsInline />
             ) : (
               <img src={url} alt={g.prompt} className={g.mode === "video" && g.demo ? "kenburns" : ""} />
@@ -54,7 +54,7 @@ export default function MediaCard({
       {open && (
         <div className="lightbox" onClick={() => setOpen(null)}>
           <div onClick={(e) => e.stopPropagation()}>
-            {isVideoUrl(open) ? <video src={open} controls autoPlay /> : <img src={open} alt={g.prompt} />}
+            {isVideo(open) ? <video src={open} controls autoPlay /> : <img src={open} alt={g.prompt} />}
             <div className="bar">
               <a className="btn" href={open} download target="_blank" rel="noreferrer">Download</a>
               <button className="btn" onClick={() => setOpen(null)}>Close</button>

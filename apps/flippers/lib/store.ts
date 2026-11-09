@@ -17,6 +17,8 @@ export interface Generation {
   demo?: boolean;
   error?: string;
   favorite?: boolean;
+  /** provider queue URLs while the job is running */
+  job?: { statusUrl: string; responseUrl: string };
 }
 
 const KEY = "flippers:v1";

@@ -4,7 +4,12 @@ import { PRESETS } from "@/lib/presets";
 import { hasFalKey, submit } from "@/lib/fal";
 
 export async function POST(req: Request) {
-  const body = (await req.json()) as GenRequest & { presetId?: string };
+  let body: GenRequest & { presetId?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  }
   const model = getModel(body.modelId);
   if (!model || model.mode !== body.mode) {
     return NextResponse.json({ error: "Unknown model" }, { status: 400 });

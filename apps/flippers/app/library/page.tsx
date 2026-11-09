@@ -2,11 +2,13 @@
 import { useState } from "react";
 import MediaCard from "@/components/MediaCard";
 import { useStore } from "@/lib/store";
+import { useResumeJobs } from "@/lib/jobs";
 
 const FILTERS = ["all", "image", "video"] as const;
 
 export default function LibraryPage() {
   const { items, remove } = useStore();
+  useResumeJobs();
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const [q, setQ] = useState("");
   const shown = items.filter(
