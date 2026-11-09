@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f0e0d">
+<title>Offline · Flippers</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; height: 100%; background: #0f0e0d; color: #f3eee8; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body { display: grid; place-items: center; padding: 24px; box-sizing: border-box; }
+  .card { max-width: 340px; width: 100%; text-align: center; background: #191715; border: 1px solid #312c27; border-radius: 20px; padding: 32px 24px; box-sizing: border-box; }
+  h1 { font-size: 26px; margin: 14px 0 8px; letter-spacing: -0.02em; }
+  p { color: #a39a90; margin: 0 0 18px; line-height: 1.45; }
+  button { border: 0; width: 100%; padding: 14px; border-radius: 12px; font: inherit; font-weight: 800; font-size: 16px; color: #1a0f08; background: linear-gradient(135deg, #ff7a45, #ffb36b); cursor: pointer; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">  <defs>    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">      <stop offset="0" stop-color="#ff6a3d"/><stop offset="1" stop-color="#ffb36b"/>    </linearGradient>  </defs>  <rect width="64" height="64" rx="16" fill="url(#bg)"/>  <g transform="translate(2.5 1.5)" fill="#fff">    <rect x="16" y="13" width="10" height="39" rx="5"/>    <path d="M21 13 C31 11.5 42 9 51 11.5 C53.5 12.2 53.8 14.6 52 16.6 C46 23 36 25.5 21 25 Z"/>    <path d="M21 30 C29 29 37 27.5 44 29.5 C46.3 30.2 46.5 32.4 44.8 34.2 C40 39.2 32 41 21 40.5 Z" opacity=".7"/>  </g></svg>
+    <h1>You're offline</h1>
+    <p>Flippers needs a connection to generate. It will reload as soon as you're back online.</p>
+    <button onclick="location.reload()">Try again</button>
+  </div>
+  <script>addEventListener("online", () => location.reload());</script>
+</body>
+</html>
